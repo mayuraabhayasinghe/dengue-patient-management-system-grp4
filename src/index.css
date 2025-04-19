@@ -1,1 +1,28 @@
 @import "tailwindcss";
+@import "tailwindcss";
+
+@theme {
+    --color-primary-1: rgba(0, 191, 165, 1);
+    --color-primary-2: rgba(0, 194, 203, 1);
+    --color-secondary-1: rgba(2, 88, 82, 1);
+    --color-background-1: rgba(0, 191, 165, 0.07);
+    --color-white-1: rgba(255, 255, 255, 1);
+    --color-white-2: rgba(242, 255, 251, 1);
+    --color-text-1: rgba(108, 135, 174, 1);
+    --color-text-2: rgba(3, 20, 50, 1);
+}
+
+
+.btn {
+    background: linear-gradient(120deg, rgba(0, 194, 203, 1) 0%, rgba(2, 88, 82, 1) 100%);
+    padding: 10px 20px;
+    border-radius: 30px;
+    color: rgba(255, 255, 255, 1);
+    font-weight: 600;
+    box-shadow: 1px 1px 80px 1px rgba(0, 0, 0, 0.512);
+}
+
+.btn:hover {
+    background: linear-gradient(120deg, rgba(0, 194, 203, 1) 100%, rgba(2, 88, 82, 1) 0%);
+    transition-delay: 20s;
+}
