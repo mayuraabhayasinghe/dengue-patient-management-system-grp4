@@ -1,0 +1,75 @@
+import React, { useState } from "react";
+import logo from "../assets/images/logo.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faAngleDown,
+  faBars,
+  faHamburger,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
+
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [userType, setUserType] = useState(false);
+
+  return (
+    <nav className="flex items-center justify-center bg-background-1 p-2 md:p-5">
+      <div className="w-full md:w-[90%] lg:w-4/5 flex items-center justify-between relative">
+        {/* logo */}
+        <img src={logo} alt="" className="w-[20%] md:w-[12%]" />
+
+        {/* nav-items */}
+        <div className="hidden sm:hidden md:flex items-center justify-between gap-8">
+          <p className="text-text-1 hover:text-primary-2">Home</p>
+          <p className="text-text-1 hover:text-primary-2">About</p>
+          <p className="text-text-1 hover:text-primary-2">Service</p>
+          <p className="text-text-1 hover:text-primary-2">Contact</p>
+        </div>
+
+        {/* button */}
+        <div className="flex flex-col md:flex-row relative">
+          <button className="flex items-center justify-between gap-3 btn">
+            <FontAwesomeIcon icon={faUser}></FontAwesomeIcon>
+            login
+            <FontAwesomeIcon
+              className="cursor-pointer"
+              icon={faAngleDown}
+              onClick={() => setUserType((prev) => !prev)}></FontAwesomeIcon>
+          </button>
+
+          {/* select user type */}
+          <div>
+            {userType ? (
+              <div className="absolute w-full">
+                <p className="bg-white  px-5 py-1 text-secondary-1 font-semibold hover:bg-[linear-gradient(120deg,_rgba(0,194,203,1)_0%,_rgba(2,88,82,1)_100%)] hover:text-white">
+                  As Patient
+                </p>
+                <p className="bg-white  px-5 py-1 text-secondary-1 font-semibold hover:bg-[linear-gradient(120deg,_rgba(0,194,203,1)_0%,_rgba(2,88,82,1)_100%)] hover:text-white">
+                  As Nurse
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        {/* mobile menu */}
+        <div className="md:hidden">
+          <FontAwesomeIcon
+            onClick={() => setIsOpen((prev) => !prev)}
+            className="text-4xl pr-5 cursor-pointer text-secondary-1"
+            icon={faBars}></FontAwesomeIcon>
+          {isOpen ? (
+            <div className="absolute bg-white right-5 my-3 flex flex-col items-center px-5 w-[100px] text-text-1 hover:text-primary-2 gap-5">
+              <p className="text-text-1 hover:text-primary-2">Home</p>
+              <p className="text-text-1 hover:text-primary-2">About</p>
+              <p className="text-text-1 hover:text-primary-2">Service</p>
+              <p className="text-text-1 hover:text-primary-2">Contact</p>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
