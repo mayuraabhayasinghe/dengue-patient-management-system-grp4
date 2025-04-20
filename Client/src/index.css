@@ -5,7 +5,6 @@
     font-family: "Poppins", sans-serif;
 }
 
-
 @theme {
     --color-primary-1: rgba(0, 191, 165, 1);
     --color-primary-2: rgba(0, 194, 203, 1);
@@ -16,7 +15,6 @@
     --color-text-1: rgba(108, 135, 174, 1);
     --color-text-2: rgba(3, 20, 50, 1);
 }
-
 
 .btn {
     background: linear-gradient(120deg, rgba(0, 194, 203, 1) 0%, rgba(2, 88, 82, 1) 100%);
