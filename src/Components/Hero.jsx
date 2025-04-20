@@ -1,7 +1,11 @@
 import React from "react";
 import hero_img from "../assets/images/Hero_img.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClock } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBell,
+  faCircleCheck,
+  faClock,
+} from "@fortawesome/free-solid-svg-icons";
 const Hero = () => {
   return (
     <div className="bg-background-1 flex items-center justify-center">
@@ -46,22 +50,24 @@ const Hero = () => {
           <div className="flex items-center justify-center px-1 py-1 md:px-3 md:py-2 bg-[linear-gradient(120deg,_rgba(0,194,203,1)_0%,_rgba(2,88,82,1)_100%)] gap-4 rounded-xl h-fit">
             <FontAwesomeIcon
               className="text-2xl sm:text-3xl lg:text-[30px] "
-              icon={faClock}></FontAwesomeIcon>
+              icon={faBell}></FontAwesomeIcon>
             <div className="flex flex-col ">
-              <h2 className="text-[clamp(1rem,1vw,1.2rem)]">24 hour service</h2>
+              <h2 className="text-[clamp(1rem,1vw,1.2rem)]"> Instant Alerts</h2>
               <p className="text-[clamp(.7rem,1vw,1.3rem)] font-thin">
-                Always available for uninterrupted patient care.
+                Real-time warnings for quick action.
               </p>
             </div>
           </div>
           <div className="flex items-center justify-center px-1 py-1 md:px-3 md:py-2 bg-[linear-gradient(120deg,_rgba(0,194,203,1)_0%,_rgba(2,88,82,1)_100%)] gap-4 rounded-xl h-fit">
             <FontAwesomeIcon
               className="text-2xl sm:text-3xl lg:text-[30px] "
-              icon={faClock}></FontAwesomeIcon>
+              icon={faCircleCheck}></FontAwesomeIcon>
             <div className="flex flex-col ">
-              <h2 className="text-[clamp(1rem,1vw,1.2rem)]">24 hour service</h2>
+              <h2 className="text-[clamp(1rem,1vw,1.2rem)]">
+                Resource Control
+              </h2>
               <p className="text-[clamp(.7rem,1vw,1.3rem)] font-thin">
-                Always available for uninterrupted patient care.
+                Smart tracking of beds and supplies.
               </p>
             </div>
           </div>
