@@ -15,6 +15,7 @@ import {
   faCircleCheck,
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
+import Feedback from "../Components/Feedback";
 
 const HomePage = () => {
   return (
@@ -263,6 +264,8 @@ const HomePage = () => {
           </div>
         </div>
       </div>
+      {/* Feedback section */}
+      <Feedback />
     </div>
   );
 };

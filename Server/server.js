@@ -20,6 +20,7 @@ app.get("/", (req, res) => {
 });
 
 // Future routes:
+app.use("/api/feedback", require("./routes/feedbackRoutes"));
 // app.use("/api/patients", require("./routes/patientRoutes"));
 
 const PORT = process.env.PORT || 5000;
