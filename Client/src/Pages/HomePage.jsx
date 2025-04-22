@@ -16,6 +16,7 @@ import {
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import Feedback from "../Components/Feedback";
+import Footer from "../Components/Footer";
 
 const HomePage = () => {
   const faqs = [
@@ -333,6 +334,8 @@ const HomePage = () => {
           ))}
         </div>
       </div>
+      {/* Footer section */}
+      <Footer />
     </div>
   );
 };
