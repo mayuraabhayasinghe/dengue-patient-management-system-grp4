@@ -16,14 +16,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Test route
 app.get("/", (req, res) => {
-    res.send("DengueGuard API is running...");
+  res.send("DengueGuard API is running...");
 });
 
 // Future routes:
 app.use("/api/feedback", require("./routes/feedbackRoutes"));
+
 // app.use("/api/patients", require("./routes/patientRoutes"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
