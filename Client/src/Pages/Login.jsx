@@ -2,6 +2,15 @@ import React, { useState } from 'react';
 import doctorImage from '../assets/doctorlogin.png';
 import logo from '../assets/logo.png';
 import logowhite from '../assets/logo_white.png';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faFacebookF,
+  faTwitter,
+  faInstagram,
+  faLinkedinIn,
+} from "@fortawesome/free-brands-svg-icons";
+import Footer from "../components/Footer"; 
+
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -87,4 +96,8 @@ const Login = () => {
           <img src={doctorImage} alt="Doctor illustration" className="w-96" />
         </div>
       </div>
+      {/* Footer */}
+
+      <Footer />
+      
 
