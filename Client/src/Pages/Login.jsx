@@ -99,5 +99,9 @@ const Login = () => {
       {/* Footer */}
 
       <Footer />
-      
+      </div>
+  );
+};
+
+export default Login; 
 
