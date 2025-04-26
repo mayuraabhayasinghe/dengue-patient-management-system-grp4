@@ -16,7 +16,7 @@ import {
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import Feedback from "../Components/Feedback";
-import Footer from "../Components/Footer";
+import { Element } from "react-scroll";
 
 const HomePage = () => {
   const faqs = [
@@ -59,8 +59,10 @@ const HomePage = () => {
   return (
     <div>
       {/* Hero section */}
-      <div className="bg-background-1 flex items-center justify-center">
-        <div className="w-full  md:w-[90%] lg:w-4/5 flex flex-col items-center justify-center">
+      <Element
+        name="home"
+        className="bg-background-1 flex items-center justify-center">
+        <div className="w-full  md:w-[90%] lg:w-4/5 flex flex-col items-center justify-center  pt-16 md:pt-[6rem] ">
           <div className="flex items-center flex-col-reverse md:flex-row gap-5 w-full pt-2">
             {/* left */}
             <div className="flex flex-col gap-4 items-start w-[90%]">
@@ -129,10 +131,10 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </Element>
 
       {/* About Us Section */}
-      <div className="bg-background-1 pb-3">
+      <Element name="about" className="bg-background-1 pb-3">
         <Title title={"About Us"} />
         <div className="flex items-center justify-center">
           <div className="w-full md:w-[90%] lg:w-4/5">
@@ -168,8 +170,10 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </div>
-      <div className="bg-white-2">
+      </Element>
+
+      {/* Services */}
+      <Element name="services" className="bg-white-2">
         <Title title={"Services"} />
         <div className="flex items-center justify-center">
           <div className="w-full md:w-[90%] lg:w-4/5">
@@ -301,7 +305,7 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </Element>
       {/* Feedback section */}
       <Feedback />
 
@@ -334,8 +338,6 @@ const HomePage = () => {
           ))}
         </div>
       </div>
-      {/* Footer section */}
-      <Footer />
     </div>
   );
 };

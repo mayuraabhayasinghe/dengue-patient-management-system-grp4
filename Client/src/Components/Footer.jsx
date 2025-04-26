@@ -7,6 +7,7 @@ import {
   faInstagram,
   faLinkedinIn,
 } from "@fortawesome/free-brands-svg-icons";
+import { Element } from "react-scroll";
 
 const Footer = () => {
   return (
@@ -51,7 +52,7 @@ const Footer = () => {
         </div>
 
         {/* Contact & Social */}
-        <div>
+        <Element name="contact">
           <h3 className="text-xl font-bold mb-4">Contact Us</h3>
           <p className="text-sm">Email: support@dengueguard.lk</p>
           <p className="text-sm">Phone: +94 76 123 4567</p>
@@ -70,7 +71,7 @@ const Footer = () => {
               <FontAwesomeIcon icon={faLinkedinIn} />
             </a>
           </div>
-        </div>
+        </Element>
       </div>
 
       <div className="border-t border-white-1 pt-4 text-center text-sm">
