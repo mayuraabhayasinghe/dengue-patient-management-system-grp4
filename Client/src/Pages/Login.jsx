@@ -49,7 +49,7 @@ const Login = () => {
                 placeholder="ABC Perera"
               />
             </div>
-            
+
             <div>
               <label htmlFor="password" className="block text-gray-700 mb-2">Password</label>
               <input
@@ -81,3 +81,10 @@ const Login = () => {
             </p>
           </form>
         </div>
+
+        {/* Image */}
+        <div className="w-1/2 md:flex md:justify-center hidden">
+          <img src={doctorImage} alt="Doctor illustration" className="w-96" />
+        </div>
+      </div>
+
