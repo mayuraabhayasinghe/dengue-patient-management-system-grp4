@@ -34,7 +34,7 @@ const Footer = () => {
               </a>
             </li>
             <li>
-              <a href="/feedback" className="hover:underline">
+              <a href="#feedback-section" className="hover:underline">
                 Feedback
               </a>
             </li>
@@ -44,7 +44,7 @@ const Footer = () => {
               </a>
             </li>
             <li>
-              <a href="/register" className="hover:underline">
+              <a href="/registration" className="hover:underline">
                 Register
               </a>
             </li>
@@ -52,7 +52,7 @@ const Footer = () => {
         </div>
 
         {/* Contact & Social */}
-        <Element name="contact">
+        <div id="contact">
           <h3 className="text-xl font-bold mb-4">Contact Us</h3>
           <p className="text-sm">Email: support@dengueguard.lk</p>
           <p className="text-sm">Phone: +94 76 123 4567</p>
@@ -71,7 +71,7 @@ const Footer = () => {
               <FontAwesomeIcon icon={faLinkedinIn} />
             </a>
           </div>
-        </Element>
+        </div>
       </div>
 
       <div className="border-t border-white-1 pt-4 text-center text-sm">
