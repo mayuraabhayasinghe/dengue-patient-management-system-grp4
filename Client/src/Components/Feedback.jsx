@@ -84,7 +84,7 @@ const Feedback = () => {
   };
 
   return (
-    <div className="bg-background-1">
+    <div id="feedback-section" className="bg-background-1">
       <Title title={"Feedback"} />
       <div className="flex items-center justify-center">
         <div className="w-full md:w-[90%] lg:w-4/5">
