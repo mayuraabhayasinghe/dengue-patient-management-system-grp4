@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import logo from "../assets/images/logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -12,6 +12,20 @@ import { Link } from "react-router-dom";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userType, setUserType] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setUserType(false); // Close dropdown if click is outside
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="flex items-center justify-center bg-background-1 p-2 md:p-5">
@@ -38,14 +52,15 @@ const Navbar = () => {
         </div>
 
         {/* button */}
-        <div className="flex flex-col md:flex-row relative">
-          <button className="flex items-center justify-between gap-3 btn">
+        <div ref={dropdownRef} className="flex flex-col md:flex-row relative">
+          <button
+            onClick={() => setUserType((prev) => !prev)}
+            className="flex items-center justify-between gap-3 btn">
             <FontAwesomeIcon icon={faUser}></FontAwesomeIcon>
             login
             <FontAwesomeIcon
               className="cursor-pointer"
-              icon={faAngleDown}
-              onClick={() => setUserType((prev) => !prev)}></FontAwesomeIcon>
+              icon={faAngleDown}></FontAwesomeIcon>
           </button>
 
           {/* select user type */}
