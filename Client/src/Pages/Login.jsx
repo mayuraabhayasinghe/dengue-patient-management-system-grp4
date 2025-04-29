@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import doctorImage from "../assets/images/doctorlogin.png";
-import logo from "../assets/images/logo.png";
-import Footer from "../components/Footer";
 
 const Login = () => {
   const [username, setUsername] = useState("");
