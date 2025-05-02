@@ -36,4 +36,5 @@ html {
       rgba(0, 194, 203, 1) 100%,
       rgba(2, 88, 82, 1) 0%);
   transition-delay: 20s;
+  cursor: pointer;
 }
