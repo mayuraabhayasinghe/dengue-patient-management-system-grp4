@@ -17,6 +17,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Feedback from "../Components/Feedback";
 import { Element } from "react-scroll";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const faqs = [
@@ -282,7 +283,9 @@ const HomePage = () => {
                     Provides medical information and treatment guidance through
                     an interactive chatbot.
                   </p>
-                  <button className="btn w-full">Ask the Chatbot</button>
+                  <button className="btn w-full">
+                    <Link to={"/chatbot"}>Ask the Chatbot</Link>
+                  </button>
                 </div>
 
                 {/* 6th item */}
