@@ -16,7 +16,8 @@ import {
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import Feedback from "../Components/Feedback";
-import Footer from "../Components/Footer";
+import { Element } from "react-scroll";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const faqs = [
@@ -59,7 +60,9 @@ const HomePage = () => {
   return (
     <div>
       {/* Hero section */}
-      <div className="bg-background-1 flex items-center justify-center">
+      <div
+        id="home"
+        className="flex items-center justify-center bg-background-1">
         <div className="w-full  md:w-[90%] lg:w-4/5 flex flex-col items-center justify-center">
           <div className="flex items-center flex-col-reverse md:flex-row gap-5 w-full pt-2">
             {/* left */}
@@ -132,7 +135,7 @@ const HomePage = () => {
       </div>
 
       {/* About Us Section */}
-      <div className="bg-background-1 pb-3">
+      <div id="about" name="about" className="bg-background-1 pb-3">
         <Title title={"About Us"} />
         <div className="flex items-center justify-center">
           <div className="w-full md:w-[90%] lg:w-4/5">
@@ -169,7 +172,9 @@ const HomePage = () => {
           </div>
         </div>
       </div>
-      <div className="bg-white-2">
+
+      {/* Services */}
+      <div id="service" name="services" className="bg-white-2">
         <Title title={"Services"} />
         <div className="flex items-center justify-center">
           <div className="w-full md:w-[90%] lg:w-4/5">
@@ -278,7 +283,9 @@ const HomePage = () => {
                     Provides medical information and treatment guidance through
                     an interactive chatbot.
                   </p>
-                  <button className="btn w-full">Ask the Chatbot</button>
+                  <button className="btn w-full">
+                    <Link to={"/chatbot"}>Ask the Chatbot</Link>
+                  </button>
                 </div>
 
                 {/* 6th item */}
@@ -334,8 +341,6 @@ const HomePage = () => {
           ))}
         </div>
       </div>
-      {/* Footer section */}
-      <Footer />
     </div>
   );
 };

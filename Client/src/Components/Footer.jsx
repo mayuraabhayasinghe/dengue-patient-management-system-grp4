@@ -7,6 +7,7 @@ import {
   faInstagram,
   faLinkedinIn,
 } from "@fortawesome/free-brands-svg-icons";
+import { Element } from "react-scroll";
 
 const Footer = () => {
   return (
@@ -33,7 +34,7 @@ const Footer = () => {
               </a>
             </li>
             <li>
-              <a href="/feedback" className="hover:underline">
+              <a href="#feedback-section" className="hover:underline">
                 Feedback
               </a>
             </li>
@@ -43,7 +44,7 @@ const Footer = () => {
               </a>
             </li>
             <li>
-              <a href="/register" className="hover:underline">
+              <a href="/registration" className="hover:underline">
                 Register
               </a>
             </li>
@@ -51,7 +52,7 @@ const Footer = () => {
         </div>
 
         {/* Contact & Social */}
-        <div>
+        <div id="contact">
           <h3 className="text-xl font-bold mb-4">Contact Us</h3>
           <p className="text-sm">Email: support@dengueguard.lk</p>
           <p className="text-sm">Phone: +94 76 123 4567</p>
