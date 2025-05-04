@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import bot_icon from "../assets/images/ai_chatbot.png";
 import {
   GoogleGenerativeAI,
@@ -10,19 +10,26 @@ import {
   faBars,
   faPlus,
   faComment,
+  faPaperPlane,
   faTrashCan,
   faUser,
-  faPaperPlane,
+  faUserAlt,
 } from "@fortawesome/free-solid-svg-icons";
 
 const Chatbot = () => {
+  // State for sidebar
   const [sidebarExtended, setSidebarExtended] = useState(false);
+
+  // State for chat
+  const [input, setInput] = useState("");
   const [chats, setChats] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null);
-  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Refs
   const resultContainerRef = useRef(null);
 
+  // Scroll to bottom when new content appears
   useEffect(() => {
     if (resultContainerRef.current) {
       resultContainerRef.current.scrollTop =
@@ -30,6 +37,7 @@ const Chatbot = () => {
     }
   }, [chats, loading]);
 
+  // Typewriter effect for responses
   const delayPara = (index, nextWord, chatId) => {
     setTimeout(() => {
       setChats((prevChats) =>
@@ -49,23 +57,93 @@ const Chatbot = () => {
     }, 75 * index);
   };
 
+  // Start a new chat
   const newChat = () => {
     const newChatId = Date.now();
     setCurrentChatId(newChatId);
     setChats((prev) => [...prev, { id: newChatId, messages: [] }]);
   };
 
-  const deleteChat = (chatId) => {
-    setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
-    if (currentChatId === chatId) {
-      setCurrentChatId(null);
-    }
-  };
+  // Process prompt and get response from Gemini
+  const onSent = async (prompt) => {
+    if (!prompt && !input.trim()) return;
 
-  const loadChat = (chatId) => {
+    const userMessage = prompt || input;
+    const chatId = currentChatId || Date.now();
+
+    // If no current chat, create a new one
+    if (!currentChatId) {
+      newChat();
+    }
+
+    // Add user message
+    setChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat.id === (currentChatId || chatId)
+          ? {
+              ...chat,
+              messages: [
+                ...chat.messages,
+                { sender: "user", content: userMessage },
+              ],
+            }
+          : chat
+      )
+    );
+
+    // Add empty bot message (will be filled by typewriter effect)
+    setChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat.id === (currentChatId || chatId)
+          ? {
+              ...chat,
+              messages: [...chat.messages, { sender: "bot", content: "" }],
+            }
+          : chat
+      )
+    );
+
+    setLoading(true);
+    setInput("");
+
+    try {
+      const response = await runGeminiChat(userMessage);
+      // Format response with bold and line breaks
+      let formattedResponse = formatResponse(response);
+
+      // Display with typewriter effect
+      let newResponseArray = formattedResponse.split(" ");
+      for (let i = 0; i < newResponseArray.length; i++) {
+        const nextWord = newResponseArray[i];
+        delayPara(i, nextWord + " ", currentChatId || chatId);
+      }
+    } catch (error) {
+      console.error("Error getting response:", error);
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === (currentChatId || chatId)
+            ? {
+                ...chat,
+                messages: chat.messages.map((msg, i) =>
+                  i === chat.messages.length - 1
+                    ? {
+                        ...msg,
+                        content:
+                          "Sorry, I encountered an error. Please try again.",
+                      }
+                    : msg
+                ),
+              }
+            : chat
+        )
+      );
+    }
+
+    setLoading(false);
     setCurrentChatId(chatId);
   };
 
+  // Call Gemini API
   const runGeminiChat = async (prompt) => {
     const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
@@ -101,82 +179,39 @@ const Chatbot = () => {
     return result.response.text();
   };
 
-  const onSent = async (prompt) => {
-    if (!prompt && !input.trim()) return;
-
-    const userMessage = prompt || input;
-    const chatId = currentChatId || Date.now();
-
-    if (!currentChatId) {
-      newChat();
-    }
-
-    setChats((prevChats) =>
-      prevChats.map((chat) =>
-        chat.id === (currentChatId || chatId)
-          ? {
-              ...chat,
-              messages: [
-                ...chat.messages,
-                { sender: "user", content: userMessage },
-              ],
-            }
-          : chat
-      )
-    );
-
-    // Add empty bot message for typewriter effect
-    setChats((prevChats) =>
-      prevChats.map((chat) =>
-        chat.id === (currentChatId || chatId)
-          ? {
-              ...chat,
-              messages: [...chat.messages, { sender: "bot", content: "" }],
-            }
-          : chat
-      )
-    );
-
-    setLoading(true);
-    setInput("");
-
-    try {
-      const response = await runGeminiChat(userMessage);
-      let newResponseArray = response.split(" ");
-      for (let i = 0; i < newResponseArray.length; i++) {
-        const nextWord = newResponseArray[i];
-        delayPara(i, nextWord + " ", currentChatId || chatId);
+  // Format response with HTML tags for bold and line breaks
+  const formatResponse = (response) => {
+    let responseArray = response.split("**");
+    let newResponse = "";
+    for (let i = 0; i < responseArray.length; i++) {
+      if (i === 0 || i % 2 !== 1) {
+        newResponse += responseArray[i];
+      } else {
+        newResponse += "<b>" + responseArray[i] + "</b>";
       }
-    } catch (error) {
-      console.error("Error getting response:", error);
-      setChats((prevChats) =>
-        prevChats.map((chat) =>
-          chat.id === (currentChatId || chatId)
-            ? {
-                ...chat,
-                messages: chat.messages.map((msg, i) =>
-                  i === chat.messages.length - 1
-                    ? {
-                        ...msg,
-                        content:
-                          "Sorry, I encountered an error. Please try again.",
-                      }
-                    : msg
-                ),
-              }
-            : chat
-        )
-      );
     }
-
-    setLoading(false);
+    return newResponse.split("*").join("<br>");
   };
 
+  // Delete a chat
+  const deleteChat = (chatId) => {
+    setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
+    if (currentChatId === chatId) {
+      setCurrentChatId(null);
+    }
+  };
+
+  // Load a chat
+  const loadChat = (chatId) => {
+    setCurrentChatId(chatId);
+  };
+
+  // Get current chat messages
   const currentChat = chats.find((chat) => chat.id === currentChatId);
   const messages = currentChat?.messages || [];
 
   return (
-    <div className="flex h-screen bg-[rgba(0,191,165,0.05)] p-5 gap-5 w-full">
+    <div className="flex h-screen bg-[rgba(0,191,165,0.05)] p-3 md:p-5 gap-3 w-full">
       {/* Sidebar */}
       <div
         className={`justify-between hidden md:flex flex-col bg-primary-1 rounded p-4 transition-all duration-300 ${
@@ -225,9 +260,7 @@ const Chatbot = () => {
       <div className="w-full flex flex-col min-h-0">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b">
-          <h1
-            className="text-xl font-semibold bg-gradient-to-r from-text-2 via-gray-500
-           to-text-1 bg-clip-text text-transparent">
+          <h1 className="text-xl font-semibold text-text-2">
             DengueGuard Chatbot
           </h1>
           {currentChatId && (
@@ -281,18 +314,27 @@ const Chatbot = () => {
                           ? "bg-primary-1 text-white"
                           : "bg-gray-100 text-gray-700"
                       }`}>
-                      {loading && index === messages.length - 1 ? (
-                        <div className="flex gap-1">
-                          <div
-                            className="w-1 h-1 rounded-full bg-primary-1 animate-bounce"
-                            style={{ animationDelay: "0.1s" }}></div>
-                          <div
-                            className="w-1 h-1 rounded-full bg-primary-1 animate-bounce"
-                            style={{ animationDelay: "0.2s" }}></div>
-                          <div
-                            className="w-1 h-1 rounded-full bg-primary-1 animate-bounce"
-                            style={{ animationDelay: "0.3s" }}></div>
-                        </div>
+                      {message.sender === "bot" ? (
+                        loading && index === messages.length - 1 ? (
+                          <div className="flex gap-1">
+                            <div
+                              className="w-2 h-2 rounded-full bg-primary-1 animate-bounce"
+                              style={{ animationDelay: "0.1s" }}></div>
+                            <div
+                              className="w-2 h-2 rounded-full bg-primary-1 animate-bounce"
+                              style={{ animationDelay: "0.2s" }}></div>
+                            <div
+                              className="w-2 h-2 rounded-full bg-primary-1 animate-bounce"
+                              style={{ animationDelay: "0.3s" }}></div>
+                          </div>
+                        ) : (
+                          <p
+                            dangerouslySetInnerHTML={{
+                              __html: message.content,
+                            }}
+                            className="font-light leading-relaxed"
+                          />
+                        )
                       ) : (
                         <p className="font-light leading-relaxed">
                           {message.content}
@@ -311,39 +353,39 @@ const Chatbot = () => {
               </div>
             </div>
           )}
-        </div>
 
-        {/* Input Area */}
-        <div className="p-5 border-t">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 bg-gray-50 p-3 border-1 border-primary-1 rounded-full">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && onSent()}
-                placeholder="Ask anything about dengue..."
-                className="flex-1 bg-transparent border-none outline-none px-3 py-2 text-text-1"
-              />
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => onSent()}
-                  disabled={!input.trim()}
-                  className={`p-2 rounded-full ${
-                    input.trim()
-                      ? "text-blue-500 hover:text-blue-600"
-                      : "text-gray-400"
-                  }`}>
-                  <FontAwesomeIcon
-                    icon={faPaperPlane}
-                    className="text-xl hover:text-primary-1"
-                  />
-                </button>
+          {/* Input Area */}
+          <div className="p-5 border-t">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center gap-3 bg-gray-50 p-3 border-1 border-primary-1 rounded-full">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && onSent()}
+                  placeholder="Ask anything about dengue..."
+                  className="flex-1 bg-transparent border-none outline-none px-3 py-2 text-text-1"
+                />
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => onSent()}
+                    disabled={!input.trim()}
+                    className={`p-2 rounded-full ${
+                      input.trim()
+                        ? "text-blue-500 hover:text-blue-600"
+                        : "text-gray-400"
+                    }`}>
+                    <FontAwesomeIcon
+                      icon={faPaperPlane}
+                      className="text-xl hover:text-primary-1"
+                    />
+                  </button>
+                </div>
               </div>
+              <p className="text-xs text-center mt-3 text-gray-500">
+                Our bot can make mistakes, so double-check it
+              </p>
             </div>
-            <p className="text-xs text-center mt-3 text-gray-500">
-              Our bot can make mistakes, so double-check it
-            </p>
           </div>
         </div>
       </div>
