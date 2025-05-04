@@ -30,6 +30,25 @@ const Chatbot = () => {
     }
   }, [chats, loading]);
 
+  const delayPara = (index, nextWord, chatId) => {
+    setTimeout(() => {
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === chatId
+            ? {
+                ...chat,
+                messages: chat.messages.map((msg, i) =>
+                  i === chat.messages.length - 1
+                    ? { ...msg, content: msg.content + nextWord }
+                    : msg
+                ),
+              }
+            : chat
+        )
+      );
+    }, 75 * index);
+  };
+
   const newChat = () => {
     const newChatId = Date.now();
     setCurrentChatId(newChatId);
@@ -106,24 +125,28 @@ const Chatbot = () => {
       )
     );
 
+    // Add empty bot message for typewriter effect
+    setChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat.id === (currentChatId || chatId)
+          ? {
+              ...chat,
+              messages: [...chat.messages, { sender: "bot", content: "" }],
+            }
+          : chat
+      )
+    );
+
     setLoading(true);
     setInput("");
 
     try {
       const response = await runGeminiChat(userMessage);
-      setChats((prevChats) =>
-        prevChats.map((chat) =>
-          chat.id === (currentChatId || chatId)
-            ? {
-                ...chat,
-                messages: [
-                  ...chat.messages,
-                  { sender: "bot", content: response },
-                ],
-              }
-            : chat
-        )
-      );
+      let newResponseArray = response.split(" ");
+      for (let i = 0; i < newResponseArray.length; i++) {
+        const nextWord = newResponseArray[i];
+        delayPara(i, nextWord + " ", currentChatId || chatId);
+      }
     } catch (error) {
       console.error("Error getting response:", error);
       setChats((prevChats) =>
@@ -131,13 +154,15 @@ const Chatbot = () => {
           chat.id === (currentChatId || chatId)
             ? {
                 ...chat,
-                messages: [
-                  ...chat.messages,
-                  {
-                    sender: "bot",
-                    content: "Sorry, I encountered an error. Please try again.",
-                  },
-                ],
+                messages: chat.messages.map((msg, i) =>
+                  i === chat.messages.length - 1
+                    ? {
+                        ...msg,
+                        content:
+                          "Sorry, I encountered an error. Please try again.",
+                      }
+                    : msg
+                ),
               }
             : chat
         )
@@ -200,7 +225,9 @@ const Chatbot = () => {
       <div className="w-full flex flex-col min-h-0">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b">
-          <h1 className="text-xl font-semibold text-text-2">
+          <h1
+            className="text-xl font-semibold bg-gradient-to-r from-text-2 via-gray-500
+           to-text-1 bg-clip-text text-transparent">
             DengueGuard Chatbot
           </h1>
           {currentChatId && (
@@ -254,13 +281,17 @@ const Chatbot = () => {
                           ? "bg-primary-1 text-white"
                           : "bg-gray-100 text-gray-700"
                       }`}>
-                      {message.sender === "bot" &&
-                      loading &&
-                      index === messages.length - 1 ? (
-                        <div className="w-full flex flex-col gap-3">
-                          <div className="h-5 rounded bg-gradient-to-r from-blue-200 via-white to-blue-200 animate-loader bg-[length:800px_50px]"></div>
-                          <div className="h-5 rounded bg-gradient-to-r from-blue-200 via-white to-blue-200 animate-loader bg-[length:800px_50px]"></div>
-                          <div className="h-5 rounded bg-gradient-to-r from-blue-200 via-white to-blue-200 animate-loader bg-[length:800px_50px]"></div>
+                      {loading && index === messages.length - 1 ? (
+                        <div className="flex gap-1">
+                          <div
+                            className="w-1 h-1 rounded-full bg-primary-1 animate-bounce"
+                            style={{ animationDelay: "0.1s" }}></div>
+                          <div
+                            className="w-1 h-1 rounded-full bg-primary-1 animate-bounce"
+                            style={{ animationDelay: "0.2s" }}></div>
+                          <div
+                            className="w-1 h-1 rounded-full bg-primary-1 animate-bounce"
+                            style={{ animationDelay: "0.3s" }}></div>
                         </div>
                       ) : (
                         <p className="font-light leading-relaxed">
