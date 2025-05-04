@@ -65,6 +65,18 @@ const Chatbot = () => {
       )
     );
 
+    // Add empty bot message
+    setChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat.id === (currentChatId || chatId)
+          ? {
+              ...chat,
+              messages: [...chat.messages, { sender: "bot", content: "..." }],
+            }
+          : chat
+      )
+    );
+
     setInput("");
   };
 
