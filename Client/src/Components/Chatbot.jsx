@@ -1,5 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import bot_icon from "../assets/images/ai_chatbot.png";
+import {
+  GoogleGenerativeAI,
+  HarmCategory,
+  HarmBlockThreshold,
+} from "@google/generative-ai";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBars,
@@ -15,6 +20,7 @@ const Chatbot = () => {
   const [chats, setChats] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null);
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
   const resultContainerRef = useRef(null);
 
   useEffect(() => {
@@ -22,7 +28,7 @@ const Chatbot = () => {
       resultContainerRef.current.scrollTop =
         resultContainerRef.current.scrollHeight;
     }
-  }, [chats]);
+  }, [chats, loading]);
 
   const newChat = () => {
     const newChatId = Date.now();
@@ -41,7 +47,42 @@ const Chatbot = () => {
     setCurrentChatId(chatId);
   };
 
-  const onSent = (prompt) => {
+  const runGeminiChat = async (prompt) => {
+    const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        temperature: 0.9,
+        topK: 1,
+        topP: 1,
+        maxOutputTokens: 2048,
+      },
+      safetySettings: [
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+      ],
+    });
+
+    const result = await model.generateContent([prompt]);
+    return result.response.text();
+  };
+
+  const onSent = async (prompt) => {
     if (!prompt && !input.trim()) return;
 
     const userMessage = prompt || input;
@@ -65,19 +106,45 @@ const Chatbot = () => {
       )
     );
 
-    // Add empty bot message
-    setChats((prevChats) =>
-      prevChats.map((chat) =>
-        chat.id === (currentChatId || chatId)
-          ? {
-              ...chat,
-              messages: [...chat.messages, { sender: "bot", content: "..." }],
-            }
-          : chat
-      )
-    );
-
+    setLoading(true);
     setInput("");
+
+    try {
+      const response = await runGeminiChat(userMessage);
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === (currentChatId || chatId)
+            ? {
+                ...chat,
+                messages: [
+                  ...chat.messages,
+                  { sender: "bot", content: response },
+                ],
+              }
+            : chat
+        )
+      );
+    } catch (error) {
+      console.error("Error getting response:", error);
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === (currentChatId || chatId)
+            ? {
+                ...chat,
+                messages: [
+                  ...chat.messages,
+                  {
+                    sender: "bot",
+                    content: "Sorry, I encountered an error. Please try again.",
+                  },
+                ],
+              }
+            : chat
+        )
+      );
+    }
+
+    setLoading(false);
   };
 
   const currentChat = chats.find((chat) => chat.id === currentChatId);
@@ -187,9 +254,19 @@ const Chatbot = () => {
                           ? "bg-primary-1 text-white"
                           : "bg-gray-100 text-gray-700"
                       }`}>
-                      <p className="font-light leading-relaxed">
-                        {message.content}
-                      </p>
+                      {message.sender === "bot" &&
+                      loading &&
+                      index === messages.length - 1 ? (
+                        <div className="w-full flex flex-col gap-3">
+                          <div className="h-5 rounded bg-gradient-to-r from-blue-200 via-white to-blue-200 animate-loader bg-[length:800px_50px]"></div>
+                          <div className="h-5 rounded bg-gradient-to-r from-blue-200 via-white to-blue-200 animate-loader bg-[length:800px_50px]"></div>
+                          <div className="h-5 rounded bg-gradient-to-r from-blue-200 via-white to-blue-200 animate-loader bg-[length:800px_50px]"></div>
+                        </div>
+                      ) : (
+                        <p className="font-light leading-relaxed">
+                          {message.content}
+                        </p>
+                      )}
                     </div>
                     {message.sender === "user" && (
                       <div className="w-10 h-10 rounded-full bg-primary-2 flex items-center justify-center text-xl">
