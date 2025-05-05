@@ -12,9 +12,9 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Main Content */}
-      <div className="container mx-auto px-4 mt-12 flex justify-between items-center">
+      <div className="container mx-auto px-4 mt-12 flex justify-center items-center md:justify-center ">
         {/* Login Form */}
-        <div className="w-1/2">
+        <div className="">
           <h1 className="text-4xl font-bold mb-4">Log In to Your Account</h1>
           <p className="text-gray-600 mb-8">
             Join to manage your health and stay connected.
@@ -57,9 +57,7 @@ const Login = () => {
               </a>
             </div>
 
-            <button
-              type="submit"
-              className=" btn w-full">
+            <button type="submit" className=" btn w-full">
               Log In
             </button>
 
@@ -73,11 +71,10 @@ const Login = () => {
         </div>
 
         {/* Image */}
-        <div className="w-1/2 md:flex md:justify-center hidden">
-          <img src={doctorImage} alt="Doctor illustration" className="w-96" />
+        <div className="hidden md:flex md:justify-center">
+          <img src={doctorImage} alt="Doctor illustration" className="w-20vw" />
         </div>
       </div>
-      {/* Footer */}
     </div>
   );
 };
