@@ -57,9 +57,7 @@ const Login = () => {
               </a>
             </div>
 
-            <button
-              type="submit"
-              className=" btn w-full">
+            <button type="submit" className=" btn w-full">
               Log In
             </button>
 
