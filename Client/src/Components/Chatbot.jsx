@@ -148,12 +148,12 @@ const Chatbot = () => {
     const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.0-flash", // better quality than flash
       generationConfig: {
-        temperature: 0.9,
+        temperature: 0.7,
         topK: 1,
         topP: 1,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 2048, // increased to prevent early cut-off
       },
       safetySettings: [
         {
@@ -176,21 +176,78 @@ const Chatbot = () => {
     });
 
     const result = await model.generateContent([prompt]);
-    return result.response.text();
+    const text = result.response.text();
+
+    // Ensure the last word is complete
+    return text.replace(
+      /\w+$/,
+      (word) => (word.length < 3 ? "" : word) // remove very short partials
+    );
   };
 
-  // Format response with HTML tags for bold and line breaks
+  // response format
   const formatResponse = (response) => {
-    let responseArray = response.split("**");
-    let newResponse = "";
-    for (let i = 0; i < responseArray.length; i++) {
-      if (i === 0 || i % 2 !== 1) {
-        newResponse += responseArray[i];
-      } else {
-        newResponse += "<b>" + responseArray[i] + "</b>";
+    if (!response) return "";
+
+    // Step 1: Normalize line breaks
+    response = response.replace(/\r\n|\r/g, "\n").replace(/\n{3,}/g, "\n\n");
+
+    // Step 2: Escape HTML tags to prevent injection (except for formatting we will add)
+    response = response
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    // Step 3: Format code blocks (```...```)
+    response = response.replace(/```([\s\S]*?)```/g, (_, code) => {
+      return `<pre><code>${code.trim()}</code></pre>`;
+    });
+
+    // Step 4: Convert **bold** and _italic_ to HTML
+    response = response.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+    response = response.replace(/_(.*?)_/g, "<i>$1</i>");
+
+    // Step 5: Convert headings and subheadings
+    response = response.replace(
+      /^[•*-]?\s?\*([^*]+)\*[:;]?\s*$/gm,
+      "<h3>$1</h3>"
+    );
+    response = response.replace(/^\*\s?(.+?)[:;]?\s*$/gm, "<h4>$1</h4>");
+
+    // Step 6: Format bullet points
+    response = response.replace(/\n\s*[-*•]\s*/g, "\n• ");
+    response = response.replace(/• (.+?)(?=\n|$)/g, (_, item) => {
+      return `• ${item.trim().endsWith(";") ? item : item + ";"}`;
+    });
+
+    // Step 7: Format numbered lists
+    response = response.replace(
+      /\n\s*(\d+\.\s*)(.*?)(?=\n|$)/g,
+      (_, num, item) => {
+        return `\n${num}${item.trim().endsWith(";") ? item : item + ";"}`;
       }
-    }
-    return newResponse.split("*").join("<br>");
+    );
+
+    // Step 8: Wrap lines in <p> unless they are headings, code blocks, or lists
+    let formatted = response
+      .split("\n")
+      .map((line) => {
+        const trimmed = line.trim();
+        if (!trimmed) return "";
+        if (
+          trimmed.startsWith("<h3") ||
+          trimmed.startsWith("<h4") ||
+          trimmed.startsWith("<pre>") ||
+          trimmed.startsWith("• ") ||
+          /^\d+\.\s/.test(trimmed)
+        ) {
+          return `<p>${trimmed}</p>`;
+        }
+        return `<p>${trimmed}</p>`;
+      })
+      .join("");
+
+    return `<section class="formatted-response">${formatted}</section>`;
   };
 
   // Delete a chat
@@ -318,13 +375,13 @@ const Chatbot = () => {
                         loading && index === messages.length - 1 ? (
                           <div className="flex gap-1">
                             <div
-                              className="w-2 h-2 rounded-full bg-primary-1 animate-bounce"
+                              className="w-1 h-1 rounded-full bg-primary-1 animate-bounce"
                               style={{ animationDelay: "0.1s" }}></div>
                             <div
-                              className="w-2 h-2 rounded-full bg-primary-1 animate-bounce"
+                              className="w-1 h-1 rounded-full bg-primary-1 animate-bounce"
                               style={{ animationDelay: "0.2s" }}></div>
                             <div
-                              className="w-2 h-2 rounded-full bg-primary-1 animate-bounce"
+                              className="w-1 h-1 rounded-full bg-primary-1 animate-bounce"
                               style={{ animationDelay: "0.3s" }}></div>
                           </div>
                         ) : (
