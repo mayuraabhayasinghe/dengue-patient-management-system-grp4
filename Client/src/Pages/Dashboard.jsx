@@ -43,9 +43,9 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen m-2 md:m-3">
       {/* Sidebar */}
-      <div className="w-fit p-2 m-1  bg-primary-1 text-white md:p-6 shadow-md rounded">
+      <div className="w-fit px-2 py-5 bg-primary-1 text-white shadow-md rounded">
         <h2 className="text-2xl font-bold mb-6 hidden md:block">Dashboard</h2>
         <div className="flex flex-col gap-3">
           {navItems.map((item) => (
@@ -68,7 +68,7 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">{renderComponent()}</div>
+      <div className="flex-1 p-6 bg-gray-100 rounded">{renderComponent()}</div>
     </div>
   );
 };
