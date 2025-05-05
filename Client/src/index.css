@@ -54,3 +54,31 @@ html {
 .animate-bounce {
   animation: bounce 0.6s infinite;
 }
+
+.formatted-response {
+  font-family: 'Segoe UI', sans-serif;
+  line-height: 1.6;
+}
+
+.formatted-response h3 {
+  font-size: 1.25rem;
+  margin-top: 1.2rem;
+  color: #1e40af;
+}
+
+.formatted-response h4 {
+  font-size: 1.1rem;
+  margin-top: 1rem;
+  color: #1d4ed8;
+}
+
+.formatted-response p {
+  margin: 0.5rem 0;
+}
+
+.formatted-response pre {
+  background: #f1f5f9;
+  padding: 0.75rem;
+  border-radius: 8px;
+  overflow-x: auto;
+}
