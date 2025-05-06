@@ -25,17 +25,28 @@ const Chatbot = () => {
   const [chats, setChats] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
 
   // Refs
   const resultContainerRef = useRef(null);
 
-  // Scroll to bottom when new content appears
+  // Scroll to bottom only when shouldScrollToBottom is true
   useEffect(() => {
-    if (resultContainerRef.current) {
+    if (resultContainerRef.current && shouldScrollToBottom) {
       resultContainerRef.current.scrollTop =
         resultContainerRef.current.scrollHeight;
     }
-  }, [chats, loading]);
+  }, [chats, loading, shouldScrollToBottom]);
+
+  // Handle scroll events to determine if we should auto-scroll
+  const handleScroll = () => {
+    if (resultContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } =
+        resultContainerRef.current;
+      const isNearBottom = scrollHeight - (scrollTop + clientHeight) < 50;
+      setShouldScrollToBottom(isNearBottom);
+    }
+  };
 
   // Typewriter effect for responses
   const delayPara = (index, nextWord, chatId) => {
@@ -62,6 +73,8 @@ const Chatbot = () => {
     const newChatId = Date.now();
     setCurrentChatId(newChatId);
     setChats((prev) => [...prev, { id: newChatId, messages: [] }]);
+    setShouldScrollToBottom(true);
+    return newChatId;
   };
 
   // Process prompt and get response from Gemini
@@ -69,17 +82,72 @@ const Chatbot = () => {
     if (!prompt && !input.trim()) return;
 
     const userMessage = prompt || input;
-    const chatId = currentChatId || Date.now();
+    let chatId = currentChatId;
 
-    // If no current chat, create a new one
-    if (!currentChatId) {
-      newChat();
+    // Check if input is allowed (dengue-related or greeting)
+    const isDengueRelated = (message) => {
+      const dengueKeywords = [
+        "dengue",
+        "mosquito",
+        "aedes",
+        "fever",
+        "symptom",
+        "treatment",
+        "prevent",
+        "vaccine",
+        "virus",
+        "bite",
+        "epidemic",
+        "outbreak",
+        "hemorrhagic",
+        "platelet",
+        "ns1",
+        "igg",
+        "igm",
+        "vector",
+        "breeding",
+        "larva",
+        "aegypti",
+        "albopictus",
+        "repellent",
+        "diagnosis",
+        "severe",
+        "warning",
+        "sign",
+        "dengvaxia",
+      ];
+
+      const greetings = [
+        "hi",
+        "hello",
+        "hey",
+        "good morning",
+        "good afternoon",
+        "good evening",
+        "how are you",
+        "what's up",
+        "greetings",
+      ];
+
+      const messageLower = message.toLowerCase();
+
+      // Check for greetings
+      if (greetings.some((greeting) => messageLower.includes(greeting))) {
+        return true;
+      }
+
+      // Check for dengue-related terms
+      return dengueKeywords.some((keyword) => messageLower.includes(keyword));
+    };
+
+    if (!chatId) {
+      chatId = newChat();
     }
 
-    // Add user message
+    // Add user message to chat
     setChats((prevChats) =>
       prevChats.map((chat) =>
-        chat.id === (currentChatId || chatId)
+        chat.id === chatId
           ? {
               ...chat,
               messages: [
@@ -91,10 +159,10 @@ const Chatbot = () => {
       )
     );
 
-    // Add empty bot message (will be filled by typewriter effect)
+    // Add empty bot message (will be filled later)
     setChats((prevChats) =>
       prevChats.map((chat) =>
-        chat.id === (currentChatId || chatId)
+        chat.id === chatId
           ? {
               ...chat,
               messages: [...chat.messages, { sender: "bot", content: "" }],
@@ -105,23 +173,30 @@ const Chatbot = () => {
 
     setLoading(true);
     setInput("");
+    setShouldScrollToBottom(true);
 
     try {
-      const response = await runGeminiChat(userMessage);
-      // Format response with bold and line breaks
-      let formattedResponse = formatResponse(response);
+      let response;
+      if (isDengueRelated(userMessage)) {
+        // Get response from Gemini for dengue-related questions
+        response = await runGeminiChat(userMessage);
+      } else {
+        // For non-dengue questions, provide a standard response
+        response =
+          "I specialize in dengue-related information. Please ask me about dengue fever symptoms, prevention, treatment, or other related topics.";
+      }
 
-      // Display with typewriter effect
-      let newResponseArray = formattedResponse.split(" ");
+      const formattedResponse = formatResponse(response);
+      const newResponseArray = formattedResponse.split(" ");
+
       for (let i = 0; i < newResponseArray.length; i++) {
-        const nextWord = newResponseArray[i];
-        delayPara(i, nextWord + " ", currentChatId || chatId);
+        delayPara(i, newResponseArray[i] + " ", chatId);
       }
     } catch (error) {
       console.error("Error getting response:", error);
       setChats((prevChats) =>
         prevChats.map((chat) =>
-          chat.id === (currentChatId || chatId)
+          chat.id === chatId
             ? {
                 ...chat,
                 messages: chat.messages.map((msg, i) =>
@@ -147,13 +222,31 @@ const Chatbot = () => {
   const runGeminiChat = async (prompt) => {
     const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
+    // Add context to make sure Gemini stays on topic
+    const dengueContext = `
+    You are DengueGuard, a specialized chatbot that provides information exclusively about dengue fever.
+    Your responses should be:
+    1. Focused on dengue-related topics only
+    2. Medically accurate and up-to-date
+    3. Clear and easy to understand
+    4. Include prevention tips when relevant
+    
+    For greetings, respond briefly and guide the conversation toward dengue topics.
+    
+    If asked about other topics, politely explain that you specialize in dengue information.
+    
+    Current question: ${prompt}
+    
+    Please provide a helpful response about dengue fever:
+  `;
+
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash", // better quality than flash
+      model: "gemini-1.5-pro",
       generationConfig: {
         temperature: 0.7,
         topK: 1,
         topP: 1,
-        maxOutputTokens: 2048, // increased to prevent early cut-off
+        maxOutputTokens: 2048,
       },
       safetySettings: [
         {
@@ -175,14 +268,11 @@ const Chatbot = () => {
       ],
     });
 
-    const result = await model.generateContent([prompt]);
+    const result = await model.generateContent([dengueContext]);
     const text = result.response.text();
 
     // Ensure the last word is complete
-    return text.replace(
-      /\w+$/,
-      (word) => (word.length < 3 ? "" : word) // remove very short partials
-    );
+    return text.replace(/\w+$/, (word) => (word.length < 3 ? "" : word));
   };
 
   // response format
@@ -261,6 +351,7 @@ const Chatbot = () => {
   // Load a chat
   const loadChat = (chatId) => {
     setCurrentChatId(chatId);
+    setShouldScrollToBottom(true);
   };
 
   // Get current chat messages
@@ -350,7 +441,8 @@ const Chatbot = () => {
           ) : (
             <div
               ref={resultContainerRef}
-              className="flex-1 overflow-y-auto p-5">
+              className="flex-1 overflow-y-auto p-5"
+              onScroll={handleScroll}>
               <div className="max-w-4xl mx-auto">
                 {messages.map((message, index) => (
                   <div
