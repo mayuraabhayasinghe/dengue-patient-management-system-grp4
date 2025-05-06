@@ -7,6 +7,7 @@ import Footer from "./components/Footer";
 import Dashboard from "./Pages/Dashboard";
 import Registration from "./Pages/Registration";
 import Chatbot from "./Components/Chatbot";
+import PatientPage from "./Pages/PatientPage";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/registration" element={<Registration />} />
         <Route path="/chatbot" element={<Chatbot />} />
+        <Route path="/patient-form" element={<PatientPage />} />
       </Routes>
       <Footer />
     </div>

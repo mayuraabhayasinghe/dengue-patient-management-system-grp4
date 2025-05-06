@@ -1,15 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-@import "tailwindcss";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 :root {
   font-family: "Poppins", sans-serif;
-}
 
-html {
-  scroll-behavior: smooth;
-}
-
-@theme {
   --color-primary-1: rgba(0, 191, 165, 1);
   --color-primary-2: rgba(0, 194, 203, 1);
   --color-secondary-1: rgba(2, 88, 82, 1);
@@ -20,6 +16,11 @@ html {
   --color-text-2: rgba(3, 20, 50, 1);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+/* Buttons */
 .btn {
   background: linear-gradient(120deg,
       rgba(0, 194, 203, 1) 0%,
@@ -35,17 +36,14 @@ html {
   background: linear-gradient(120deg,
       rgba(0, 194, 203, 1) 100%,
       rgba(2, 88, 82, 1) 0%);
-  transition-delay: 20s;
   cursor: pointer;
 }
 
+/* Bounce Animation */
 @keyframes bounce {
-
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0);
   }
-
   50% {
     transform: translateY(-5px);
   }
@@ -55,6 +53,7 @@ html {
   animation: bounce 0.6s infinite;
 }
 
+/* Response Display Formatting */
 .formatted-response {
   font-family: 'Segoe UI', sans-serif;
   line-height: 1.6;
