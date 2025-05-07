@@ -31,7 +31,7 @@ const addPatient = async (req, res) => {
     //Create user entry
     const newUser = await User.create({
       name,
-      email,
+      email: bystanderEmail,
       password: hashedPassword,
       role: "patient",
     });
