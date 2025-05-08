@@ -62,7 +62,10 @@ const Registration = () => {
         </h1>
 
         {/* form */}
-        <form className="w-full flex flex-col gap-[20px] mt-[30px]">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full flex flex-col gap-[20px] mt-[30px]"
+        >
           <div className="flex items-center gap-[20px]">
             <lable className="flex-[1] text-center font-sans font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
               Patient's Name
