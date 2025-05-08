@@ -13,7 +13,7 @@ html {
   --color-primary-1: rgba(0, 191, 165, 1);
   --color-primary-2: rgba(0, 194, 203, 1);
   --color-secondary-1: rgba(2, 88, 82, 1);
-  --color-background-1: rgba(0, 191, 165, 0.07);
+  --color-background-1: rgba(0, 191, 165, 0.10);
   --color-white-1: rgba(255, 255, 255, 1);
   --color-white-2: rgba(242, 255, 251, 1);
   --color-text-1: rgba(108, 135, 174, 1);
@@ -37,4 +37,48 @@ html {
       rgba(2, 88, 82, 1) 0%);
   transition-delay: 20s;
   cursor: pointer;
+}
+
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 0.6s infinite;
+}
+
+.formatted-response {
+  font-family: 'Segoe UI', sans-serif;
+  line-height: 1.6;
+}
+
+.formatted-response h3 {
+  font-size: 1.25rem;
+  margin-top: 1.2rem;
+  color: #1e40af;
+}
+
+.formatted-response h4 {
+  font-size: 1.1rem;
+  margin-top: 1rem;
+  color: #1d4ed8;
+}
+
+.formatted-response p {
+  margin: 0.5rem 0;
+}
+
+.formatted-response pre {
+  background: #f1f5f9;
+  padding: 0.75rem;
+  border-radius: 8px;
+  overflow-x: auto;
 }

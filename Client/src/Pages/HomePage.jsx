@@ -62,7 +62,8 @@ const HomePage = () => {
       {/* Hero section */}
       <div
         id="home"
-        className="flex items-center justify-center bg-background-1">
+        className="flex items-center justify-center bg-background-1"
+      >
         <div className="w-full  md:w-[90%] lg:w-4/5 flex flex-col items-center justify-center">
           <div className="flex items-center flex-col-reverse md:flex-row gap-5 w-full pt-2">
             {/* left */}
@@ -93,7 +94,8 @@ const HomePage = () => {
             <div className="flex items-center justify-center px-1 py-1 md:px-3 md:py-2 bg-[linear-gradient(120deg,_rgba(0,194,203,1)_0%,_rgba(2,88,82,1)_100%)] gap-4 rounded-xl h-fit">
               <FontAwesomeIcon
                 className="text-2xl sm:text-3xl lg:text-[30px] "
-                icon={faClock}></FontAwesomeIcon>
+                icon={faClock}
+              ></FontAwesomeIcon>
               <div className="flex flex-col ">
                 <h2 className="text-[clamp(1rem,1vw,1.2rem)]">
                   24 hour service
@@ -106,7 +108,8 @@ const HomePage = () => {
             <div className="flex items-center justify-center px-1 py-1 md:px-3 md:py-2 bg-[linear-gradient(120deg,_rgba(0,194,203,1)_0%,_rgba(2,88,82,1)_100%)] gap-4 rounded-xl h-fit">
               <FontAwesomeIcon
                 className="text-2xl sm:text-3xl lg:text-[30px] "
-                icon={faBell}></FontAwesomeIcon>
+                icon={faBell}
+              ></FontAwesomeIcon>
               <div className="flex flex-col ">
                 <h2 className="text-[clamp(1rem,1vw,1.2rem)]">
                   {" "}
@@ -120,7 +123,8 @@ const HomePage = () => {
             <div className="flex items-center justify-center px-1 py-1 md:px-3 md:py-2 bg-[linear-gradient(120deg,_rgba(0,194,203,1)_0%,_rgba(2,88,82,1)_100%)] gap-4 rounded-xl h-fit">
               <FontAwesomeIcon
                 className="text-2xl sm:text-3xl lg:text-[30px] "
-                icon={faCircleCheck}></FontAwesomeIcon>
+                icon={faCircleCheck}
+              ></FontAwesomeIcon>
               <div className="flex flex-col ">
                 <h2 className="text-[clamp(1rem,1vw,1.2rem)]">
                   Resource Control
@@ -321,10 +325,12 @@ const HomePage = () => {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="rounded-xl overflow-hidden bg-white shadow">
+              className="rounded-xl overflow-hidden bg-white shadow"
+            >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full px-6 py-4 focus:outline-none flex justify-start items-center gap-5">
+                className="w-full px-6 py-4 focus:outline-none flex justify-start items-center gap-5"
+              >
                 <span className="text-xl text-primary-2">
                   {activeIndex === index ? "-" : "+"}
                 </span>

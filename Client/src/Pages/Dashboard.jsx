@@ -5,6 +5,15 @@ import WardManagement from "../Components/Dashboard/WardManagement";
 import Inventory from "../Components/Dashboard/Inventory";
 import Accounts from "../Components/Dashboard/Accounts";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChartPie,
+  faUserInjured,
+  faHospitalUser,
+  faBoxes,
+  faUserShield,
+} from "@fortawesome/free-solid-svg-icons";
+
 const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState("overview");
 
@@ -25,30 +34,42 @@ const Dashboard = () => {
     }
   };
 
-  return (
-    <div>
-      <div className="flex gap-2">
-        {/* Sidebar links */}
-        <div className="flex flex-col gap-2 w-48 bg-gray-100 p-4 min-h-screen">
-          <button onClick={() => setActiveComponent("overview")}>
-            Overview
-          </button>
-          <button onClick={() => setActiveComponent("patients")}>
-            Patients
-          </button>
-          <button onClick={() => setActiveComponent("ward")}>
-            Ward Management
-          </button>
-          <button onClick={() => setActiveComponent("inventory")}>
-            Inventory
-          </button>
-          <button onClick={() => setActiveComponent("account")}>
-            Accounts
-          </button>
-        </div>
+  const navItems = [
+    { id: "overview", label: "Overview", icon: faChartPie },
+    { id: "patients", label: "Patients", icon: faUserInjured },
+    { id: "ward", label: "Ward Management", icon: faHospitalUser },
+    { id: "inventory", label: "Inventory", icon: faBoxes },
+    { id: "account", label: "Accounts", icon: faUserShield },
+  ];
 
-        {/* Display section */}
-        <div className="flex-1 p-4">{renderComponent()}</div>
+  return (
+    <div className="flex min-h-screen m-2 md:m-3">
+      {/* Sidebar */}
+      <div className="w-fit px-2 py-5 bg-primary-1 text-white shadow-md rounded">
+        <h2 className="text-2xl font-bold mb-6 hidden md:block">Dashboard</h2>
+        <div className="flex flex-col gap-3">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveComponent(item.id)}
+              className={`flex items-center gap-3 p-2 md:p-3 rounded-lg text-left transition duration-200 ${
+                activeComponent === item.id
+                  ? "bg-white text-primary-1 font-semibold shadow"
+                  : "hover:bg-white hover:text-primary-1"
+              }`}>
+              <FontAwesomeIcon
+                className="text-2xl md:text-xl"
+                icon={item.icon}
+              />
+              <span className="hidden md:block">{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-3 md:p-5 bg-gray-100 rounded">
+        {renderComponent()}
       </div>
     </div>
   );
