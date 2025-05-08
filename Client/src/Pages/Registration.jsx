@@ -200,7 +200,7 @@ const Registration = () => {
                 Bed Number
               </lable>
               <input
-                type="number"
+                type="text"
                 name="bedNumber"
                 value={formData.bedNumber}
                 onChange={handleChange}
