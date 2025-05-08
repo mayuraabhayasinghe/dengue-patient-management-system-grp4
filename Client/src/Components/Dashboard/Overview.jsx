@@ -1,4 +1,4 @@
-import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faSearch, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 
@@ -75,43 +75,54 @@ const Overview = () => {
         <div className="p-2 md:p-4 bg-white shadow-2xl rounded flex flex-col justify-center gap-3 order-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h2 className="font-semibold text-text-2">Notifications</h2>
-            <input type="text" placeholder="Search patients" />
+            <div className="py-1 px-2 flex-1 flex items-center justify-between bg-background-1 rounded text-text-1 border-1 border-primary-1">
+              <input type="text" placeholder="Search patients" />
+              <FontAwesomeIcon icon={faSearch}></FontAwesomeIcon>
+            </div>
           </div>
           <div>
-            <table className="w-full text-sm md:text-base text-left border border-gray-300 rounded overflow-hidden">
+            <table className="w-full text-xs sm:text-sm md:text-base text-left border border-gray-300 rounded overflow-hidden">
               <thead className="bg-primary-2 text-white-1">
                 <tr>
-                  <th className="p-3 border-b">Reference No.</th>
-                  <th className="p-3 border-b">Message</th>
-                  <th className="p-3 border-b">Status</th>
+                  <th className="p-2 sm:p-3 md:p-4 border-b">Reference No.</th>
+                  <th className="p-2 sm:p-3 md:p-4 border-b">Message</th>
+                  <th className="p-2 sm:p-3 md:p-4 border-b">Status</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="bg-gray-100 hover:bg-gray-200 transition">
-                  <td className="p-3 border-b">REF001</td>
-                  <td className="p-3 border-b">Patient admitted to ward 5</td>
-                  <td className="p-3 border-b text-green-600 font-semibold">
+                  <td className="p-2 sm:p-3 md:p-4 border-b">REF001</td>
+                  <td className="p-2 sm:p-3 md:p-4 border-b">
+                    Patient admitted to ward 5
+                  </td>
+                  <td className="p-2 sm:p-3 md:p-4 border-b text-green-600 font-semibold">
                     Resolved
                   </td>
                 </tr>
                 <tr className="bg-white hover:bg-gray-100 transition">
-                  <td className="p-3 border-b">REF002</td>
-                  <td className="p-3 border-b">Bed unavailable in ward 3</td>
-                  <td className="p-3 border-b text-red-500 font-semibold">
+                  <td className="p-2 sm:p-3 md:p-4 border-b">REF002</td>
+                  <td className="p-2 sm:p-3 md:p-4 border-b">
+                    Bed unavailable in ward 3
+                  </td>
+                  <td className="p-2 sm:p-3 md:p-4 border-b text-red-500 font-semibold">
                     Pending
                   </td>
                 </tr>
                 <tr className="bg-gray-100 hover:bg-gray-200 transition">
-                  <td className="p-3 border-b">REF003</td>
-                  <td className="p-3 border-b">New nurse assigned to ward 1</td>
-                  <td className="p-3 border-b text-green-600 font-semibold">
+                  <td className="p-2 sm:p-3 md:p-4 border-b">REF003</td>
+                  <td className="p-2 sm:p-3 md:p-4 border-b">
+                    New nurse assigned to ward 1
+                  </td>
+                  <td className="p-2 sm:p-3 md:p-4 border-b text-green-600 font-semibold">
                     Resolved
                   </td>
                 </tr>
                 <tr className="bg-white hover:bg-gray-100 transition">
-                  <td className="p-3">REF004</td>
-                  <td className="p-3">Request for medical supplies</td>
-                  <td className="p-3 text-yellow-500 font-semibold">
+                  <td className="p-2 sm:p-3 md:p-4">REF004</td>
+                  <td className="p-2 sm:p-3 md:p-4">
+                    Request for medical supplies
+                  </td>
+                  <td className="p-2 sm:p-3 md:p-4 text-yellow-500 font-semibold">
                     In Progress
                   </td>
                 </tr>
