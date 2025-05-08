@@ -68,7 +68,9 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 bg-gray-100 rounded">{renderComponent()}</div>
+      <div className="flex-1 p-3 md:p-5 bg-gray-100 rounded">
+        {renderComponent()}
+      </div>
     </div>
   );
 };
