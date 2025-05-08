@@ -15,7 +15,7 @@ const Registration = () => {
     admissionDate: "",
     admissionTime: "",
     bedNumber: "",
-    dischargeDate: "", // it is empty initially
+    dischargeDate: "",
   });
 
   // Handle input change
@@ -23,7 +23,7 @@ const Registration = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  //Submit handler
+  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -54,38 +54,38 @@ const Registration = () => {
       console.error("Error: ", error);
     }
   };
+
   return (
-    <div className="bg-[#00BFA5] w-full min-h-screen flex items-center justify-center px-[10%]">
-      <div className="w-full bg-white rounded-lg shadow-xl py-[50px] px-[60px]">
-        <h1 className="text-center font-sans font-bold text-[22px]">
+    <div className="bg-[#00BFA5] w-full min-h-screen flex items-center justify-center px-4 md:px-8 lg:px-20">
+      <div className="w-full bg-white rounded-lg shadow-xl py-8 px-6 md:px-10 lg:px-16">
+        <h1 className="text-center font-sans font-bold text-2xl md:text-3xl mb-6">
           Patient Registration
         </h1>
 
         {/* form */}
-        <form
-          onSubmit={handleSubmit}
-          className="w-full flex flex-col gap-[20px] mt-[30px]"
-        >
-          <div className="flex items-center gap-[20px]">
-            <lable className="flex-[1] text-center font-sans font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
+        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
+          {/* Patient's Name */}
+          <div className="flex flex-col md:flex-row gap-6">
+            <label className="flex-1 text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
               Patient's Name
-            </lable>
+            </label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               placeholder="Enter patient's name"
-              className="flex-[3] w-full border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-            ></input>
+              className="flex-3 w-full border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
+            />
           </div>
-          {/* gender, weight and age */}
-          <div className="grid grid-cols-3">
-            {/* age */}
-            <div className="flex items-center gap-[10px]">
-              <lable className=" flex-none text-center font-sans font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
+
+          {/* Age, Weight, Gender */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Age */}
+            <div className="flex flex-col">
+              <label className="text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
                 Age
-              </lable>
+              </label>
               <input
                 type="number"
                 name="age"
@@ -93,13 +93,14 @@ const Registration = () => {
                 onChange={handleChange}
                 placeholder="Enter age"
                 className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-              ></input>
+              />
             </div>
-            {/* weight */}
-            <div className="flex items-center gap-[10px]">
-              <lable className=" flex-none text-center font-sans font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
+
+            {/* Weight */}
+            <div className="flex flex-col">
+              <label className="text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
                 Weight
-              </lable>
+              </label>
               <input
                 type="number"
                 name="weight"
@@ -107,98 +108,106 @@ const Registration = () => {
                 onChange={handleChange}
                 placeholder="Enter weight(Kg)"
                 className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-              ></input>
+              />
             </div>
-            {/* gender */}
-            <div className="flex items-center gap-[10px]">
-              <lable className="flex-none text-center font-sans font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
+
+            {/* Gender */}
+            <div className="flex flex-col">
+              <label className="text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
                 Gender
-              </lable>
+              </label>
               <select
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
-                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-              >
+                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]">
                 <option>Male</option>
                 <option>Female</option>
                 <option>Other</option>
               </select>
             </div>
           </div>
+
           {/* Bystander details */}
-          <div className="flex items-center gap-[20px]">
-            <lable className="flex-[1] text-center font-sans font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
-              Bystander's Name
-            </lable>
-            <input
-              type="text"
-              name="bystanderName"
-              value={formData.bystanderName}
-              onChange={handleChange}
-              placeholder="Enter bystander's name"
-              className="flex-[3] w-full border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-            ></input>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col md:flex-row gap-6">
+              <label className="flex-1 text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
+                Bystander's Name
+              </label>
+              <input
+                type="text"
+                name="bystanderName"
+                value={formData.bystanderName}
+                onChange={handleChange}
+                placeholder="Enter bystander's name"
+                className="flex-3 w-full border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
+              />
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-6">
+              <label className="flex-1 text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
+                Bystander's Email Address
+              </label>
+              <input
+                type="email"
+                name="bystanderEmail"
+                value={formData.bystanderEmail}
+                onChange={handleChange}
+                placeholder="Enter bystander's email address"
+                className="flex-3 w-full border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
+              />
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-6">
+              <label className="flex-1 text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
+                Bystander's Address
+              </label>
+              <input
+                type="text"
+                name="bystanderAddress"
+                value={formData.bystanderAddress}
+                onChange={handleChange}
+                placeholder="Enter bystander's address"
+                className="flex-3 w-full border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-[20px]">
-            <lable className="flex-[1] text-center font-sans font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
-              Bystander's Email Address
-            </lable>
-            <input
-              type="email"
-              name="bystanderEmail"
-              value={formData.bystanderEmail}
-              onChange={handleChange}
-              placeholder="Enter bystander's email adress"
-              className="flex-[3] w-full border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-            ></input>
-          </div>
-          <div className="flex items-center gap-[20px]">
-            <lable className="flex-[1] text-center font-sans font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
-              Bystander's Address
-            </lable>
-            <input
-              type="text"
-              name="bystanderAddress"
-              value={formData.bystanderAddress}
-              onChange={handleChange}
-              placeholder="Enter bystander's address"
-              className="flex-[3] w-full border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-            ></input>
-          </div>
+
           {/* Admission details */}
-          <div className="w-full grid grid-cols-2">
-            <div className="flex items-center gap-[20px]">
-              <lable className="flex-none text-center font-sans font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex flex-col">
+              <label className="text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
                 Date of Admission
-              </lable>
+              </label>
               <input
                 type="date"
                 name="admissionDate"
                 value={formData.admissionDate}
                 onChange={handleChange}
                 className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-              ></input>
+              />
             </div>
-            <div className="flex items-center gap-[20px]">
-              <lable className="flex-none text-center font-sans font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
+
+            <div className="flex flex-col">
+              <label className="text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
                 Time of Admission
-              </lable>
+              </label>
               <input
                 type="time"
                 name="admissionTime"
                 value={formData.admissionTime}
                 onChange={handleChange}
                 className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-              ></input>
+              />
             </div>
           </div>
-          {/* bed number and data of discharge */}
-          <div className="grid grid-cols-2">
-            <div className="flex items-center gap-[10px]">
-              <lable className=" flex-none text-center font-sans font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
+
+          {/* Bed Number and Discharge Date */}
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex flex-col">
+              <label className="text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
                 Bed Number
-              </lable>
+              </label>
               <input
                 type="text"
                 name="bedNumber"
@@ -206,33 +215,32 @@ const Registration = () => {
                 onChange={handleChange}
                 placeholder="Enter bed number"
                 className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-              ></input>
+              />
             </div>
-            {/* date of discharge */}
-            <div className="flex items-center gap-[20px]">
-              <lable className="flex-none text-center font-sans font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
+
+            <div className="flex flex-col">
+              <label className="text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
                 Date of Discharge
-              </lable>
+              </label>
               <input
                 type="date"
                 name="dischargeDate"
                 value={formData.dischargeDate}
                 onChange={handleChange}
                 className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-              ></input>
+              />
             </div>
           </div>
-          <div className="flex justify-between items-center mt-[40px]">
+
+          <div className="flex justify-between items-center mt-8">
             <button
               type="button"
-              className="w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-sans font-semibold py-4 px-4 rounded-full"
-            >
+              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full">
               Back
             </button>
             <button
               type="submit"
-              className="w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-sans font-semibold py-4 px-4 rounded-full"
-            >
+              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full">
               Submit
             </button>
           </div>
