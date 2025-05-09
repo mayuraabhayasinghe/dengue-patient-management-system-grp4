@@ -28,3 +28,9 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
+// Add this with your other route imports
+const staffRoutes = require('./routes/staff');
+
+// Add this with your other route middleware
+app.use('/api/staff', staffRoutes);
