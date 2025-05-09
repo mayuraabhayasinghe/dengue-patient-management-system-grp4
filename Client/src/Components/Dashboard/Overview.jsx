@@ -6,7 +6,8 @@ const Overview = () => {
   return (
     <div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-center">
-        <div className="p-2 md:p-4 bg-white shadow-2xl rounded flex flex-col justify-center items-center gap-3 order-2 md:order-1">
+        {/* Ward staff */}
+        <div className="p-4 md:p-5 bg-white shadow-2xl rounded flex flex-col justify-center items-center gap-3 order-2 md:order-1">
           <h1 className="text-text-2 text-xl font-semibold"> Ward Staff</h1>
           <div className="flex gap-2 w-full">
             <p className="bg-text-2 text-white-1 p-2">101</p>
@@ -54,6 +55,8 @@ const Overview = () => {
             </p>
           </div>
         </div>
+
+        {/* Bed count */}
         <div className="flex flex-col gap-3 order-1 md:order-2">
           <div className="bg-primary-2 rounded-2xl flex items-center justify-between gap-3 p-3 md:p-5">
             <p className="text-white-1 font-semibold text-[1.1rem] md:text-2xl">
@@ -72,11 +75,17 @@ const Overview = () => {
             </p>
           </div>
         </div>
-        <div className="p-2 md:p-4 bg-white shadow-2xl rounded flex flex-col justify-center gap-3 order-3">
+
+        {/* Notifications */}
+        <div className="p-4 md:p-5 bg-white shadow-2xl rounded flex flex-col justify-center gap-3 order-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h2 className="font-semibold text-text-2">Notifications</h2>
             <div className="py-1 px-2 flex-1 flex items-center justify-between bg-background-1 rounded text-text-1 border-1 border-primary-1">
-              <input type="text" placeholder="Search patients" />
+              <input
+                type="text"
+                placeholder="Search patients"
+                className="border-none outline-none bg-transparent text-text-1 placeholder-text-1"
+              />
               <FontAwesomeIcon icon={faSearch}></FontAwesomeIcon>
             </div>
           </div>
@@ -130,7 +139,58 @@ const Overview = () => {
             </table>
           </div>
         </div>
-        <div className="p-10 bg-yellow-900 order-4"></div>
+
+        {/* Special attention needed patients */}
+        <div className="p-4 md:p-5  bg-white shadow-2xl rounded flex flex-col justify-center gap-5 order-4 text-xs sm:text-sm">
+          <h1 className="text-text-2 font-semibold">
+            Special Attention Needed
+          </h1>
+          <div className="flex items-center justify-between gap-2 md:gap-4 h-14">
+            <p className="bg-gray-300 p-4 flex-1 h-[inherit]">
+              D.S. Senanayake
+            </p>
+            <div className="flex flex-col justify-center h-[inherit]">
+              <p className="bg-gray-900 text-white-1 p-1 px-3">Ward 02</p>
+              <p className="bg-gray-300 p-1 px-3">Ward 02</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-2 md:gap-4 h-14">
+            <p className="bg-gray-300 p-4 flex-1 h-[inherit]">
+              D.S. Senanayake
+            </p>
+            <div className="flex flex-col justify-center h-[inherit]">
+              <p className="bg-gray-900 text-white-1 p-1 px-3">Ward 02</p>
+              <p className="bg-gray-300 p-1 px-3">Ward 02</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-2 md:gap-4 h-14">
+            <p className="bg-gray-300 p-4 flex-1 h-[inherit]">
+              D.S. Senanayake
+            </p>
+            <div className="flex flex-col justify-center h-[inherit]">
+              <p className="bg-gray-900 text-white-1 p-1 px-3">Ward 02</p>
+              <p className="bg-gray-300 p-1 px-3">Ward 02</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-2 md:gap-4 h-14">
+            <p className="bg-gray-300 p-4 flex-1 h-[inherit]">
+              D.S. Senanayake
+            </p>
+            <div className="flex flex-col justify-center h-[inherit]">
+              <p className="bg-gray-900 text-white-1 p-1 px-3">Ward 02</p>
+              <p className="bg-gray-300 p-1 px-3">Ward 02</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-2 md:gap-4 h-14">
+            <p className="bg-gray-300 p-4 flex-1 h-[inherit]">
+              D.S. Senanayake
+            </p>
+            <div className="flex flex-col justify-center h-[inherit]">
+              <p className="bg-gray-900 text-white-1 p-1 px-3">Ward 02</p>
+              <p className="bg-gray-300 p-1 px-3">Ward 02</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
