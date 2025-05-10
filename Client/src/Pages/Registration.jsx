@@ -120,7 +120,8 @@ const Registration = () => {
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
-                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]">
+                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
+              >
                 <option>Male</option>
                 <option>Female</option>
                 <option>Other</option>
@@ -235,12 +236,14 @@ const Registration = () => {
           <div className="flex justify-between items-center mt-8">
             <button
               type="button"
-              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full">
+              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full"
+            >
               Back
             </button>
             <button
               type="submit"
-              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full">
+              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full"
+            >
               Submit
             </button>
           </div>
