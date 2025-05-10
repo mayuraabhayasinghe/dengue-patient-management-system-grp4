@@ -10,7 +10,7 @@ const Login = () => {
     // Handle login logic here
   };
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col justify-center items-center p-4">
       {/* Main Content */}
       <div className="container mx-auto px-4 mt-12 flex justify-center items-center md:justify-center ">
         {/* Login Form */}
@@ -49,13 +49,7 @@ const Login = () => {
               />
             </div>
 
-            <div className="text-right">
-              <a
-                href="/forgot-password"
-                className="text-gray-600 hover:text-primary">
-                Forgot Password?
-              </a>
-            </div>
+            
 
             <button type="submit" className=" btn w-full">
               Log In
