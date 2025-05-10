@@ -33,5 +33,5 @@ app.listen(PORT, () => {
 // Add this with your other route imports
 const staffRoutes = require("./routes/staff");
 
-// Add this with your other route middleware
-app.use("/api/staff", staffRoutes);
+// // Add this with your other route middleware
+// app.use("/api/staff", staffRoutes);

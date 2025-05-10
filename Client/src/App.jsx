@@ -9,6 +9,7 @@ import Registration from "./Pages/Registration";
 import Chatbot from "./Components/Chatbot";
 import PatientPage from "./Pages/PatientPage";
 import Caretaker from "./Pages/Caretaker/Caretaker";
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
         <Route path="/patient-form" element={<PatientPage />} />
         <Route path="/caretaker-input-form" element={<Caretaker />} />
       </Routes>
+      <ToastContainer position="top-center" autoClose={3000} />
       <Footer />
     </div>
   );

@@ -26,7 +26,7 @@ exports.loginUser = async (req, res) => {
     }
 
     // Success - send token and user info
-    const token = generateToken(matchedUser._id);
+    const token = generateToken(matchedUser._id, matchedUser.role);
 
     res.status(200).json({
       token,
@@ -35,6 +35,7 @@ exports.loginUser = async (req, res) => {
         name: matchedUser.name,
         role: matchedUser.role,
       },
+      message: "Login successful",
     });
   } catch (error) {
     console.error(error);
