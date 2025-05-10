@@ -9,7 +9,7 @@ exports.loginUser = async (req, res) => {
     const users = await User.find({ email });
 
     if (users.length === 0) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(404).json({ message: "No user found with this email" });
     }
 
     // Check if any user's password matches
@@ -22,7 +22,7 @@ exports.loginUser = async (req, res) => {
     ).catch(() => null);
 
     if (!matchedUser) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "Incorrect password" });
     }
 
     // Success - send token and user info

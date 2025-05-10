@@ -8,13 +8,21 @@ import "react-toastify/dist/ReactToastify.css";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState(""); // inline email error
+  const [passwordError, setPasswordError] = useState(""); // inline password error
+
+  const navigate = useNavigate();
 
   // sumbit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Clear previous errors
+    setEmailError("");
+    setPasswordError("");
+
     try {
-      const res = await axios.post("http://localhost:5000/api/users/login", {
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
         email,
         password,
       });
@@ -28,17 +36,29 @@ const Login = () => {
       localStorage.setItem("name", name);
       localStorage.setItem("role", role);
 
-      toast.success(message || "Login successful");
       //Reset input field after login
       setEmail("");
       setPassword("");
 
+      toast.success(message || "Login successful");
       // Redirect to landing page(home)
       navigate("/");
     } catch (err) {
-      const errorMsg =
-        err.response?.data?.message || "Login failed. Try again.";
-      toast.error(errorMsg);
+      const status = err.response?.status;
+      const msg = err.response?.data?.message;
+
+      if (status === 404) {
+        setEmailError(err.response.status.data?.message);
+      } else if (status === 401) {
+        setPasswordError(err.response.status.data?.message);
+      } else {
+        toast.error(msg);
+      }
+      // const errorMsg =
+      //   err.response?.data?.message || "Login failed. Try again.";
+      // // toast.error(errorMsg);
+      // const [statusCode, setStatusCode] = useState();
+      // setStatusCode(err.response?.status);
     }
   };
   return (
@@ -62,9 +82,14 @@ const Login = () => {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-primary"
+                className={`w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 ${
+                  emailError ? "border-red-500" : "border-gray-200"
+                } focus:outline-none focus:border-primary`}
                 placeholder="ABC Perera"
               />
+              {emailError && (
+                <p className="text-red-500 text-sm mt-1">{emailError}</p>
+              )}
             </div>
 
             <div>
@@ -76,9 +101,14 @@ const Login = () => {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:border-primary"
+                className={`w-full px-4 py-3 rounded-lg bg-gray-50 border ${
+                  passwordError ? "border-red-500" : "border-gray-200"
+                } focus:outline-none focus:border-primary`}
                 placeholder="password"
               />
+              {passwordError && (
+                <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+              )}
             </div>
 
             <button type="submit" className=" btn w-full">
