@@ -1,13 +1,12 @@
-
-// const express = require('express');
-// const router = express.Router();
-// const staffController = require('../controllers/staffController');
-// const authMiddleware = require('../middleware/auth');
-
-
-// router.post('/register', staffController.registerStaff);
+const express = require('express');
+const router = express.Router();
+const staffController = require('../controllers/staffController');
+const authMiddleware = require('../middleware/auth');
 
 
-// router.get('/', authMiddleware, staffController.getAllStaff);
+router.post('/register', staffController.registerStaff);
 
-// module.exports = router;
+
+router.get('/', authMiddleware, staffController.getAllStaff);
+
+module.exports = router;

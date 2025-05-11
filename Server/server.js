@@ -19,19 +19,15 @@ app.get("/", (req, res) => {
   res.send("DengueGuard API is running...");
 });
 
-// Future routes:
+// Routes:
 app.use("/api/feedback", require("./routes/feedbackRoutes"));
 app.use("/api/patients", require("./routes/patientsRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
-// app.use("/api/patients", require("./routes/patientRoutes"));
+app.use("/api/staff", require("./routes/staff"));
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
 
-// Add this with your other route imports
-const staffRoutes = require("./routes/staff");
-
-// // Add this with your other route middleware
-// app.use("/api/staff", staffRoutes);
