@@ -22,6 +22,7 @@ app.get("/", (req, res) => {
 // Future routes:
 app.use("/api/feedback", require("./routes/feedbackRoutes"));
 app.use("/api/patients", require("./routes/patientsRoutes"));
+app.use("/api/auth", require("./routes/authRoutes"));
 // app.use("/api/patients", require("./routes/patientRoutes"));
 
 const PORT = process.env.PORT || 5000;
@@ -30,7 +31,7 @@ app.listen(PORT, () => {
 });
 
 // Add this with your other route imports
-const staffRoutes = require('./routes/staff');
+const staffRoutes = require("./routes/staff");
 
-// Add this with your other route middleware
-app.use('/api/staff', staffRoutes);
+// // Add this with your other route middleware
+// app.use("/api/staff", staffRoutes);
