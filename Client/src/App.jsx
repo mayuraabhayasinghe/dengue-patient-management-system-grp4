@@ -8,7 +8,7 @@ import Dashboard from "./Pages/Dashboard";
 import Registration from "./Pages/Registration";
 import Chatbot from "./Components/Chatbot";
 import PatientPage from "./Pages/PatientPage";
-import Caretaker from "./Pages/Caretaker/Caretaker";
+import Caretaker from "./Pages/Caretaker";
 
 const App = () => {
   return (
