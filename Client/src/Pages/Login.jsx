@@ -10,6 +10,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState(""); // inline email error
   const [passwordError, setPasswordError] = useState(""); // inline password error
+  const [missingError, setMissingError] = useState(false);
 
   const navigate = useNavigate();
 
@@ -20,6 +21,7 @@ const Login = () => {
     // Clear previous errors
     setEmailError("");
     setPasswordError("");
+    setMissingError("");
 
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", {
@@ -48,9 +50,12 @@ const Login = () => {
       const msg = err.response?.data?.message;
 
       if (status === 404) {
-        setEmailError(err.response.status.data?.message);
+        setEmailError("No user found with this email.");
       } else if (status === 401) {
-        setPasswordError(err.response.status.data?.message);
+        setPasswordError("Incorrect password.");
+      } else if (status === 400) {
+        setMissingError(true);
+        toast.error("All fields are required.");
       } else {
         toast.error(msg);
       }
@@ -83,13 +88,21 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={`w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 ${
-                  emailError ? "border-red-500" : "border-gray-200"
+                  emailError || missingError
+                    ? "border-red-500"
+                    : "border-gray-200"
                 } focus:outline-none focus:border-primary`}
                 placeholder="ABC Perera"
               />
-              {emailError && (
-                <p className="text-red-500 text-sm mt-1">{emailError}</p>
-              )}
+              <div>
+                <p
+                  className={`text-red-500 text-sm mt-1 ${
+                    emailError ? "show" : "hidden"
+                  }`}
+                >
+                  {emailError}
+                </p>
+              </div>
             </div>
 
             <div>
@@ -101,11 +114,23 @@ const Login = () => {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full px-4 py-3 rounded-lg bg-gray-50 border ${
-                  passwordError ? "border-red-500" : "border-gray-200"
+                className={`w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 ${
+                  passwordError || missingError
+                    ? "border-red-500"
+                    : "border-gray-200"
                 } focus:outline-none focus:border-primary`}
                 placeholder="password"
               />
+              {/* <input
+                type="text"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="password"
+                className={`w-full px-4 py-3 rounded-lg bg-gray-50 border ${
+                  passwordError ? "border-red-500" : "border-gray-200"
+                } focus:outline-none focus:border-primary`}
+              /> */}
               {passwordError && (
                 <p className="text-red-500 text-sm mt-1">{passwordError}</p>
               )}

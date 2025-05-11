@@ -5,6 +5,11 @@ exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Missing email or password
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     // Find users with this email
     const users = await User.find({ email });
 
