@@ -46,7 +46,7 @@ const Navbar = () => {
           />
           <LinkItem icon={faUsers} label="Users" to="/admin/users" />
           <LinkItem icon={faChartLine} label="Reports" to="/admin/reports" />
-          <LinkItem icon={faBook} label="Feedbacks" to="/feedback" />
+          <LinkItem icon={faBook} label="Feedbacks" to="/admin/feedback" />
         </div>
 
         {/* Mobile Menu Toggle */}
