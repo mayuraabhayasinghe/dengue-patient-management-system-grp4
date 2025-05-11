@@ -25,17 +25,17 @@ const addPatient = async (req, res) => {
       bedNumber,
     } = req.body;
 
-    // Check if email already exists in the system
-    const existingUser = await User.findOne({ email: bystanderEmail });
-    if (existingUser) {
-      return res.status(400).json({ message: "Bystander's email is already in use." });
-    }
+    // // Check if email already exists in the system
+    // const existingUser = await User.findOne({ email: bystanderEmail });
+    // if (existingUser) {
+    //   return res.status(400).json({ message: "Bystander's email is already in use." });
+    // }
 
-    // Check if bystander's address already exists
-    const existingAddress = await PatientDetails.findOne({ bystanderAddress });
-    if (existingAddress) {
-      return res.status(400).json({ message: "Bystander's address is already associated with another patient." });
-    }
+    // // Check if bystander's address already exists
+    // const existingAddress = await PatientDetails.findOne({ bystanderAddress });
+    // if (existingAddress) {
+    //   return res.status(400).json({ message: "Bystander's address is already associated with another patient." });
+    // }
 
     // Check if bed number already exists
     const existingBedNumber = await PatientDetails.findOne({ bedNumber });
@@ -43,10 +43,10 @@ const addPatient = async (req, res) => {
       return res.status(400).json({ message: "Bed number is already in use." });
     }
 
-    // Validate age (ensure it's a positive number and within a realistic range)
-    if (age <= 0 || age > 120) {
-      return res.status(400).json({ message: "Invalid age entered." });
-    }
+    // // Validate age (ensure it's a positive number and within a realistic range)
+    // if (age <= 0 || age > 120) {
+    //   return res.status(400).json({ message: "Invalid age entered." });
+    // }
 
     // Validate weight (ensure it's a positive number)
     if (weight <= 0) {
@@ -55,7 +55,9 @@ const addPatient = async (req, res) => {
 
     // Validate admission and discharge dates if present
     if (admissionDate && new Date(admissionDate) > new Date()) {
-      return res.status(400).json({ message: "Admission date cannot be in the future." });
+      return res
+        .status(400)
+        .json({ message: "Admission date cannot be in the future." });
     }
 
     // Generating the password

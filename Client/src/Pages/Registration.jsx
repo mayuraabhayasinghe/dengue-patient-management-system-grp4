@@ -250,7 +250,11 @@ const Registration = () => {
         </form>
 
         {/* Toast container for feedback */}
-        <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+        <ToastContainer
+          position="top-center"
+          autoClose={2000}
+          hideProgressBar
+        />
       </div>
     </div>
   );
