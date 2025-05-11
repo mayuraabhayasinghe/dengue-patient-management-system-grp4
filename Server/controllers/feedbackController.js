@@ -1,5 +1,6 @@
 const Feedback = require("../models/Feedback");
 
+// Submit feedback 
 const submitFeedback = async (req, res) => {
     try {
         const { name, email, phone, userType, rating, feedback } = req.body;
@@ -17,4 +18,15 @@ const submitFeedback = async (req, res) => {
     }
 };
 
-module.exports = { submitFeedback };
+// Fetch all feedbacks
+const getAllFeedbacks = async (req, res) => {
+    try {
+        const feedbacks = await Feedback.find().sort({ createdAt: -1 });
+        res.status(200).json(feedbacks);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch feedbacks" });
+    }
+};
+
+
+module.exports = { submitFeedback, getAllFeedbacks };
