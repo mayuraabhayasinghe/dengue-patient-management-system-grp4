@@ -1,85 +1,114 @@
-import React from "react";
+import React from 'react';
 
 const PatientForm = () => {
   return (
-    <div className="bg-white shadow-md rounded-xl p-6 max-w-4xl mx-auto mt-6">
-      <div className="flex justify-between mb-4">
-        <div>
-          <p className="font-semibold">Patient Name : <span className="text-gray-700">Thilak Rathnayake</span></p>
-          <p className="text-sm text-gray-600">Time : 4.08 PM</p>
+    <div className="min-h-screen bg-teal-200 flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-md p-6 w-full max-w-4xl">
+        {/* Header Box */}
+        <div className="bg-teal-200 border border-gray-300 p-4 rounded-lg mb-6">
+          <div className="flex justify-between">
+            <div>
+              <p className="font-bold">Patient Name : Thilak Rathnayake</p>
+              <p className="text-sm">Time : 4.08 PM</p>
+            </div>
+            <div className="text-right">
+              <p className="font-bold">Admission Date : 12/03/2025</p>
+              <p className="text-sm">Date : 29/03/2025</p>
+            </div>
+          </div>
         </div>
-        <div>
-          <p className="font-semibold">Admission Date : <span className="text-gray-700">12/03/2025</span></p>
-          <p className="text-sm text-gray-600">Date : 29/03/2025</p>
-        </div>
+
+        <form className="grid grid-cols-3 gap-4 text-sm">
+          {/* Row 1 */}
+          <div className="flex flex-col relative">
+            <input type="text" placeholder="Body Temperature" className="border p-2 rounded pr-12" />
+            <span className="text-xs text-pink-500">*should measure 4 hourly</span>
+          </div>
+          <div className="flex flex-col relative">
+            <input type="text" placeholder="HCT/PVC" className="border p-2 rounded pr-12" />
+            <span className="text-xs text-pink-500">*should measure 6 hourly</span>
+          </div>
+          <div className="flex flex-col relative">
+            <input type="text" placeholder="Pulse Rate" className="border p-2 rounded pr-12" />
+            <span className="text-xs text-pink-500">*should measure 3 hourly</span>
+          </div>
+
+          {/* FBC Section */}
+          <p className="col-span-3 font-bold mt-2">FBC</p>
+          <div className="flex flex-col relative">
+            <input type="text" placeholder="WBC" className="border p-2 rounded pr-12" />
+            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mm3</span>
+            <span className="text-xs text-pink-500">*measure on admission & daily</span>
+          </div>
+          <div className="flex flex-col relative">
+            <input type="text" placeholder="PLT" className="border p-2 rounded pr-12" />
+            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mm3</span>
+          </div>
+          <div></div>
+
+          {/* Blood Pressure Supine */}
+          <p className="col-span-3 font-bold mt-2">Blood Pressure(Supine) <span className="text-xs text-pink-500">*should measure 3 hourly</span></p>
+          <div className="relative">
+            <input type="text" placeholder="Systolic" className="border p-2 rounded pr-12 w-full" />
+            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mmHg</span>
+          </div>
+          <div className="relative">
+            <input type="text" placeholder="Diastolic" className="border p-2 rounded pr-12 w-full" />
+            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mmHg</span>
+          </div>
+          <div></div>
+
+          <div className="relative">
+            <input type="text" defaultValue="20" placeholder="Pulse Pressure(PP)" className="border p-2 rounded pr-12 w-full" />
+            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mmHg</span>
+          </div>
+          <div className="relative">
+            <input type="text" defaultValue="60" placeholder="Mean Arterial Pressure(MAP)" className="border p-2 rounded pr-12 w-full" />
+            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mmHg</span>
+          </div>
+          <div></div>
+
+          {/* Blood Pressure Sitting */}
+          <p className="col-span-3 font-bold mt-2">Blood Pressure(Sitting) <span className="text-xs text-pink-500">*should measure 3 hourly</span></p>
+          <div className="relative">
+            <input type="text" placeholder="Systolic" className="border p-2 rounded pr-12 w-full" />
+            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mmHg</span>
+          </div>
+          <div className="relative">
+            <input type="text" placeholder="Diastolic" className="border p-2 rounded pr-12 w-full" />
+            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mmHg</span>
+          </div>
+          <div></div>
+
+          {/* Respiratory and CRFT */}
+          <div className="relative">
+            <input type="text" placeholder="Respiratory Rate" className="border p-2 rounded pr-12 w-full" />
+            <span className="absolute right-2 top-2 text-gray-500 text-sm">/min</span>
+          </div>
+          <div className="relative">
+            <input type="text" placeholder="Capillary Refill Time (CRFT)" className="border p-2 rounded pr-12 w-full" />
+            <span className="absolute right-2 top-2 text-gray-500 text-sm">s</span>
+          </div>
+          <div></div>
+
+          {/* Observation */}
+          <div className="col-span-3">
+            <label className="block font-bold mb-1">Observation / Action</label>
+            <textarea className="w-full border p-2 rounded h-24"></textarea>
+          </div>
+
+          {/* Buttons */}
+          <div className="col-span-3 flex justify-between mt-4">
+            <button type="button" className="bg-blue-600 text-white px-6 py-2 rounded">Back</button>
+            <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded">Submit</button>
+          </div>
+        </form>
       </div>
-
-      <form className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-        <div>
-          <label>Body Temperature</label>
-          <input type="text" className="input" />
-          <p className="text-xs text-red-400">*should measure 4 hourly</p>
-        </div>
-        <div>
-          <label>HCT/PVC</label>
-          <input type="text" className="input" />
-          <p className="text-xs text-red-400">*should measure 6 hourly</p>
-        </div>
-        <div>
-          <label>Pulse Rate</label>
-          <input type="text" className="input" />
-          <p className="text-xs text-red-400">*should measure 3 hourly</p>
-        </div>
-
-        <div>
-          <label>WBC</label>
-          <input type="text" className="input" />
-          <p className="text-xs text-red-400">*Measure on admission & daily</p>
-        </div>
-        <div>
-          <label>PLT</label>
-          <input type="text" className="input" />
-        </div>
-
-        <div className="md:col-span-3 mt-4">
-          <h2 className="font-semibold mb-2">Blood Pressure (Supine) <span className="text-red-400 text-xs">*should measure 3 hourly</span></h2>
-          <div className="grid grid-cols-3 gap-4">
-            <input placeholder="Systolic /mmHg" className="input" />
-            <input placeholder="Diastolic /mmHg" className="input" />
-            <input placeholder="Pulse Pressure (PP) /mmHg" defaultValue="20" className="input" />
-            <input placeholder="MAP /mmHg" defaultValue="60" className="input" />
-          </div>
-        </div>
-
-        <div className="md:col-span-3 mt-4">
-          <h2 className="font-semibold mb-2">Blood Pressure (Sitting) <span className="text-red-400 text-xs">*should measure 3 hourly</span></h2>
-          <div className="grid grid-cols-2 gap-4">
-            <input placeholder="Systolic /mmHg" className="input" />
-            <input placeholder="Diastolic /mmHg" className="input" />
-          </div>
-        </div>
-
-        <div>
-          <label>Respiratory Rate</label>
-          <input type="text" className="input" placeholder="/min" />
-        </div>
-        <div>
-          <label>Capillary Refill Time (CRFT)</label>
-          <input type="text" className="input" placeholder="s" />
-        </div>
-
-        <div className="md:col-span-3">
-          <label>Observation / Action</label>
-          <textarea className="input h-24 resize-none" />
-        </div>
-
-        <div className="md:col-span-3 flex justify-between mt-6">
-          <button type="button" className="btn bg-blue-500 text-white px-6 py-2 rounded-full">Back</button>
-          <button type="submit" className="btn bg-blue-500 text-white px-6 py-2 rounded-full">Submit</button>
-        </div>
-      </form>
     </div>
   );
 };
 
 export default PatientForm;
+
+
+
