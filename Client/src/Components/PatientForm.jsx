@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
 const PatientForm = () => {
   return (
-    <div className="min-h-screen bg-teal-200 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-md p-6 w-full max-w-4xl">
-        {/* Header Box */}
+    <div className="min-h-screen bg-teal-400 flex items-center justify-center p-6">
+      <div className="bg-white rounded-2xl shadow-md p-8 w-full max-w-4xl">
+        {/* Header */}
         <div className="bg-teal-200 border border-gray-300 p-4 rounded-lg mb-6">
           <div className="flex justify-between">
             <div>
@@ -18,97 +18,147 @@ const PatientForm = () => {
           </div>
         </div>
 
-        <form className="grid grid-cols-3 gap-4 text-sm">
-          {/* Row 1 */}
-          <div className="flex flex-col relative">
-            <input type="text" placeholder="Body Temperature" className="border p-2 rounded pr-12" />
-            <span className="text-xs text-pink-500">*should measure 4 hourly</span>
-          </div>
-          <div className="flex flex-col relative">
-            <input type="text" placeholder="HCT/PVC" className="border p-2 rounded pr-12" />
-            <span className="text-xs text-pink-500">*should measure 6 hourly</span>
-          </div>
-          <div className="flex flex-col relative">
-            <input type="text" placeholder="Pulse Rate" className="border p-2 rounded pr-12" />
-            <span className="text-xs text-pink-500">*should measure 3 hourly</span>
+        {/* Form */}
+        <form className="space-y-6">
+          {/* Temperature Section */}
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="text-sm">Body Temperature</label>
+              <input className="input-field" type="text" />
+              <p className="text-xs text-red-400">*should measure 4 hourly</p>
+            </div>
+            <div>
+              <label className="text-sm">HCT/PVC</label>
+              <input className="input-field" type="text" />
+              <p className="text-xs text-red-400">*should measure 6 hourly</p>
+            </div>
+            <div>
+              <label className="text-sm">Pulse Rate</label>
+              <input className="input-field" type="text" />
+              <p className="text-xs text-red-400">*should measure 3 hourly</p>
+            </div>
           </div>
 
           {/* FBC Section */}
-          <p className="col-span-3 font-bold mt-2">FBC</p>
-          <div className="flex flex-col relative">
-            <input type="text" placeholder="WBC" className="border p-2 rounded pr-12" />
-            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mm3</span>
-            <span className="text-xs text-pink-500">*measure on admission & daily</span>
+          <div>
+            <p className="font-bold text-sm">FBC</p>
+            <p className="text-xs text-red-400 mb-1">*Measure on admission & daily</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm">WBC</label>
+                <input className="input-field" type="text" placeholder="/mm3" />
+              </div>
+              <div>
+                <label className="text-sm">PLT</label>
+                <input className="input-field" type="text" placeholder="/mm3" />
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col relative">
-            <input type="text" placeholder="PLT" className="border p-2 rounded pr-12" />
-            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mm3</span>
-          </div>
-          <div></div>
 
-          {/* Blood Pressure Supine */}
-          <p className="col-span-3 font-bold mt-2">Blood Pressure(Supine) <span className="text-xs text-pink-500">*should measure 3 hourly</span></p>
-          <div className="relative">
-            <input type="text" placeholder="Systolic" className="border p-2 rounded pr-12 w-full" />
-            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mmHg</span>
-          </div>
-          <div className="relative">
-            <input type="text" placeholder="Diastolic" className="border p-2 rounded pr-12 w-full" />
-            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mmHg</span>
-          </div>
-          <div></div>
+          {/* Blood Pressure (Supine) */}
+          <div>
+            <p className="font-bold text-sm">Blood Pressure (Supine)</p>
+            <p className="text-xs text-red-400 mb-1">*should measure 3 hourly</p>
 
-          <div className="relative">
-            <input type="text" defaultValue="20" placeholder="Pulse Pressure(PP)" className="border p-2 rounded pr-12 w-full" />
-            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mmHg</span>
-          </div>
-          <div className="relative">
-            <input type="text" defaultValue="60" placeholder="Mean Arterial Pressure(MAP)" className="border p-2 rounded pr-12 w-full" />
-            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mmHg</span>
-          </div>
-          <div></div>
+            {/* Row 1: Systolic & Diastolic */}
+            <div className="grid grid-cols-2 gap-4 mb-2">
+              <div>
+                <label className="text-sm">Systolic</label>
+                <input className="input-field" type="text" placeholder="/mmHg" />
+              </div>
+              <div>
+                <label className="text-sm">Diastolic</label>
+                <input className="input-field" type="text" placeholder="/mmHg" />
+              </div>
+            </div>
 
-          {/* Blood Pressure Sitting */}
-          <p className="col-span-3 font-bold mt-2">Blood Pressure(Sitting) <span className="text-xs text-pink-500">*should measure 3 hourly</span></p>
-          <div className="relative">
-            <input type="text" placeholder="Systolic" className="border p-2 rounded pr-12 w-full" />
-            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mmHg</span>
+            {/* Row 2: PP & MAP */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm">Pulse Pressure (PP)</label>
+                <input className="input-field" type="text" value="20" placeholder="/mmHg" />
+              </div>
+              <div>
+                <label className="text-sm">Mean Arterial Pressure (MAP)</label>
+                <input className="input-field" type="text" value="60" placeholder="/mmHg" />
+              </div>
+            </div>
           </div>
-          <div className="relative">
-            <input type="text" placeholder="Diastolic" className="border p-2 rounded pr-12 w-full" />
-            <span className="absolute right-2 top-2 text-gray-500 text-sm">/mmHg</span>
-          </div>
-          <div></div>
 
-          {/* Respiratory and CRFT */}
-          <div className="relative">
-            <input type="text" placeholder="Respiratory Rate" className="border p-2 rounded pr-12 w-full" />
-            <span className="absolute right-2 top-2 text-gray-500 text-sm">/min</span>
+          {/* Blood Pressure (Sitting) */}
+          <div>
+            <p className="font-bold text-sm">Blood Pressure (Sitting)</p>
+            <p className="text-xs text-red-400 mb-1">*should measure 3 hourly</p>
+
+            {/* Row 1: Systolic & Diastolic */}
+            <div className="grid grid-cols-2 gap-4 mb-2">
+              <div>
+                <label className="text-sm">Systolic</label>
+                <input className="input-field" type="text" placeholder="/mmHg" />
+              </div>
+              <div>
+                <label className="text-sm">Diastolic</label>
+                <input className="input-field" type="text" placeholder="/mmHg" />
+              </div>
+            </div>
+
+            {/* Row 2: Respiratory & CRT */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm">Respiratory Rate</label>
+                <input className="input-field" type="text" placeholder="/min" />
+              </div>
+              <div>
+                <label className="text-sm">Capillary Refill Time (CRFT)</label>
+                <input className="input-field" type="text" placeholder="s" />
+              </div>
+            </div>
           </div>
-          <div className="relative">
-            <input type="text" placeholder="Capillary Refill Time (CRFT)" className="border p-2 rounded pr-12 w-full" />
-            <span className="absolute right-2 top-2 text-gray-500 text-sm">s</span>
-          </div>
-          <div></div>
 
           {/* Observation */}
-          <div className="col-span-3">
-            <label className="block font-bold mb-1">Observation / Action</label>
-            <textarea className="w-full border p-2 rounded h-24"></textarea>
+          <div>
+            <label className="text-sm font-bold">Observation / Action</label>
+            <textarea className="w-full border border-gray-300 rounded-md p-2 min-h-[100px]"></textarea>
           </div>
 
           {/* Buttons */}
-          <div className="col-span-3 flex justify-between mt-4">
-            <button type="button" className="bg-blue-600 text-white px-6 py-2 rounded">Back</button>
-            <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded">Submit</button>
+          <div className="flex justify-between mt-6">
+            <button
+              type="button"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-full"
+            >
+              Back
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-full"
+            >
+              Submit
+            </button>
           </div>
         </form>
       </div>
+
+      {/* Custom styles for input fields */}
+      <style>{`
+        .input-field {
+          width: 100%;
+          padding: 0.5rem;
+          border: 1px solid #d1d5db;
+          border-radius: 0.375rem;
+          outline: none;
+        }
+        .input-field:focus {
+          border-color: #3b82f6;
+        }
+      `}</style>
     </div>
   );
 };
 
 export default PatientForm;
+
+
 
 
 
