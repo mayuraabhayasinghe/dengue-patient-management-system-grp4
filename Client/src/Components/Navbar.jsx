@@ -41,7 +41,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex items-center justify-center bg-background-1 p-2 md:p-5">
+    <nav className="flex items-center justify-center bg-background-1 py-5 p-2 md:p-5">
       <div className="w-full md:w-[90%] lg:w-4/5 flex items-center justify-between relative">
         {/* Logo */}
         <img src={logo} alt="Logo" className="w-[20%] md:w-[12%]" />
@@ -86,19 +86,21 @@ const Navbar = () => {
         </div>
 
         {/* Auth Button */}
-        <div className="flex flex-col md:flex-row relative">
+        <div className="flex flex-col md:flex-row relative text-sm md:text-sm">
           {isLoggedIn() ? (
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 btn text-red-600">
+              className="flex items-center gap-2 btn">
               <FontAwesomeIcon icon={faSignOutAlt} />
               Logout
             </button>
           ) : (
-            <button className="flex items-center gap-2 btn">
-              <FontAwesomeIcon icon={faUser} />
-              <Link to="/login">Login</Link>
-            </button>
+            <Link to="/login">
+              <button className="flex items-center gap-2 btn">
+                <p>Log In</p>
+                <FontAwesomeIcon icon={faUser} />
+              </button>
+            </Link>
           )}
 
           {/* Show dropdown message if not logged in */}
@@ -113,7 +115,7 @@ const Navbar = () => {
         <div className="md:hidden" ref={dropdownRef}>
           <FontAwesomeIcon
             onClick={() => setIsOpen((prev) => !prev)}
-            className="text-4xl pr-5 cursor-pointer text-secondary-1"
+            className="text-2xl md:text-4xl pr-5 cursor-pointer text-secondary-1"
             icon={faBars}
           />
           {isOpen && (
@@ -122,6 +124,20 @@ const Navbar = () => {
                 Home
               </Link>
 
+              {user?.role !== "patient" ? (
+                <p
+                  className="text-text-1 hover:text-primary-2 cursor-pointer"
+                  onClick={() => handleProtectedClick("/dashboard")}>
+                  Dashboard
+                </p>
+              ) : (
+                <p
+                  className="text-text-1 hover:text-primary-2 cursor-pointer"
+                  onClick={() => handleProtectedClick("/patient-dashboard")}>
+                  Dashboard
+                </p>
+              )}
+
               {user?.role === "patient" ? (
                 <Link
                   className="text-text-1 hover:text-primary-2"
@@ -129,14 +145,6 @@ const Navbar = () => {
                   Reports
                 </Link>
               ) : (
-                <p
-                  className="text-text-1 hover:text-primary-2 cursor-pointer"
-                  onClick={() => handleProtectedClick("/dashboard")}>
-                  Dashboard
-                </p>
-              )}
-
-              {user?.role !== "patient" && (
                 <p
                   className="text-text-1 hover:text-primary-2 cursor-pointer"
                   onClick={() => handleProtectedClick("/registration")}>
