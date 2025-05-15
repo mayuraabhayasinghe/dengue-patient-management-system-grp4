@@ -45,7 +45,8 @@ const Navbar = () => {
           </p>
           <a
             href="#contact"
-            className="text-text-1 hover:text-primary-2 cursor-pointer">
+            className="text-text-1 hover:text-primary-2 cursor-pointer"
+          >
             Contact
           </a>
         </div>
@@ -63,7 +64,8 @@ const Navbar = () => {
           <FontAwesomeIcon
             onClick={() => setIsOpen((prev) => !prev)}
             className="text-4xl pr-5 cursor-pointer text-secondary-1"
-            icon={faBars}></FontAwesomeIcon>
+            icon={faBars}
+          ></FontAwesomeIcon>
           {isOpen ? (
             <div className="absolute bg-white right-5 my-3 flex flex-col items-center p-5 w-[150px] text-text-1 hover:text-primary-2 gap-5">
               <p className="text-text-1 hover:text-primary-2">
@@ -77,7 +79,8 @@ const Navbar = () => {
               </p>
               <a
                 href="#contact"
-                className="text-text-1 hover:text-primary-2 cursor-pointer">
+                className="text-text-1 hover:text-primary-2 cursor-pointer"
+              >
                 Contact
               </a>
             </div>
