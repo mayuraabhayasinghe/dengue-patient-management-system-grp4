@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Title from "./Title";
+import Title from "../Title";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser,
