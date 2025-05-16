@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Overview from "../Components/Dashboard/Overview";
-import Patients from "../Components/Dashboard/Staff";
+import Users from "../Components/Dashboard/Users";
 import WardManagement from "../Components/Dashboard/WardManagement";
 import Inventory from "../Components/Dashboard/Inventory";
 import Accounts from "../Components/Dashboard/Accounts";
@@ -8,10 +8,10 @@ import Accounts from "../Components/Dashboard/Accounts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChartPie,
-  faUserInjured,
   faHospitalUser,
   faBoxes,
   faUserShield,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
 const Dashboard = () => {
@@ -21,8 +21,8 @@ const Dashboard = () => {
     switch (activeComponent) {
       case "overview":
         return <Overview />;
-      case "patients":
-        return <Staff />;
+      case "users":
+        return <Users />;
       case "ward":
         return <WardManagement />;
       case "inventory":
@@ -36,7 +36,7 @@ const Dashboard = () => {
 
   const navItems = [
     { id: "overview", label: "Overview", icon: faChartPie },
-    { id: "patients", label: "Patients", icon: faUserInjured },
+    { id: "users", label: "Users", icon: faUser },
     { id: "ward", label: "Ward Management", icon: faHospitalUser },
     { id: "inventory", label: "Inventory", icon: faBoxes },
     { id: "account", label: "Accounts", icon: faUserShield },
