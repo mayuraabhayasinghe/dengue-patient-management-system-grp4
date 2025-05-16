@@ -44,7 +44,6 @@ const Navbar = () => {
             label="Dashboard"
             to="/admin/dashboard"
           />
-          <LinkItem icon={faUsers} label="Users" to="/admin/users" />
           <LinkItem icon={faChartLine} label="Reports" to="/admin/reports" />
           <LinkItem icon={faBook} label="Feedbacks" to="/admin/feedback" />
         </div>
