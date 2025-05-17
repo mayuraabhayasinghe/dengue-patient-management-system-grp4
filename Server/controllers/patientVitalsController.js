@@ -1,4 +1,4 @@
-const PatientVitals = require("../models/PatientVitals");
+const PatientVitals = require("../models/staffPatientVitals");
 
 const addVitals = async (req, res) => {
   try {
