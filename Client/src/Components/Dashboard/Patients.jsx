@@ -14,11 +14,11 @@ const Patients = () => {
         const fetchPatients = async () => {
             try {
                 const mockPatients = [
-                    { id: 1, name: "John Doe", email: "john@example.com", age: 32, status: "Active", ward: "Ward 1", bloodType: "A+", admissionDate: "2023-05-15" },
-                    { id: 2, name: "Jane Smith", email: "jane@example.com", age: 28, status: "Recovered", ward: "Ward 2", bloodType: "B-", admissionDate: "2023-06-20" },
-                    { id: 3, name: "Robert Johnson", email: "robert@example.com", age: 45, status: "Critical", ward: "Ward 3", bloodType: "O+", admissionDate: "2023-07-10" },
-                    { id: 4, name: "Emily Davis", email: "emily@example.com", age: 22, status: "Monitoring", ward: "Ward 1", bloodType: "AB+", admissionDate: "2023-08-05" },
-                    { id: 5, name: "Michael Brown", email: "michael@example.com", age: 60, status: "Recovered", ward: "Ward 4", bloodType: "A-", admissionDate: "2023-09-12" },
+                    { id: 1, name: "Anura Kumara", email: "anura@example.com", age: 32, status: "Active", ward: "Ward 1", bloodType: "A+", admissionDate: "2023-05-15" },
+                    { id: 2, name: "Sanath Nishantha", email: "sanath@example.com", age: 28, status: "Recovered", ward: "Ward 2", bloodType: "B-", admissionDate: "2023-06-20" },
+                    { id: 3, name: "Chamara Sampath", email: "chamara@example.com", age: 45, status: "Critical", ward: "Ward 3", bloodType: "O+", admissionDate: "2023-07-10" },
+                    { id: 4, name: "Namal Perera", email: "namal@example.com", age: 22, status: "Monitoring", ward: "Ward 1", bloodType: "AB+", admissionDate: "2023-08-05" },
+                    { id: 5, name: "Sunil Perera", email: "sunil@example.com", age: 60, status: "Recovered", ward: "Ward 4", bloodType: "A-", admissionDate: "2023-09-12" },
                 ];
                 
                 setPatients(mockPatients);
