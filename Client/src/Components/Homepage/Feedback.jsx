@@ -8,6 +8,8 @@ import {
   faStar,
   faAngleDown,
 } from "@fortawesome/free-solid-svg-icons";
+import { isLoggedIn } from "../../../../Server/utils/auth";
+import { useNavigate } from "react-router-dom";
 
 const Feedback = () => {
   const [name, setName] = useState("");
@@ -20,8 +22,17 @@ const Feedback = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  const loggedIn = isLoggedIn();
+  const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check login status (adjust logic as per your auth system)
+    if (!loggedIn) {
+      navigate("/login", { state: { message: "Please login first." } });
+      return;
+    }
 
     // Basic field check
     if (!name || !email || !phone || !userType || !rating || !feedback) {
@@ -72,6 +83,9 @@ const Feedback = () => {
         setUserType("");
         setRating(0);
         setFeedback("");
+        setTimeout(() => {
+          setMessage("");
+        }, 2000);
       } else {
         setError(data.error || "Something went wrong.");
         setMessage("");
