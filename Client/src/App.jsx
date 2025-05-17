@@ -10,6 +10,8 @@ import Chatbot from "./Components/Chatbot";
 import PatientPage from "./Pages/PatientPage";
 import Caretaker from "./Pages/Caretaker";
 import { ToastContainer } from "react-toastify";
+import Patients from "./Components/Dashboard/Patients";
+import Profile from "./Components/Dashboard/Profile";
 
 const App = () => {
   return (
@@ -19,6 +21,10 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        {/* Add these nested routes under dashboard */}
+        <Route path="/dashboard/patients" element={<Patients />} />
+        <Route path="/patients/:id" element={<Profile />} />
+        {/* End of new routes */}
         <Route path="/registration" element={<Registration />} />
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/patient-form" element={<PatientPage />} />
