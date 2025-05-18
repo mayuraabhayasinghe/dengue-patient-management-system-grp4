@@ -20,7 +20,9 @@ app.get("/", (req, res) => {
 });
 
 // Future routes:
-app.use("/api/feedback", require("./routes/feedbackRoutes"));
+//app.use("/api/feedback", require("./routes/feedbackRoutes"));
+app.use("/api/fluid", require("./routes/fluid"));
+
 
 // app.use("/api/patients", require("./routes/patientRoutes"));
 
