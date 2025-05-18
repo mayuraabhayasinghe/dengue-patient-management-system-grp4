@@ -4,7 +4,7 @@ import Dashboard from "./Pages/Dashboard";
 import AdminNavbar from "./Components/Navbar";
 import AdminFeedbacks from "./Pages/AdminFeedbacks";
 import StaffRegistration from "./Pages/StaffRegistration";
-import patientRegistration from "../../Client/src/Pages/Registration";
+import PatientRegistration from "../../Client/src/Pages/Registration";
 import AdminHome from "./Pages/AdminHome";
 
 const App = () => {
@@ -22,7 +22,7 @@ const App = () => {
         />
         <Route
           path="/admin/patientRegistration"
-          element={<patientRegistration />}
+          element={<PatientRegistration />}
         />
       </Routes>
     </>
