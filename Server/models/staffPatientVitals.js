@@ -26,4 +26,4 @@ const staffPatientVitalsSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("staffPatientVitals", staffPatientVitalsSchema);
+module.exports = mongoose.model("staffPatientVital", staffPatientVitalsSchema);

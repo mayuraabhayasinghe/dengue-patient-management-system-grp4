@@ -23,8 +23,8 @@ app.get("/", (req, res) => {
 app.use("/api/feedback", require("./routes/feedbackRoutes"));
 app.use("/api/patients", require("./routes/patientsRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/staff", require("./routes/staff"));
-app.use("/api/patient-vitals", require("./routes/patientVitalsRoutes"));
+app.use("/api/staff", require("./routes/staffRoutes"));
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
