@@ -1,5 +1,8 @@
+const userModel = require("../models/userModel");
 const User = require("../models/userModel");
 const generateToken = require("../utils/generateToken");
+const Staff = require("../models/staffModel");
+const Patient = require("../models/patientModel");
 
 exports.loginUser = async (req, res) => {
   try {
@@ -47,3 +50,25 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ message: "Server error during login" });
   }
 };
+
+// Fetch all users
+exports.getAllUsers = async (req, res) => {
+  try {
+    const staff = await Staff.find()
+      .populate("user") // joins user data
+      .sort({ createdAt: -1 });
+
+    const patients = await Patient.find()
+      .populate("user") // joins user data
+      .sort({ createdAt: -1 });
+
+    // Combine all into one array
+    const allUsers = [...staff, ...patients];
+
+    res.status(200).json(allUsers);
+  } catch (error) {
+    console.error("Error in getAllUsers:", error);
+    res.status(500).json({ error: "Failed to fetch Users details" });
+  }
+};
+
