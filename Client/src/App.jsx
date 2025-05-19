@@ -20,9 +20,11 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        {/* Add these nested routes under dashboard */}
-        <Route path="/dashboard/patients" element={<Patients />} />
+        <Route path="/dashboard" element={<Dashboard />}>
+          {/* Nested routes under dashboard */}
+          <Route path="/dashboard/:section" element={<Dashboard />} />
+        </Route>
+
         <Route path="/patients/:id" element={<Profile />} />
         {/* End of new routes */}
         <Route path="/registration" element={<Registration />} />
