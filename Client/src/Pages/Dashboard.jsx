@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+
 import Overview from "../Components/Dashboard/Overview";
 import Patients from "../Components/Dashboard/Patients";
 import WardManagement from "../Components/Dashboard/WardManagement";
@@ -15,7 +17,17 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const Dashboard = () => {
+  const { section } = useParams();
+  const navigate = useNavigate();
   const [activeComponent, setActiveComponent] = useState("overview");
+
+  useEffect(() => {
+    if (section && navItems.some((item) => item.id === section)) {
+      setActiveComponent(section);
+    } else {
+      navigate("/dashboard/overview"); // fallback if invalid section
+    }
+  }, [section]);
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -51,7 +63,7 @@ const Dashboard = () => {
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveComponent(item.id)}
+              onClick={() => navigate(`/dashboard/${item.id}`)}
               className={`flex items-center gap-3 p-2 md:p-3 rounded-lg text-left transition duration-200 ${
                 activeComponent === item.id
                   ? "bg-white text-primary-1 font-semibold shadow"
