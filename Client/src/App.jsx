@@ -12,6 +12,7 @@ import Caretaker from "./Pages/Caretaker";
 import { ToastContainer } from "react-toastify";
 import Patients from "./Components/Dashboard/Patients";
 import Profile from "./Components/Dashboard/Profile";
+import PatientDashboard from "./Pages/PatientDashboard";
 
 const App = () => {
   return (
@@ -20,9 +21,20 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
+
+        {/* Staff Dashboard */}
         <Route path="/dashboard" element={<Dashboard />}>
           {/* Nested routes under dashboard */}
           <Route path="/dashboard/:section" element={<Dashboard />} />
+        </Route>
+
+        {/* Patient Dashboard */}
+        <Route path="/patient-dashboard" element={<PatientDashboard />}>
+          {/* Nested routes under patient dashboard */}
+          <Route
+            path="/patient-dashboard/:section"
+            element={<PatientDashboard />}
+          />
         </Route>
 
         <Route path="/patients/:id" element={<Profile />} />
