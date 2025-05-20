@@ -36,7 +36,7 @@ const Services = () => {
         "Handles patient registration, secure login, and profile management.",
       image: patient_management_img,
       buttonText: "Manage Patients",
-      onClickPath: "/patients",
+      onClickPath: "/dashboard/overview",
     },
     {
       title: "Real-Time Patient Monitoring",
@@ -44,7 +44,7 @@ const Services = () => {
         "Logs patient vitals, fluid intake/output, and timestamps data for accuracy.",
       image: patient_monitoring_img,
       buttonText: "Monitor Patients",
-      onClickPath: "/monitoring",
+      onClickPath: "/dashboard/patients",
     },
     {
       title: "Hospital Resource and Ward Management",
@@ -52,7 +52,7 @@ const Services = () => {
         "Manages bed allocation, medical equipment, and pharmacy inventory.",
       image: ward_management_img,
       buttonText: "Manage Wards",
-      onClickPath: "/wards",
+      onClickPath: "/dashboard/ward",
     },
     {
       title: "Medical Reporting and Analytics",
@@ -76,7 +76,7 @@ const Services = () => {
         "Get a comprehensive overview of patient count, bed availability, and critical cases.",
       image: dashboard_img,
       buttonText: "Dashboard",
-      onClickPath: "/dashboard",
+      onClickPath: "/patient-dashboard",
     },
   ];
 
