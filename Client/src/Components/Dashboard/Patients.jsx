@@ -1,7 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+<<<<<<< Updated upstream
 import { faUser, faEnvelope, faIdBadge, faHeartbeat, faSearch } from "@fortawesome/free-solid-svg-icons";
+=======
+import {
+  faUser,
+  faEnvelope,
+  faIdBadge,
+  faHeartbeat,
+  faSearch,
+  faBed,
+  faUserInjured,
+  faUserShield,
+  faUserCheck
+} from "@fortawesome/free-solid-svg-icons";
+>>>>>>> Stashed changes
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Patients = () => {
@@ -36,10 +50,44 @@ const Patients = () => {
         navigate(`/patients/${patientId}`);
     };
 
+<<<<<<< Updated upstream
     const filteredPatients = patients.filter(patient => 
         patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         patient.ward.toLowerCase().includes(searchTerm.toLowerCase())
+=======
+    fetchPatients();
+  }, []);
+
+  const handlePatientClick = (patientId) => {
+    navigate(`/patients/${patientId}`);
+  };
+
+  const filteredPatients = patients.filter(
+    (patient) =>
+      patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      patient.ward.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Calculate patient counts by status
+  const patientCounts = {
+    total: patients.length,
+    active: patients.filter(p => p.status === "Active").length,
+    recovered: patients.filter(p => p.status === "Recovered").length,
+    critical: patients.filter(p => p.status === "Critical").length,
+    monitoring: patients.filter(p => p.status === "Monitoring").length
+  };
+
+  if (loading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="p-5 text-center text-gray-600">
+        Loading patients...
+      </motion.div>
+>>>>>>> Stashed changes
     );
 
     if (loading) {
@@ -54,6 +102,7 @@ const Patients = () => {
         );
     }
 
+<<<<<<< Updated upstream
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -133,6 +182,123 @@ const Patients = () => {
             </motion.div>
         </motion.div>
     );
+=======
+        {/* Patient Summary Cards */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+        >
+          {/* Total Patients */}
+          <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-blue-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Total Patients</p>
+                <p className="text-2xl font-bold">{patientCounts.total}</p>
+              </div>
+              <FontAwesomeIcon icon={faUser} className="text-blue-500 text-xl" />
+            </div>
+          </div>
+
+          {/* Active Patients */}
+          <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-green-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Active</p>
+                <p className="text-2xl font-bold">{patientCounts.active}</p>
+              </div>
+              <FontAwesomeIcon icon={faUserInjured} className="text-green-500 text-xl" />
+            </div>
+          </div>
+
+          {/* Recovered Patients */}
+          <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-blue-400">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Recovered</p>
+                <p className="text-2xl font-bold">{patientCounts.recovered}</p>
+              </div>
+              <FontAwesomeIcon icon={faUserCheck} className="text-blue-400 text-xl" />
+            </div>
+          </div>
+
+          {/* Critical Patients */}
+          <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-red-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Critical</p>
+                <p className="text-2xl font-bold">{patientCounts.critical}</p>
+              </div>
+              <FontAwesomeIcon icon={faUserShield} className="text-red-500 text-xl" />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Patients Table */}
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-blue-600 text-white">
+              <tr>
+                <th className="p-3 md:p-4 text-left">ID</th>
+                <th className="p-3 md:p-4 text-left">Name</th>
+                <th className="p-3 md:p-4 text-left">Email</th>
+                <th className="p-3 md:p-4 text-left">Age</th>
+                <th className="p-3 md:p-4 text-left">Ward</th>
+                <th className="p-3 md:p-4 text-left">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPatients.map((patient, index) => (
+                <motion.tr
+                  key={patient.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  onClick={() => handlePatientClick(patient.id)}
+                  className={`${
+                    index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                  } hover:bg-gray-100 cursor-pointer transition-colors`}>
+                  <td className="p-3 md:p-4 border-b border-gray-200">
+                    {patient.id}
+                  </td>
+                  <td className="p-3 md:p-4 border-b border-gray-200 font-medium">
+                    {patient.name}
+                  </td>
+                  <td className="p-3 md:p-4 border-b border-gray-200 text-blue-600">
+                    {patient.email}
+                  </td>
+                  <td className="p-3 md:p-4 border-b border-gray-200">
+                    {patient.age}
+                  </td>
+                  <td className="p-3 md:p-4 border-b border-gray-200">
+                    <span className="bg-gray-200 text-gray-800 py-1 px-2 rounded-full text-xs">
+                      {patient.ward}
+                    </span>
+                  </td>
+                  <td className="p-3 md:p-4 border-b border-gray-200">
+                    <span
+                      className={`inline-block py-1 px-3 rounded-full text-xs font-semibold ${
+                        patient.status === "Active"
+                          ? "bg-green-100 text-green-800"
+                          : patient.status === "Recovered"
+                          ? "bg-blue-100 text-blue-800"
+                          : patient.status === "Critical"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}>
+                      {patient.status}
+                    </span>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+>>>>>>> Stashed changes
 };
 
 export default Patients;
