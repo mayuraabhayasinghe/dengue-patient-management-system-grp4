@@ -7,6 +7,11 @@ import {
   faIdBadge,
   faHeartbeat,
   faSearch,
+  faBed,
+  faUserInjured,
+  faUserShield,
+  faUserCheck
+
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -93,14 +98,21 @@ const Patients = () => {
       patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.ward.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  // Calculate patient counts by status
+  const patientCounts = {
+    total: patients.length,
+    active: patients.filter(p => p.status === "Active").length,
+    recovered: patients.filter(p => p.status === "Recovered").length,
+    critical: patients.filter(p => p.status === "Critical").length,
+    monitoring: patients.filter(p => p.status === "Monitoring").length
+  };
 
   if (loading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="p-5 text-center text-gray-600"
-      >
+        className="p-5 text-center text-gray-600">
         Loading patients...
       </motion.div>
     );
@@ -111,14 +123,12 @@ const Patients = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="p-4 md:p-6"
-    >
+      className="p-4 md:p-6">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="mb-6"
-      >
+        className="mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <h2 className="text-2xl font-semibold text-gray-800">
             Registered Patients
@@ -138,6 +148,60 @@ const Patients = () => {
           </div>
         </div>
 
+
+        {/* Patient Summary Cards */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+        >
+          {/* Total Patients */}
+          <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-blue-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Total Patients</p>
+                <p className="text-2xl font-bold">{patientCounts.total}</p>
+              </div>
+              <FontAwesomeIcon icon={faUser} className="text-blue-500 text-xl" />
+            </div>
+          </div>
+
+          {/* Active Patients */}
+          <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-green-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Active</p>
+                <p className="text-2xl font-bold">{patientCounts.active}</p>
+              </div>
+              <FontAwesomeIcon icon={faUserInjured} className="text-green-500 text-xl" />
+            </div>
+          </div>
+
+          {/* Recovered Patients */}
+          <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-blue-400">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Recovered</p>
+                <p className="text-2xl font-bold">{patientCounts.recovered}</p>
+              </div>
+              <FontAwesomeIcon icon={faUserCheck} className="text-blue-400 text-xl" />
+            </div>
+          </div>
+
+          {/* Critical Patients */}
+          <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-red-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Critical</p>
+                <p className="text-2xl font-bold">{patientCounts.critical}</p>
+              </div>
+              <FontAwesomeIcon icon={faUserShield} className="text-red-500 text-xl" />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Patients Table */}
         <div className="bg-white shadow-lg rounded-lg overflow-hidden">
           <table className="w-full">
             <thead className="bg-blue-600 text-white">
@@ -146,7 +210,7 @@ const Patients = () => {
                 <th className="p-3 md:p-4 text-left">Name</th>
                 <th className="p-3 md:p-4 text-left">Email</th>
                 <th className="p-3 md:p-4 text-left">Age</th>
-                <th className="p-3 md:p-4 text-left">BedNumber</th>
+                <th className="p-3 md:p-4 text-left">Ward</th>
                 <th className="p-3 md:p-4 text-left">Status</th>
               </tr>
             </thead>
@@ -160,8 +224,7 @@ const Patients = () => {
                   onClick={() => handlePatientClick(patient.id)}
                   className={`${
                     index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                  } hover:bg-gray-100 cursor-pointer transition-colors`}
-                >
+                  } hover:bg-gray-100 cursor-pointer transition-colors`}>
                   <td className="p-3 md:p-4 border-b border-gray-200">
                     {patient.id}
                   </td>
@@ -189,8 +252,7 @@ const Patients = () => {
                           : patient.status === "Critical"
                           ? "bg-red-100 text-red-800"
                           : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
+                      }`}>
                       {patient.status}
                     </span>
                   </td>
