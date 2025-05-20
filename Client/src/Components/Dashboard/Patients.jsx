@@ -7,6 +7,11 @@ import {
   faIdBadge,
   faHeartbeat,
   faSearch,
+  faBed,
+  faUserInjured,
+  faUserShield,
+  faUserCheck
+
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -93,6 +98,14 @@ const Patients = () => {
       patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.ward.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  // Calculate patient counts by status
+  const patientCounts = {
+    total: patients.length,
+    active: patients.filter(p => p.status === "Active").length,
+    recovered: patients.filter(p => p.status === "Recovered").length,
+    critical: patients.filter(p => p.status === "Critical").length,
+    monitoring: patients.filter(p => p.status === "Monitoring").length
+  };
 
   if (loading) {
     return (
@@ -135,6 +148,60 @@ const Patients = () => {
           </div>
         </div>
 
+
+        {/* Patient Summary Cards */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+        >
+          {/* Total Patients */}
+          <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-blue-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Total Patients</p>
+                <p className="text-2xl font-bold">{patientCounts.total}</p>
+              </div>
+              <FontAwesomeIcon icon={faUser} className="text-blue-500 text-xl" />
+            </div>
+          </div>
+
+          {/* Active Patients */}
+          <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-green-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Active</p>
+                <p className="text-2xl font-bold">{patientCounts.active}</p>
+              </div>
+              <FontAwesomeIcon icon={faUserInjured} className="text-green-500 text-xl" />
+            </div>
+          </div>
+
+          {/* Recovered Patients */}
+          <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-blue-400">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Recovered</p>
+                <p className="text-2xl font-bold">{patientCounts.recovered}</p>
+              </div>
+              <FontAwesomeIcon icon={faUserCheck} className="text-blue-400 text-xl" />
+            </div>
+          </div>
+
+          {/* Critical Patients */}
+          <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-red-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Critical</p>
+                <p className="text-2xl font-bold">{patientCounts.critical}</p>
+              </div>
+              <FontAwesomeIcon icon={faUserShield} className="text-red-500 text-xl" />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Patients Table */}
         <div className="bg-white shadow-lg rounded-lg overflow-hidden">
           <table className="w-full">
             <thead className="bg-blue-600 text-white">
