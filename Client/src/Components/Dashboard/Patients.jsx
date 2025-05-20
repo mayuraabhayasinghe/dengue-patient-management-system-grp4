@@ -11,6 +11,7 @@ import {
   faUserInjured,
   faUserShield,
   faUserCheck
+
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -97,7 +98,6 @@ const Patients = () => {
       patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.ward.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   // Calculate patient counts by status
   const patientCounts = {
     total: patients.length,
@@ -147,6 +147,7 @@ const Patients = () => {
             />
           </div>
         </div>
+
 
         {/* Patient Summary Cards */}
         <motion.div 
