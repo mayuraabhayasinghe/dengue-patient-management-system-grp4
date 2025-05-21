@@ -3,16 +3,21 @@ const mongoose = require('mongoose');
 const patientSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    trim: true,
+    lowercase: true
   },
   age: {
     type: Number,
-    required: true
+    required: true,
+    min: 0,
+    max: 120
   },
   status: {
     type: String,
@@ -21,7 +26,8 @@ const patientSchema = new mongoose.Schema({
   },
   ward: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   bloodType: {
     type: String,
@@ -32,9 +38,26 @@ const patientSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  diagnosis: String,
-  treatment: String,
-  notes: String
-}, { timestamps: true });
+  diagnosis: {
+    type: String,
+    trim: true
+  },
+  treatment: {
+    type: String,
+    trim: true
+  },
+  notes: {
+    type: String,
+    trim: true
+  }
+}, { 
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
 
-module.exports = mongoose.model('Patient', patientSchema);
+// Add index for frequently queried fields
+patientSchema.index({ name: 1, status: 1, ward: 1 });
+
+const Patient = mongoose.model('Patient', patientSchema);
+module.exports = Patient;
