@@ -2,23 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import Overview from "../Components/Patient-Dashboard/Overview";
-import MyProfile from "../Components/Patient-Dashboard/MyProfile";
+import LabResults from "../Components/Patient-Dashboard/LabResults";
+import TreatmentPlan from "../Components/Patient-Dashboard/TreatmentPlan";
+import VitalSigns from "../Components/Patient-Dashboard/VitalSigns";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChartPie,
-  faUserInjured,
-  faHospitalUser,
-  faBoxes,
-  faUserShield,
-  faUser,
   faTablets,
   faHeartbeat,
   faNotesMedical,
 } from "@fortawesome/free-solid-svg-icons";
-import LabResults from "../Components/Patient-Dashboard/LabResults";
-import TreatmentPlan from "../Components/Patient-Dashboard/TreatmentPlan";
-import VitalSigns from "../Components/Patient-Dashboard/VitalSigns";
 
 const PatientDashboard = () => {
   const { section } = useParams();
@@ -37,8 +31,6 @@ const PatientDashboard = () => {
     switch (activeComponent) {
       case "overview":
         return <Overview />;
-      case "profile":
-        return <MyProfile />;
       case "labResults":
         return <LabResults />;
       case "treatmentPlan":
@@ -52,10 +44,9 @@ const PatientDashboard = () => {
 
   const navItems = [
     { id: "overview", label: "Overview", icon: faChartPie },
-    { id: "profile", label: "Profile", icon: faUser },
+    { id: "vitalSign", label: "Vital sign", icon: faHeartbeat },
     { id: "labResults", label: "Lab Results", icon: faNotesMedical },
     { id: "treatmentPlan", label: "Treatment Plan", icon: faTablets },
-    { id: "vitalSign", label: "Vital sign", icon: faHeartbeat },
   ];
 
   return (
