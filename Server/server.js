@@ -1,13 +1,24 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const http = require("http");
+const socketIO = require("socket.io");
 const bodyParser = require("body-parser");
 const connectDB = require("./config/db");
+const { setupReminders } = require("./utils/reminderLogic");
 
 dotenv.config();
 connectDB();
 
 const app = express();
+//socket server
+const server = http.createServer(app);
+const io = socketIO(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
 
 // Middleware
 app.use(cors());
@@ -25,6 +36,15 @@ app.use("/api/patients", require("./routes/patientsRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/staff", require("./routes/staffRoutes"));
 app.use("/api/vitals", require("./routes/patientVitalsRoutes"));
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+  setupReminders(io); // Start the reminder checker
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

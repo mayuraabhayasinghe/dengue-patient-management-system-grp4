@@ -1,86 +1,114 @@
-const PatientVitals = require("../models/staffPatientVitals");
-
-// controllers/vitalsController.js
-const Vitals = require("../models/staffPatientVitals");
+const PatientVital = require("../models/staffPatientVitals");
 const Notification = require("../models/NotificationModel");
-const AttentionNeeded = require("../models/AttentionNeededModel");
-const User = require("../models/userModel");
 const PatientDetails = require("../models/patientModel");
+const User = require("../models/userModel");
 
-// Helper to check conditions and return messages
-const checkConditions = (vitals) => {
-  const messages = [];
-
-  if (vitals.bodyTemperature > 37.5)
-    messages.push({
-      condition: "body temperature",
-      value: vitals.bodyTemperature,
-    });
-  if (vitals.wbc < 5000) messages.push({ condition: "WBC", value: vitals.wbc });
-  if (vitals.plt < 130000)
-    messages.push({ condition: "PLT", value: vitals.plt });
-  if (vitals.hctPvc > 20)
-    messages.push({ condition: "HCT PVC", value: vitals.hctPvc });
-
-  const bp = vitals.bloodPressureSupine;
-  if (bp?.systolic < 90)
-    messages.push({ condition: "Supine Systolic BP", value: bp.systolic });
-  if (bp?.meanArterialPressure < 60)
-    messages.push({ condition: "MAP", value: bp.meanArterialPressure });
-  if (bp?.pulsePressure <= 20)
-    messages.push({ condition: "Pulse Pressure", value: bp.pulsePressure });
-
-  if (vitals.pulseRate > 100)
-    messages.push({ condition: "Pulse Rate", value: vitals.pulseRate });
-  if (vitals.respiratoryRate > 15)
-    messages.push({
-      condition: "Respiratory Rate",
-      value: vitals.respiratoryRate,
-    });
-  if (vitals.capillaryRefillTime > 2.5)
-    messages.push({ condition: "CRFT", value: vitals.capillaryRefillTime });
-
-  return messages;
-};
-
-const addVitals = async (req, res) => {
+// Pass your initialized socket instance when calling this function
+exports.submitVitals = async (req, res, next, io) => {
   try {
     const { user, enteredBy, vitals } = req.body;
 
-    // Save vitals
-    const newVitals = new Vitals({ user, enteredBy, vitals });
+    // Save vitals to the database
+    const newVitals = new PatientVital({ user, enteredBy, vitals });
     await newVitals.save();
 
-    // Check for alert conditions
-    const triggeredConditions = checkConditions(vitals);
+    // Fetch patient's name and bed number for notification messages
+    const patient = await PatientDetails.findOne({ user }).populate("user");
+    if (!patient) return res.status(404).json({ error: "Patient not found." });
 
-    if (triggeredConditions.length > 0) {
-      const patient = await User.findById(user);
-      const patientDetails = await PatientDetails.findOne({ user });
+    const notifications = [];
+    const now = new Date();
 
-      // Save each triggered notification
-      for (let condition of triggeredConditions) {
-        const message = `${patient.name}’s ${condition.condition} is abnormal - ${condition.value}`;
-        await Notification.create({
-          user,
-          message,
-          condition: condition.condition,
-        });
+    // Conditions to evaluate
+    const rules = [
+      {
+        field: "bodyTemperature",
+        condition: (v) => v > 37.5,
+        message: (v) => `${patient.user.name}’s body temperature is high - ${v}°C` ,
+      },
+      {
+        field: "wbc",
+        condition: (v) => v < 5000,
+        message: (v) => `${patient.user.name} has low WBC - ${v}/mm³` ,
+      },
+      {
+        field: "plt",
+        condition: (v) => v < 130000,
+        message: (v) => `${patient.user.name} has low platelet count - ${v}/mm³` ,
+      },
+      {
+        field: "hctPvc",
+        condition: (v) => v > 20,
+        message: (v) => `${patient.user.name} has high HCT/PVC - ${v}%` ,
+      },
+      {
+        field: "bloodPressureSupine.systolic",
+        condition: (v) => v < 90,
+        message: (v) => `${patient.user.name}'s supine systolic BP is low - ${v} mmHg` ,
+      },
+      {
+        field: "bloodPressureSupine.meanArterialPressure",
+        condition: (v) => v < 60,
+        message: (v) => `${patient.user.name}'s MAP is low - ${v} mmHg` ,
+      },
+      {
+        field: "bloodPressureSupine.pulsePressure",
+        condition: (v) => v <= 20,
+        message: (v) => `${patient.user.name}'s pulse pressure is critically low - ${v} mmHg` ,
+      },
+      {
+        field: "pulseRate",
+        condition: (v) => v > 100,
+        message: (v) => `${patient.user.name}'s pulse rate is high - ${v}/min` ,
+      },
+      {
+        field: "respiratoryRate",
+        condition: (v) => v > 15,
+        message: (v) => `${patient.user.name}'s respiratory rate is elevated - ${v}/min` ,
+      },
+      {
+        field: "capillaryRefillTime",
+        condition: (v) => v > 2.5,
+        message: (v) => `${patient.user.name}'s CRFT is prolonged - ${v} sec` ,
+      },
+    ];
+
+    for (const rule of rules) {
+      // Support nested fields (e.g., bloodPressureSupine.systolic)
+      const path = rule.field.split(".");
+      let value = vitals;
+      for (const key of path) {
+        value = value?.[key];
       }
+      if (value !== undefined && rule.condition(value)) {
+        const message = rule.message(value);
+        const notification = new Notification({
+          patientId: patient._id,
+          message,
+          vital: rule.field,
+          value,
+          condition: rule.condition.toString(),
+          timestamp: now,
+        });
+        await notification.save();
 
-      // Add to special attention list if not already there
-      const exists = await AttentionNeeded.findOne({ user });
-      if (!exists) {
-        await AttentionNeeded.create({ user });
+        // Emit via Socket.IO
+        io.emit("new_notification", {
+          patientId: patient._id,
+          name: patient.user.name,
+          bedNumber: patient.bedNumber,
+          message,
+          time: now,
+        });
+
+        notifications.push(notification);
       }
     }
 
-    res
-      .status(201)
-      .json({ message: "Vitals saved successfully", data: newVitals });
+    res.status(201).json({ message: "Vitals submitted", notifications });
   } catch (error) {
-    console.error("Error in addVitals:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Vitals Submission Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 

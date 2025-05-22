@@ -1,9 +1,15 @@
 const mongoose = require("mongoose");
 
 const notificationSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  message: String,
+  patientId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "PatientDetails",
+    required: true,
+  },
+  message: { type: String, required: true },
   timestamp: { type: Date, default: Date.now },
+  vital: String,
+  value: mongoose.Schema.Types.Mixed,
   condition: String,
 });
 
