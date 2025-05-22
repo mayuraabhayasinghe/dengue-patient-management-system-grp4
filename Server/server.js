@@ -77,10 +77,14 @@ app.use("/api/feedback", require("./routes/feedbackRoutes"));
 app.use("/api/patients", require("./routes/patientsRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/staff", require("./routes/staffRoutes"));
+
 app.use("/api/wards", require("./routes/wardRoutes")); // Added ward routes
 
 // Error handler middleware (must be after routes)
 app.use(errorHandler);
+=======
+app.use("/api/vitals", require("./routes/patientVitalsRoutes"));
+
 
 const PORT = process.env.PORT || 5000;
 
@@ -95,8 +99,11 @@ process.on("unhandledRejection", (err, promise) => {
   server.close(() => process.exit(1));
 });
 
+
 // Handle uncaught exceptions
 process.on("uncaughtException", (err) => {
   console.log(`Error: ${err.message}`.red);
   server.close(() => process.exit(1));
 });
+=======
+
