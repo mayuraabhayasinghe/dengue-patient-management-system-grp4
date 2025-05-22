@@ -1,57 +1,36 @@
 const Patient = require('../models/Patient');
 
-// @desc    Get all patients
+// @desc    Get all patients with filtering
 // @route   GET /api/patients
 // @access  Public
 exports.getAllPatients = async (req, res) => {
   try {
-    // Filtering
-    const queryObj = { ...req.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    excludedFields.forEach(el => delete queryObj[el]);
+    // Basic filtering
+    const query = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit'];
+    excludedFields.forEach(el => delete query[el]);
 
-    // Advanced filtering
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-
-    let query = Patient.find(JSON.parse(queryStr));
+    let patients = Patient.find(query);
 
     // Sorting
     if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      query = query.sort(sortBy);
+      patients = patients.sort(req.query.sort);
     } else {
-      query = query.sort('-createdAt');
+      patients = patients.sort('-createdAt');
     }
 
-    // Field limiting
-    if (req.query.fields) {
-      const fields = req.query.fields.split(',').join(' ');
-      query = query.select(fields);
-    } else {
-      query = query.select('-__v');
-    }
+    // Execute query
+    const result = await patients;
 
-    // Pagination
-    const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 100;
-    const skip = (page - 1) * limit;
-
-    query = query.skip(skip).limit(limit);
-
-    const patients = await query;
-    
     res.status(200).json({
-      status: 'success',
-      results: patients.length,
-      data: {
-        patients
-      }
+      success: true,
+      count: result.length,
+      data: result
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message
+    res.status(500).json({
+      success: false,
+      error: 'Server Error'
     });
   }
 };
@@ -65,31 +44,19 @@ exports.getPatientStats = async (req, res) => {
       {
         $group: {
           _id: '$status',
-          count: { $sum: 1 },
-          avgAge: { $avg: '$age' }
+          count: { $sum: 1 }
         }
-      },
-      {
-        $addFields: { status: '$_id' }
-      },
-      {
-        $project: { _id: 0 }
       }
     ]);
 
-    const totalPatients = await Patient.countDocuments();
-
     res.status(200).json({
-      status: 'success',
-      data: {
-        total: totalPatients,
-        stats
-      }
+      success: true,
+      data: stats
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message
+    res.status(500).json({
+      success: false,
+      error: 'Server Error'
     });
   }
 };
@@ -100,24 +67,22 @@ exports.getPatientStats = async (req, res) => {
 exports.getPatient = async (req, res) => {
   try {
     const patient = await Patient.findById(req.params.id);
-    
+
     if (!patient) {
       return res.status(404).json({
-        status: 'fail',
-        message: 'Patient not found'
+        success: false,
+        error: 'Patient not found'
       });
     }
 
     res.status(200).json({
-      status: 'success',
-      data: {
-        patient
-      }
+      success: true,
+      data: patient
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message
+    res.status(500).json({
+      success: false,
+      error: 'Server Error'
     });
   }
 };
@@ -127,53 +92,45 @@ exports.getPatient = async (req, res) => {
 // @access  Private
 exports.createPatient = async (req, res) => {
   try {
-    const newPatient = await Patient.create(req.body);
+    const patient = await Patient.create(req.body);
 
     res.status(201).json({
-      status: 'success',
-      data: {
-        patient: newPatient
-      }
+      success: true,
+      data: patient
     });
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
-      message: err.message
+      success: false,
+      error: err.message
     });
   }
 };
 
 // @desc    Update patient
-// @route   PATCH /api/patients/:id
+// @route   PUT /api/patients/:id
 // @access  Private
 exports.updatePatient = async (req, res) => {
   try {
-    const patient = await Patient.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true
-      }
-    );
+    const patient = await Patient.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
 
     if (!patient) {
       return res.status(404).json({
-        status: 'fail',
-        message: 'Patient not found'
+        success: false,
+        error: 'Patient not found'
       });
     }
 
     res.status(200).json({
-      status: 'success',
-      data: {
-        patient
-      }
+      success: true,
+      data: patient
     });
   } catch (err) {
     res.status(400).json({
-      status: 'fail',
-      message: err.message
+      success: false,
+      error: err.message
     });
   }
 };
@@ -187,19 +144,19 @@ exports.deletePatient = async (req, res) => {
 
     if (!patient) {
       return res.status(404).json({
-        status: 'fail',
-        message: 'Patient not found'
+        success: false,
+        error: 'Patient not found'
       });
     }
 
-    res.status(204).json({
-      status: 'success',
-      data: null
+    res.status(200).json({
+      success: true,
+      data: {}
     });
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message
+    res.status(500).json({
+      success: false,
+      error: 'Server Error'
     });
   }
 };
