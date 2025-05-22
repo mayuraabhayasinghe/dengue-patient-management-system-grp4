@@ -1,38 +1,57 @@
 const mongoose = require('mongoose');
 
-const patientSchema = new mongoose.Schema({
+const PatientSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
-    trim: true
+    required: [true, 'Please add a name'],
+    trim: true,
+    maxlength: [50, 'Name cannot be more than 50 characters']
   },
   email: {
     type: String,
-    required: true,
+    required: [true, 'Please add an email'],
     unique: true,
     trim: true,
-    lowercase: true
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      'Please add a valid email'
+    ]
   },
   age: {
     type: Number,
-    required: true,
-    min: 0,
-    max: 120
+    required: [true, 'Please add an age'],
+    min: [0, 'Age must be at least 0'],
+    max: [120, 'Age must be less than 120']
   },
   status: {
     type: String,
-    enum: ['Active', 'Recovered', 'Critical', 'Monitoring'],
+    required: [true, 'Please add a status'],
+    enum: [
+      'Active',
+      'Recovered',
+      'Critical',
+      'Monitoring'
+    ],
     default: 'Active'
   },
   ward: {
     type: String,
-    required: true,
+    required: [true, 'Please add a ward'],
     trim: true
   },
   bloodType: {
     type: String,
-    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-    required: true
+    required: [true, 'Please add a blood type'],
+    enum: [
+      'A+',
+      'A-',
+      'B+',
+      'B-',
+      'AB+',
+      'AB-',
+      'O+',
+      'O-'
+    ]
   },
   admissionDate: {
     type: Date,
@@ -49,15 +68,11 @@ const patientSchema = new mongoose.Schema({
   notes: {
     type: String,
     trim: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
-}, { 
-  timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
 });
 
-// Add index for frequently queried fields
-patientSchema.index({ name: 1, status: 1, ward: 1 });
-
-const Patient = mongoose.model('Patient', patientSchema);
-module.exports = Patient;
+module.exports = mongoose.model('Patient', PatientSchema);
