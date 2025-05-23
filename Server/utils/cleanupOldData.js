@@ -1,6 +1,6 @@
 // utils/cleanupOldData.js
-const Notification = require("../models/Notification");
-const SpecialAttentionPatient = require("../models/SpecialAttentionPatient");
+const Notification = require("../models/NotificationModel");
+const SpecialAttentionPatient = require("../models/AttentionNeededModel");
 
 /**
  * Removes:

@@ -5,7 +5,8 @@ const http = require("http");
 const socketIO = require("socket.io");
 const bodyParser = require("body-parser");
 const connectDB = require("./config/db");
-const { setupReminders } = require("./utils/reminderLogic");
+// const { setupReminders } = require("./utils/reminderLogic");
+const cleanupOldData = require("./utils/cleanupOldData");
 
 dotenv.config();
 connectDB();
@@ -49,3 +50,8 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// ✅ Start cleanup interval after the server is running
+setInterval(() => {
+  cleanupOldData();
+}, 24 * 60 * 60 * 1000); // Every 1 day

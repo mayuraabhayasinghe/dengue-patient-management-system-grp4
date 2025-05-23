@@ -134,3 +134,4 @@ exports.submitVitals = async (req, res, next, io) => {
 // };
 
 module.exports = { addVitals };
+
