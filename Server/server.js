@@ -32,10 +32,9 @@ app.get("/", (req, res) => {
 
 // Routes:
 app.use("/api/feedback", require("./routes/feedbackRoutes"));
-app.use("/api/patients", require("./routes/patientsRoutes"));
+app.use("/api/patients", require("./routes/patientListRoutes")); // Updated this line
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/staff", require("./routes/staffRoutes"));
-app.use("/api/vitals", require("./routes/patientVitalsRoutes"));
 
 io.on("connection", (socket) => {
   console.log("New client connected");
