@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const staffPatientVitalsSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  // enteredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // optional: nurse/doctor ID
+  enteredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // optional: nurse/doctor ID
   timestamp: { type: Date, default: Date.now },
   vitals: {
     bodyTemperature: Number,
