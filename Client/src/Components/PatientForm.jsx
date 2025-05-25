@@ -132,22 +132,37 @@ const PatientForm = () => {
         </div>
 
         {/* Form */}
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Temperature Section */}
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="text-sm">Body Temperature</label>
-              <input className="input-field" type="text" />
+              <input
+                value={formData.bodyTemperature}
+                onChange={(e) => handleChange(e, null, "bodyTemperature")}
+                className="input-field"
+                type="number"
+              />
               <p className="text-xs text-red-400">*should measure 4 hourly</p>
             </div>
             <div>
               <label className="text-sm">HCT/PVC</label>
-              <input className="input-field" type="text" />
+              <input
+                value={formData.hctPvc}
+                onChange={(e) => handleChange(e, null, "hctPvc")}
+                className="input-field"
+                type="number"
+              />
               <p className="text-xs text-red-400">*should measure 6 hourly</p>
             </div>
             <div>
               <label className="text-sm">Pulse Rate</label>
-              <input className="input-field" type="text" />
+              <input
+                value={formData.pulseRate}
+                onChange={(e) => handleChange(e, null, "pulseRate")}
+                className="input-field"
+                type="number"
+              />
               <p className="text-xs text-red-400">*should measure 3 hourly</p>
             </div>
           </div>
@@ -161,11 +176,23 @@ const PatientForm = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm">WBC</label>
-                <input className="input-field" type="text" placeholder="/mm3" />
+                <input
+                  value={formData.wbc}
+                  onChange={(e) => handleChange(e, null, "wbc")}
+                  className="input-field"
+                  type="number"
+                  placeholder="/mm3"
+                />
               </div>
               <div>
                 <label className="text-sm">PLT</label>
-                <input className="input-field" type="text" placeholder="/mm3" />
+                <input
+                  className="input-field"
+                  value={formData.plt}
+                  onChange={(e) => handleChange(e, null, "plt")}
+                  type="number"
+                  placeholder="/mm3"
+                />
               </div>
             </div>
           </div>
@@ -183,7 +210,11 @@ const PatientForm = () => {
                 <label className="text-sm">Systolic</label>
                 <input
                   className="input-field"
-                  type="text"
+                  type="number"
+                  value={formData.bloodPressureSupine.systolic}
+                  onChange={(e) =>
+                    handleChange(e, "bloodPressureSupine", "systolic")
+                  }
                   placeholder="/mmHg"
                 />
               </div>
@@ -191,7 +222,11 @@ const PatientForm = () => {
                 <label className="text-sm">Diastolic</label>
                 <input
                   className="input-field"
-                  type="text"
+                  type="number"
+                  value={formData.bloodPressureSupine.diastolic}
+                  onChange={(e) =>
+                    handleChange(e, "bloodPressureSupine", "diastolic")
+                  }
                   placeholder="/mmHg"
                 />
               </div>
@@ -203,8 +238,9 @@ const PatientForm = () => {
                 <label className="text-sm">Pulse Pressure (PP)</label>
                 <input
                   className="input-field"
-                  type="text"
-                  value="20"
+                  type="number"
+                  value={formData.bloodPressureSupine.pulsePressure}
+                  readOnly
                   placeholder="/mmHg"
                 />
               </div>
@@ -212,8 +248,9 @@ const PatientForm = () => {
                 <label className="text-sm">Mean Arterial Pressure (MAP)</label>
                 <input
                   className="input-field"
-                  type="text"
-                  value="60"
+                  type="number"
+                  value={formData.bloodPressureSupine.meanArterialPressure}
+                  readOnly
                   placeholder="/mmHg"
                 />
               </div>
@@ -233,7 +270,11 @@ const PatientForm = () => {
                 <label className="text-sm">Systolic</label>
                 <input
                   className="input-field"
-                  type="text"
+                  type="number"
+                  value={formData.bloodPressureSitting.systolic}
+                  onChange={(e) =>
+                    handleChange(e, "bloodPressureSitting", "systolic")
+                  }
                   placeholder="/mmHg"
                 />
               </div>
@@ -241,6 +282,10 @@ const PatientForm = () => {
                 <label className="text-sm">Diastolic</label>
                 <input
                   className="input-field"
+                  value={formData.bloodPressureSitting.diastolic}
+                  onChange={(e) =>
+                    handleChange(e, "bloodPressureSitting", "diastolic")
+                  }
                   type="text"
                   placeholder="/mmHg"
                 />
@@ -251,7 +296,7 @@ const PatientForm = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm">Respiratory Rate</label>
-                <input className="input-field" type="text" placeholder="/min" />
+                <input className="input-field" type="number" placeholder="/min" />
               </div>
               <div>
                 <label className="text-sm">Capillary Refill Time (CRFT)</label>
