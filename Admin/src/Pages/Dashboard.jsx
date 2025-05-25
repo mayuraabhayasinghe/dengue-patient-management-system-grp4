@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Overview from "../Components/Dashboard/Overview";
 import Users from "../Components/Dashboard/Users";
 import WardManagement from "../Components/Dashboard/WardManagement";
 import Inventory from "../Components/Dashboard/Inventory";
-import Accounts from "../Components/Dashboard/Accounts";
-
+import { useParams, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChartPie,
@@ -15,7 +14,24 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const Dashboard = () => {
+  const { section } = useParams();
+  const navigate = useNavigate();
   const [activeComponent, setActiveComponent] = useState("overview");
+
+  const navItems = [
+    { id: "overview", label: "Overview", icon: faChartPie },
+    { id: "users", label: "Users", icon: faUser },
+    { id: "ward", label: "Ward Management", icon: faHospitalUser },
+    { id: "inventory", label: "Inventory", icon: faBoxes },
+  ];
+
+  useEffect(() => {
+    if (section && navItems.some((item) => item.id === section)) {
+      setActiveComponent(section);
+    } else {
+      navigate("/dashboard/overview");
+    }
+  }, [section, navigate]);
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -27,20 +43,10 @@ const Dashboard = () => {
         return <WardManagement />;
       case "inventory":
         return <Inventory />;
-      case "account":
-        return <Accounts />;
       default:
         return <Overview />;
     }
   };
-
-  const navItems = [
-    { id: "overview", label: "Overview", icon: faChartPie },
-    { id: "users", label: "Users", icon: faUser },
-    { id: "ward", label: "Ward Management", icon: faHospitalUser },
-    { id: "inventory", label: "Inventory", icon: faBoxes },
-    { id: "account", label: "Accounts", icon: faUserShield },
-  ];
 
   return (
     <div className="flex min-h-screen m-2 md:m-3">
@@ -51,7 +57,10 @@ const Dashboard = () => {
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveComponent(item.id)}
+              onClick={() => {
+                setActiveComponent(item.id);
+                navigate(`/dashboard/${item.id}`);
+              }}
               className={`flex items-center gap-3 p-2 md:p-3 rounded-lg text-left transition duration-200 ${
                 activeComponent === item.id
                   ? "bg-white text-primary-1 font-semibold shadow"
