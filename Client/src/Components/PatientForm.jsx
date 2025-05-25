@@ -296,11 +296,23 @@ const PatientForm = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm">Respiratory Rate</label>
-                <input className="input-field" type="number" placeholder="/min" />
+                <input
+                  className="input-field"
+                  type="number"
+                  value={formData.respiratoryRate}
+                  onChange={(e) => handleChange(e, null, "respiratoryRate")}
+                  placeholder="/min"
+                />
               </div>
               <div>
                 <label className="text-sm">Capillary Refill Time (CRFT)</label>
-                <input className="input-field" type="text" placeholder="s" />
+                <input
+                  className="input-field"
+                  value={formData.capillaryRefillTime}
+                  onChange={(e) => handleChange(e, null, "capillaryRefillTime")}
+                  type="number"
+                  placeholder="s"
+                />
               </div>
             </div>
           </div>
@@ -308,7 +320,11 @@ const PatientForm = () => {
           {/* Observation */}
           <div>
             <label className="text-sm font-bold">Observation / Action</label>
-            <textarea className="w-full border border-gray-300 rounded-md p-2 min-h-[100px]"></textarea>
+            <textarea
+              value={formData.observation}
+              onChange={(e) => handleChange(e, null, "observation")}
+              className="w-full border border-gray-300 rounded-md p-2 min-h-[100px]"
+            ></textarea>
           </div>
 
           {/* Buttons */}
