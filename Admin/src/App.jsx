@@ -7,7 +7,7 @@ import StaffRegistration from "./Pages/StaffRegistration";
 import PatientRegistration from "../../Client/src/Pages/Registration";
 import AdminHome from "./Pages/AdminHome";
 import AdminFooter from "./Components/Footer";
-import Registration from "./Pages/Registration";
+
 
 const App = () => {
   return (
@@ -20,7 +20,7 @@ const App = () => {
         <Route path="/admin/feedback" element={<AdminFeedbacks />}></Route>
         <Route path="/admin/staffRegistration"element={<StaffRegistration />}/>
         <Route path="/admin/patientRegistration"element={<PatientRegistration />}/>
-        <Route path="/register" element={<Registration />} />
+        
       </Routes>
       <AdminFooter />
     </>
