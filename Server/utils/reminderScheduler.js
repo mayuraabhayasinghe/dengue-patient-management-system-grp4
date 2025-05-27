@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Vitals = require("../models/staffPatientVitalsModel");
+const Vitals = require("../models/staffPatientVitals");
 const PatientDetails = require("../models/patientModel");
 
 const reminderIntervals = {

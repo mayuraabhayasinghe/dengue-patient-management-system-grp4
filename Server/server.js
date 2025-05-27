@@ -5,7 +5,7 @@ const http = require("http");
 const socketIO = require("socket.io");
 const bodyParser = require("body-parser");
 const connectDB = require("./config/db");
-// const { setupReminders } = require("./utils/reminderLogic");
+const startReminderScheduler = require("./utils/reminderScheduler");
 const cleanupOldData = require("./utils/cleanupOldData");
 
 dotenv.config();
@@ -40,7 +40,7 @@ app.use("/api/vitals", require("./routes/patientVitalsRoutes"));
 
 io.on("connection", (socket) => {
   console.log("New client connected");
-  setupReminders(io); // Start the reminder checker
+  startReminderScheduler(io); // Start the reminder checker
 
   socket.on("disconnect", () => {
     console.log("Client disconnected");

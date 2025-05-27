@@ -1,7 +1,7 @@
 const PatientVital = require("../models/staffPatientVitals");
 const Notification = require("../models/NotificationModel");
 const PatientDetails = require("../models/patientModel");
-const User = require("../models/userModel");
+// const User = require("../models/userModel");
 
 // Pass your initialized socket instance when calling this function
 exports.submitVitals = async (req, res, next, io) => {
@@ -24,52 +24,57 @@ exports.submitVitals = async (req, res, next, io) => {
       {
         field: "bodyTemperature",
         condition: (v) => v > 37.5,
-        message: (v) => `${patient.user.name}’s body temperature is high - ${v}°C` ,
+        message: (v) =>
+          `${patient.user.name}’s body temperature is high - ${v}°C`,
       },
       {
         field: "wbc",
         condition: (v) => v < 5000,
-        message: (v) => `${patient.user.name} has low WBC - ${v}/mm³` ,
+        message: (v) => `${patient.user.name} has low WBC - ${v}/mm³`,
       },
       {
         field: "plt",
         condition: (v) => v < 130000,
-        message: (v) => `${patient.user.name} has low platelet count - ${v}/mm³` ,
+        message: (v) =>
+          `${patient.user.name} has low platelet count - ${v}/mm³`,
       },
       {
         field: "hctPvc",
         condition: (v) => v > 20,
-        message: (v) => `${patient.user.name} has high HCT/PVC - ${v}%` ,
+        message: (v) => `${patient.user.name} has high HCT/PVC - ${v}%`,
       },
       {
         field: "bloodPressureSupine.systolic",
         condition: (v) => v < 90,
-        message: (v) => `${patient.user.name}'s supine systolic BP is low - ${v} mmHg` ,
+        message: (v) =>
+          `${patient.user.name}'s supine systolic BP is low - ${v} mmHg`,
       },
       {
         field: "bloodPressureSupine.meanArterialPressure",
         condition: (v) => v < 60,
-        message: (v) => `${patient.user.name}'s MAP is low - ${v} mmHg` ,
+        message: (v) => `${patient.user.name}'s MAP is low - ${v} mmHg`,
       },
       {
         field: "bloodPressureSupine.pulsePressure",
         condition: (v) => v <= 20,
-        message: (v) => `${patient.user.name}'s pulse pressure is critically low - ${v} mmHg` ,
+        message: (v) =>
+          `${patient.user.name}'s pulse pressure is critically low - ${v} mmHg`,
       },
       {
         field: "pulseRate",
         condition: (v) => v > 100,
-        message: (v) => `${patient.user.name}'s pulse rate is high - ${v}/min` ,
+        message: (v) => `${patient.user.name}'s pulse rate is high - ${v}/min`,
       },
       {
         field: "respiratoryRate",
         condition: (v) => v > 15,
-        message: (v) => `${patient.user.name}'s respiratory rate is elevated - ${v}/min` ,
+        message: (v) =>
+          `${patient.user.name}'s respiratory rate is elevated - ${v}/min`,
       },
       {
         field: "capillaryRefillTime",
         condition: (v) => v > 2.5,
-        message: (v) => `${patient.user.name}'s CRFT is prolonged - ${v} sec` ,
+        message: (v) => `${patient.user.name}'s CRFT is prolonged - ${v} sec`,
       },
     ];
 
@@ -133,5 +138,4 @@ exports.submitVitals = async (req, res, next, io) => {
 //   }
 // };
 
-module.exports = { addVitals };
-
+// module.exports = { addVitals };

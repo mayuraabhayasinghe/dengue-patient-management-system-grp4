@@ -11,7 +11,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Pie, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -23,6 +23,7 @@ import {
   BarElement,
   Title,
 } from "chart.js";
+import socket from "../../socket";
 
 // Register Chart.js components
 ChartJS.register(
@@ -94,7 +95,8 @@ const Overview = () => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="space-y-6">
+      className="space-y-6"
+    >
       {/* Stats Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {[
@@ -132,7 +134,8 @@ const Overview = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: stat.delay }}
-            className={`p-5 rounded-xl shadow-md flex items-center justify-between ${stat.color}`}>
+            className={`p-5 rounded-xl shadow-md flex items-center justify-between ${stat.color}`}
+          >
             <div>
               <p className="text-sm font-medium">{stat.title}</p>
               <p className="text-2xl font-bold">{stat.value}</p>
@@ -151,7 +154,8 @@ const Overview = () => {
           className="p-5 bg-white rounded-xl shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}>
+          transition={{ delay: 0.2 }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon icon={faUserNurse} className="text-blue-500" />
@@ -172,7 +176,8 @@ const Overview = () => {
               <motion.div
                 key={i}
                 whileHover={{ scale: 1.02 }}
-                className="flex gap-3 w-full items-center">
+                className="flex gap-3 w-full items-center"
+              >
                 <div className="bg-blue-500 text-white p-2 rounded-lg w-12 text-center font-medium">
                   10{i + 1}
                 </div>
@@ -189,7 +194,8 @@ const Overview = () => {
               <motion.div
                 key={i + 3}
                 whileHover={{ scale: 1.02 }}
-                className="flex gap-3 w-full items-center">
+                className="flex gap-3 w-full items-center"
+              >
                 <div className="bg-blue-500 text-white p-2 rounded-lg w-12 text-center font-medium">
                   20{i + 1}
                 </div>
@@ -209,7 +215,8 @@ const Overview = () => {
           className="p-5 bg-white rounded-xl shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}>
+          transition={{ delay: 0.3 }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon icon={faChartPie} className="text-blue-500" />
@@ -226,7 +233,8 @@ const Overview = () => {
           className="p-5 bg-white rounded-xl shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}>
+          transition={{ delay: 0.4 }}
+        >
           <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon icon={faBell} className="text-blue-500" />
@@ -284,7 +292,8 @@ const Overview = () => {
                   <motion.tr
                     key={idx}
                     whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.05)" }}
-                    className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
+                    className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                  >
                     <td className="p-3 font-medium">{n.ref}</td>
                     <td className="p-3">{n.msg}</td>
                     <td className={`p-3 font-semibold ${n.color} rounded`}>
@@ -302,7 +311,8 @@ const Overview = () => {
           className="p-5 bg-white rounded-xl shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}>
+          transition={{ delay: 0.5 }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon icon={faChartLine} className="text-blue-500" />
@@ -319,7 +329,8 @@ const Overview = () => {
           className="p-5 bg-white rounded-xl shadow-md lg:col-span-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}>
+          transition={{ delay: 0.6 }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon
@@ -338,7 +349,8 @@ const Overview = () => {
               <motion.div
                 key={i}
                 whileHover={{ y: -5 }}
-                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+              >
                 <div className="flex flex-col items-center text-center">
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
                     <span className="text-blue-600 font-bold">{i + 1}</span>

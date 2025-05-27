@@ -1,7 +1,7 @@
 const Notification = require("../models/NotificationModel"); // create this model for notifications
 const SpecialAttentionPatient = require("../models/AttentionNeededModel"); // optional separate collection
 const PatientDetails = require("../models/patientModel");
-const User = require("../models/userModel");
+// const User = require("../models/userModel");
 
 // Emit to all connected clients
 let ioInstance;
@@ -43,6 +43,14 @@ async function emitNotification({ patientId, vital, value, condition }) {
       { patient: patientId, name, bedNumber, lastCritical: new Date() },
       { upsert: true }
     );
+
+    if (ioInstance) {
+      // Emit updated special attention list to all clients
+      const specialAttentionList = await SpecialAttentionPatient.find({}).sort({
+        lastCritical: -1,
+      });
+      ioInstance.emit("specialAttentionUpdate", specialAttentionList);
+    }
   } catch (err) {
     console.error("Notification error:", err);
   }
