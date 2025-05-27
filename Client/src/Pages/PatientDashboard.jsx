@@ -1,52 +1,53 @@
 import React, { useState, useEffect } from "react";
-import Overview from "../Components/Dashboard/Overview";
-import Users from "../Components/Dashboard/Users";
-import WardManagement from "../Components/Dashboard/WardManagement";
-import Inventory from "../Components/Dashboard/Inventory";
 import { useParams, useNavigate } from "react-router-dom";
+
+import Overview from "../Components/Patient-Dashboard/Overview";
+import LabResults from "../Components/Patient-Dashboard/LabResults";
+import TreatmentPlan from "../Components/Patient-Dashboard/TreatmentPlan";
+import VitalSigns from "../Components/Patient-Dashboard/VitalSigns";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChartPie,
-  faHospitalUser,
-  faBoxes,
-  faUserShield,
-  faUser,
+  faTablets,
+  faHeartbeat,
+  faNotesMedical,
 } from "@fortawesome/free-solid-svg-icons";
 
-const Dashboard = () => {
+const PatientDashboard = () => {
   const { section } = useParams();
   const navigate = useNavigate();
   const [activeComponent, setActiveComponent] = useState("overview");
-
-  const navItems = [
-    { id: "overview", label: "Overview", icon: faChartPie },
-    { id: "users", label: "Users", icon: faUser },
-    { id: "ward", label: "Ward Management", icon: faHospitalUser },
-    { id: "inventory", label: "Inventory", icon: faBoxes },
-  ];
 
   useEffect(() => {
     if (section && navItems.some((item) => item.id === section)) {
       setActiveComponent(section);
     } else {
-      navigate("/dashboard/overview");
+      navigate("/patient-dashboard/overview"); // fallback if invalid section
     }
-  }, [section, navigate]);
+  }, [section]);
 
   const renderComponent = () => {
     switch (activeComponent) {
       case "overview":
         return <Overview />;
-      case "users":
-        return <Users />;
-      case "ward":
-        return <WardManagement />;
-      case "inventory":
-        return <Inventory />;
+      case "labResults":
+        return <LabResults />;
+      case "treatmentPlan":
+        return <TreatmentPlan />;
+      case "vitalSign":
+        return <VitalSigns />;
       default:
         return <Overview />;
     }
   };
+
+  const navItems = [
+    { id: "overview", label: "Overview", icon: faChartPie },
+    { id: "vitalSign", label: "Vital sign", icon: faHeartbeat },
+    { id: "labResults", label: "Lab Results", icon: faNotesMedical },
+    { id: "treatmentPlan", label: "Treatment Plan", icon: faTablets },
+  ];
 
   return (
     <div className="flex min-h-screen m-2 md:m-3">
@@ -57,10 +58,7 @@ const Dashboard = () => {
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => {
-                setActiveComponent(item.id);
-                navigate(`/dashboard/${item.id}`);
-              }}
+              onClick={() => navigate(`/patient-dashboard/${item.id}`)}
               className={`flex items-center gap-3 p-2 md:p-3 rounded-lg text-left transition duration-200 ${
                 activeComponent === item.id
                   ? "bg-white text-primary-1 font-semibold shadow"
@@ -84,4 +82,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default PatientDashboard;

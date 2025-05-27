@@ -6,6 +6,7 @@ import AdminFeedbacks from "./Pages/AdminFeedbacks";
 import StaffRegistration from "./Pages/StaffRegistration";
 import PatientRegistration from "../../Client/src/Pages/Registration";
 import AdminHome from "./Pages/AdminHome";
+import AdminFooter from "./Components/Footer";
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/" element={<AdminHome />}></Route>
         <Route path="/admin" element={<AdminHome />}></Route>
         <Route path="/admin/dashboard" element={<Dashboard />}></Route>
+        <Route path="/dashboard/:section" element={<Dashboard />} />
         <Route path="/admin/feedback" element={<AdminFeedbacks />}></Route>
         <Route
           path="/admin/staffRegistration"
@@ -25,6 +27,7 @@ const App = () => {
           element={<PatientRegistration />}
         />
       </Routes>
+      <AdminFooter />
     </>
   );
 };
