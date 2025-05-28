@@ -12,6 +12,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
+import socket from "../../socket";
 import { Pie, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -37,6 +38,9 @@ ChartJS.register(
 );
 
 const Overview = () => {
+  const [notifications, setNotifications] = useState([]);
+  const [specialAttentionPatients, setSpecialAttentionPatients] = useState([]);
+  
   // Chart data for bed status
   const bedData = {
     labels: ["Occupied", "Available", "Maintenance"],

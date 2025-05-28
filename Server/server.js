@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const connectDB = require("./config/db");
 const startReminderScheduler = require("./utils/reminderScheduler");
 const cleanupOldData = require("./utils/cleanupOldData");
+const { setIO, cleanupOldData } = require("./utils/notificationManager");
 
 dotenv.config();
 connectDB();
@@ -20,6 +21,8 @@ const io = socketIO(server, {
     methods: ["GET", "POST"],
   },
 });
+
+setIO(io);
 
 // Middleware
 app.use(cors());
@@ -52,7 +55,9 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+setInterval(cleanupOldData, 60 * 60 * 1000);
+
 // ✅ Start cleanup interval after the server is running
-setInterval(() => {
-  cleanupOldData();
-}, 24 * 60 * 60 * 1000); // Every 1 day
+// setInterval(() => {
+//   cleanupOldData();
+// }, 24 * 60 * 60 * 1000); // Every 1 day
