@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "axios";
 import { 
     faArrowLeft, 
     faUser, 
@@ -17,77 +18,68 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const Profile = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [patient, setPatient] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     
-    // Mock data - in a real app, you would fetch this from an API
-    const patientData = {
-        1: { 
-            id: 1, 
-            name: "Anura Kumara", 
-            email: "anura@example.com", 
-            age: 32, 
-            status: "Active", 
-            ward: "Ward 1", 
-            bloodType: "A+", 
-            admissionDate: "2025-05-15",
-            diagnosis: "Dengue Fever",
-            treatment: "Supportive care with hydration",
-            notes: "Patient responding well to treatment"
-        },
-        2: { 
-            id: 2, 
-            name: "Sanath Nishantha", 
-            email: "sanath@example.com", 
-            age: 28, 
-            status: "Recovered", 
-            ward: "Ward 2", 
-            bloodType: "B-", 
-            admissionDate: "2024-12-20",
-            diagnosis: "Dengue Hemorrhagic Fever",
-            treatment: "IV fluids and platelet transfusion",
-            notes: "Discharged on 2025-01-05"
-        },
-        3: { 
-            id: 3, 
-            name: "Chamara Sampath", 
-            email: "chamara@example.com", 
-            age: 45, 
-            status: "Critical", 
-            ward: "Ward 3", 
-            bloodType: "O+", 
-            admissionDate: "2025-05-10",
-            diagnosis: "Severe Dengue",
-            treatment: "ICU monitoring and aggressive fluid management",
-            notes: "Critical condition, requires close monitoring"
-        },
-        4: { 
-            id: 4, 
-            name: "Namal Perera", 
-            email: "namal@example.com", 
-            age: 22, 
-            status: "Monitoring", 
-            ward: "Ward 1", 
-            bloodType: "AB+", 
-            admissionDate: "2025-03-15",
-            diagnosis: "Dengue Fever",
-            treatment: "Oral hydration and symptom management",
-            notes: "Fever subsiding, platelet count stable"
-        },
-        5: { 
-            id: 5, 
-            name: "Sunil Perera", 
-            email: "sunil@example.com", 
-            age: 60, 
-            status: "Recovered", 
-            ward: "Ward 4", 
-            bloodType: "A-", 
-            admissionDate: "2025-05-12",
-            diagnosis: "Dengue Fever with warning signs",
-            treatment: "IV fluids and close monitoring",
-            notes: "Discharged on 2023-09-25"
-        }
-    };
+    useEffect(() => {
+        const fetchPatientProfile = async () => {
+            try {
+                setLoading(true);
+                
+                // Get the token from localStorage
+                const token = localStorage.getItem('token');
+                
+                if (!token) {
+                    setError("Authorization required");
+                    setLoading(false);
+                    return;
+                }
 
-    const patient = patientData[id];
+                // Fetch patient data from API
+                const response = await axios.get(`http://localhost:5000/api/patients/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (response.data.success) {
+                    setPatient(response.data.data);
+                } else {
+                    setError("Failed to fetch patient data");
+                }
+                
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching patient:", error);
+                setError(error.response?.data?.message || "Error fetching patient data");
+                setLoading(false);
+            }
+        };
+
+        if (id) {
+            fetchPatientProfile();
+        }
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="p-6 text-center">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-2">Loading patient data...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-6 text-center text-red-500">
+                Error: {error}
+            </div>
+        );
+    }
 
     if (!patient) {
         return (
@@ -103,10 +95,9 @@ const Profile = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
             className="p-4 md:p-6"
-        >
-            <button 
+        >            <button 
                 onClick={() => navigate(-1)}
-                className="flex items-center gap-2 mb-6 text-blue-600 hover:text-blue-800 transition-colors"
+                className="flex items-center gap-2 mb-6 text-green-600 hover:text-green-800 transition-colors"
             >
                 <FontAwesomeIcon icon={faArrowLeft} />
                 <span>Back to Patients</span>
@@ -115,98 +106,104 @@ const Profile = () => {
             <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white shadow-lg rounded-lg overflow-hidden"
+                className="bg-white rounded-xl shadow-md overflow-hidden"
             >
-                <div className="bg-blue-600 text-white p-4 md:p-6">
-                    <h1 className="text-2xl md:text-3xl font-bold">{patient.name}</h1>
-                    <p className="text-blue-100">Patient ID: {patient.id}</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 md:p-6">
-                    <div className="space-y-6">
-                        <div>
-                            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <div className="md:flex">                <div className="md:w-1/3 bg-primary-1 text-white p-6">
+                        <div className="text-center">
+                            <div className="w-24 h-24 rounded-full bg-white text-green-600 flex items-center justify-center mx-auto mb-4 text-4xl">
                                 <FontAwesomeIcon icon={faUser} />
-                                <span>Personal Information</span>
-                            </h2>
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-4">
-                                    <span className="text-gray-600 w-32">Age:</span>
-                                    <span className="font-medium">{patient.age} years</span>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <span className="text-gray-600 w-32">Email:</span>
-                                    <span className="font-medium text-blue-600">{patient.email}</span>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <span className="text-gray-600 w-32">Blood Type:</span>
-                                    <span className="font-medium flex items-center gap-2">
-                                        <FontAwesomeIcon icon={faTint} className="text-red-500" />
-                                        {patient.bloodType}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <span className="text-gray-600 w-32">Admission Date:</span>
-                                    <span className="font-medium flex items-center gap-2">
-                                        <FontAwesomeIcon icon={faCalendarDay} className="text-green-500" />
-                                        {patient.admissionDate}
-                                    </span>
-                                </div>
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2">{patient.name}</h2>
+                            <p className="text-green-200">
+                                <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
+                                {patient.email}
+                            </p>
+                            <div className="mt-4 inline-block px-4 py-1 bg-white text-green-600 rounded-full font-semibold">
+                                {patient.status}
                             </div>
                         </div>
-
-                        <div>
-                            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <FontAwesomeIcon icon={faBed} />
-                                <span>Ward Information</span>
-                            </h2>
-                            <div className="flex items-center gap-4">
-                                <span className="text-gray-600 w-32">Ward:</span>
-                                <span className="bg-blue-100 text-blue-800 py-1 px-3 rounded-full font-medium">
-                                    {patient.ward}
-                                </span>
+                          <div className="mt-8">
+                            <div className="flex items-center mb-4">
+                                <FontAwesomeIcon icon={faIdBadge} className="text-xl mr-4" />
+                                <div>
+                                    <p className="text-sm text-green-200">Patient ID</p>
+                                    <p>{patient._id?.substring(0, 8) || "N/A"}</p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center mb-4">
+                                <FontAwesomeIcon icon={faBed} className="text-xl mr-4" />
+                                <div>
+                                    <p className="text-sm text-green-200">Ward</p>
+                                    <p>{patient.ward}</p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center mb-4">
+                                <FontAwesomeIcon icon={faTint} className="text-xl mr-4" />
+                                <div>
+                                    <p className="text-sm text-green-200">Blood Type</p>
+                                    <p>{patient.bloodType}</p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center">
+                                <FontAwesomeIcon icon={faCalendarDay} className="text-xl mr-4" />
+                                <div>
+                                    <p className="text-sm text-green-200">Admission Date</p>
+                                    <p>{new Date(patient.admissionDate).toLocaleDateString()}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <div className="space-y-6">
-                        <div>
-                            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <FontAwesomeIcon icon={faHeartbeat} />
-                                <span>Medical Information</span>
-                            </h2>
-                            <div className="space-y-3">
-                                <div className="flex items-start gap-4">
-                                    <span className="text-gray-600 w-32">Diagnosis:</span>
-                                    <span className="font-medium">{patient.diagnosis}</span>
-                                </div>
-                                <div className="flex items-start gap-4">
-                                    <span className="text-gray-600 w-32">Treatment:</span>
-                                    <span className="font-medium">{patient.treatment}</span>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <span className="text-gray-600 w-32">Status:</span>
-                                    <span className={`inline-block py-1 px-3 rounded-full text-sm font-semibold ${
-                                        patient.status === "Active" ? "bg-green-100 text-green-800" :
-                                        patient.status === "Recovered" ? "bg-blue-100 text-blue-800" :
-                                        patient.status === "Critical" ? "bg-red-100 text-red-800" :
-                                        "bg-yellow-100 text-yellow-800"
-                                    }`}>
-                                        {patient.status}
-                                    </span>
-                                </div>
+                    
+                    <div className="md:w-2/3 p-6">
+                        <h3 className="text-xl font-bold mb-4 text-gray-800">Patient Details</h3>
+                        
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="text-sm text-gray-500">Age</p>
+                                <p className="font-medium text-lg">{patient.age} years</p>
+                            </div>
+                            
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="text-sm text-gray-500">Status</p>
+                                <p className={`font-medium text-lg ${                                    patient.status === "Critical" ? "text-red-600" : 
+                                    patient.status === "Recovered" ? "text-green-600" : 
+                                    patient.status === "Active" ? "text-green-600" : 
+                                    "text-yellow-600"
+                                }`}>{patient.status}</p>
                             </div>
                         </div>
-
-                        <div>
-                            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <FontAwesomeIcon icon={faNotesMedical} />
-                                <span>Medical Notes</span>
-                            </h2>
-                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                                <p className="text-gray-700">{patient.notes}</p>
+                        
+                        <div className="mb-6">                            <h4 className="text-lg font-medium text-gray-700 mb-2 flex items-center">
+                                <FontAwesomeIcon icon={faNotesMedical} className="mr-2 text-green-600" />
+                                Medical Information
+                            </h4>
+                            
+                            <div className="bg-gray-50 p-4 rounded-lg mb-3">
+                                <p className="text-sm text-gray-500">Diagnosis</p>
+                                <p className="font-medium">{patient.diagnosis || "No diagnosis recorded"}</p>
                             </div>
+                            
+                            <div className="bg-gray-50 p-4 rounded-lg mb-3">
+                                <p className="text-sm text-gray-500">Treatment</p>
+                                <p className="font-medium">{patient.treatment || "No treatment recorded"}</p>
+                            </div>
+                            
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="text-sm text-gray-500">Notes</p>
+                                <p className="font-medium">{patient.notes || "No notes recorded"}</p>
+                            </div>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3">
+                            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                View Medical Records
+                            </button>
+                            <button className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
+                                Update Information
+                            </button>
                         </div>
                     </div>
                 </div>
