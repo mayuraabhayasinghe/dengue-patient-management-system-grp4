@@ -8,6 +8,7 @@ import PatientRegistration from "../../Client/src/Pages/Registration";
 import AdminHome from "./Pages/AdminHome";
 import AdminFooter from "./Components/Footer";
 import AddInventory from "./Pages/AddInventory";
+import AddWard from "./Pages/AddWard";
 
 
 const App = () => {
@@ -29,6 +30,7 @@ const App = () => {
           element={<PatientRegistration />}
         />
         <Route path="/admin/addInventory" element={<AddInventory />} />
+        <Route path="/admin/addward" element={<AddWard />} />
 
       </Routes>
       <AdminFooter />
