@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import socket from "../../socket";
+import axios from "axios"; // Add axios
 import { Pie, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -24,7 +25,6 @@ import {
   BarElement,
   Title,
 } from "chart.js";
-import socket from "../../socket";
 
 // Register Chart.js components
 ChartJS.register(
@@ -40,7 +40,53 @@ ChartJS.register(
 const Overview = () => {
   const [notifications, setNotifications] = useState([]);
   const [specialAttentionPatients, setSpecialAttentionPatients] = useState([]);
-  
+  const [reminderAlerts, setReminderAlerts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch initial data
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [notificationsRes, specialAttentionRes] = await Promise.all([
+          axios.get("/api/notifications"),
+          axios.get("/api/special-attention-patients"),
+        ]);
+
+        setNotifications(notificationsRes.data);
+        setSpecialAttentionPatients(specialAttentionRes.data);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+
+    if (socket.connected) {
+      // Socket event listeners for real-time updates
+      socket.on("notification", (newNotification) => {
+        setNotifications((prev) => [newNotification, ...prev.slice(0, 9)]);
+      });
+
+      socket.on("specialAttentionUpdate", (updatedList) => {
+        setSpecialAttentionPatients(updatedList);
+      });
+
+      // socket.on("reminder", (reminder) => {
+      //   setReminderAlerts((prev) => [reminder, ...prev.slice(0, 4)]);
+      // });
+    }
+    return () => {
+      if (socket.connected) {
+        socket.off("notification");
+        socket.off("specialAttentionUpdate");
+        // socket.off("reminder");
+      }
+    };
+  }, []);
+
   // Chart data for bed status
   const bedData = {
     labels: ["Occupied", "Available", "Maintenance"],
@@ -93,6 +139,141 @@ const Overview = () => {
       },
     },
   };
+
+  // Modified JSX for Notifications section
+  const renderNotificationsSection = () => (
+    <motion.div
+      className="p-5 bg-white rounded-xl shadow-md"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.4 }}
+    >
+      <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <FontAwesomeIcon icon={faBell} className="text-blue-500" />
+          Recent Notifications
+        </h2>
+        <div className="relative flex-1 max-w-xs">
+          <input
+            type="text"
+            placeholder="Search notifications..."
+            className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <FontAwesomeIcon
+            icon={faSearch}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          />
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-blue-50 text-blue-800">
+            <tr>
+              <th className="p-3 text-left rounded-tl-lg">Time</th>
+              <th className="p-3 text-left">Bed</th>
+              <th className="p-3 text-left">Patient</th>
+              <th className="p-3 text-left rounded-tr-lg">Message</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {isLoading ? (
+              <tr>
+                <td colSpan="4" className="p-3 text-center">
+                  Loading notifications...
+                </td>
+              </tr>
+            ) : notifications.length > 0 ? (
+              notifications.map((notification, idx) => (
+                <motion.tr
+                  key={notification._id || idx}
+                  whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.05)" }}
+                  className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                >
+                  <td className="p-3 font-medium">
+                    {new Date(notification.timestamp).toLocaleTimeString()}
+                  </td>
+                  <td className="p-3">{notification.bedNumber}</td>
+                  <td className="p-3">{notification.name}</td>
+                  <td className="p-3">
+                    <span className="font-semibold text-red-600">
+                      {notification.vital}: {notification.value}
+                    </span>
+                  </td>
+                </motion.tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="p-3 text-center text-gray-500">
+                  No notifications yet
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </motion.div>
+  );
+
+  // Modified JSX for Special Attention section
+  const renderSpecialAttentionSection = () => (
+    <motion.div
+      className="p-5 bg-white rounded-xl shadow-md lg:col-span-2"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.6 }}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <FontAwesomeIcon
+            icon={faExclamationTriangle}
+            className="text-red-500"
+          />
+          Patients Needing Special Attention
+        </h2>
+        <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">
+          {specialAttentionPatients.length} Cases
+        </span>
+      </div>
+
+      {isLoading ? (
+        <div className="text-center py-8">Loading patient data...</div>
+      ) : specialAttentionPatients.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          {specialAttentionPatients.map((patient) => (
+            <motion.div
+              key={patient._id}
+              whileHover={{ y: -5 }}
+              className="bg-white border border-red-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-3">
+                  <span className="text-red-600 font-bold">
+                    {patient.bedNumber}
+                  </span>
+                </div>
+                <h3 className="font-medium">{patient.name}</h3>
+                <div className="mt-2">
+                  <span className="px-2 py-1 bg-gray-800 text-white text-xs rounded">
+                    Bed {patient.bedNumber}
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">
+                    {new Date(patient.lastCritical).toLocaleTimeString()}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-8 text-gray-500">
+          No patients currently require special attention
+        </div>
+      )}
+    </motion.div>
+  );
 
   return (
     <motion.div
@@ -233,7 +414,8 @@ const Overview = () => {
         </motion.div>
 
         {/* Notifications */}
-        <motion.div
+        {renderNotificationsSection()}
+        {/* <motion.div
           className="p-5 bg-white rounded-xl shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -308,7 +490,7 @@ const Overview = () => {
               </tbody>
             </table>
           </div>
-        </motion.div>
+        </motion.div> */}
 
         {/* Patient Status Chart */}
         <motion.div
@@ -329,7 +511,8 @@ const Overview = () => {
         </motion.div>
 
         {/* Special Attention */}
-        <motion.div
+        {renderSpecialAttentionSection()}
+        {/* <motion.div
           className="p-5 bg-white rounded-xl shadow-md lg:col-span-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -347,7 +530,6 @@ const Overview = () => {
               5 Cases
             </span>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {[...Array(5)].map((_, i) => (
               <motion.div
@@ -374,7 +556,7 @@ const Overview = () => {
               </motion.div>
             ))}
           </div>
-        </motion.div>
+        </motion.div> */}
       </div>
     </motion.div>
   );

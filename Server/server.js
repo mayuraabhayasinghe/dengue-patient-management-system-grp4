@@ -2,11 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const http = require("http");
-const socketIO = require("socket.io");
+const { Server } = require("socket.io");
 const bodyParser = require("body-parser");
 const connectDB = require("./config/db");
 const startReminderScheduler = require("./utils/reminderScheduler");
-const cleanupOldData = require("./utils/cleanupOldData");
+// const cleanupOldData = require("./utils/cleanupOldData");
 const { setIO, cleanupOldData } = require("./utils/notificationManager");
 
 dotenv.config();
@@ -15,7 +15,7 @@ connectDB();
 const app = express();
 //socket server
 const server = http.createServer(app);
-const io = socketIO(server, {
+const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
     methods: ["GET", "POST"],
@@ -40,13 +40,14 @@ app.use("/api/patients", require("./routes/patientListRoutes")); // Updated this
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/staff", require("./routes/staffRoutes"));
 app.use("/api/vitals", require("./routes/patientVitalsRoutes"));
+app.use("/api", require("./routes/notificationRoutes"));
 
 io.on("connection", (socket) => {
-  console.log("New client connected");
+  console.log("New client connected", socket.id);
   startReminderScheduler(io); // Start the reminder checker
 
   socket.on("disconnect", () => {
-    console.log("Client disconnected");
+    console.log("Client disconnected", socket.id);
   });
 });
 
