@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 function App() {
   const [form, setForm] = useState({
@@ -6,28 +7,55 @@ function App() {
     intakeType: "",
     intakeVolume: "",
     urineOutput: "",
-    outputType: "",
+    outputTypes: [],
   });
 
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
-    const val = type === "radio" ? e.target.id : value;
-    setForm({ ...form, [name]: val });
+    const { name, value, type, id, checked } = e.target;
+
+    if (type === "checkbox") {
+      let updatedOutputTypes = [...form.outputTypes];
+      if (checked) {
+        updatedOutputTypes.push(id);
+      } else {
+        updatedOutputTypes = updatedOutputTypes.filter((item) => item !== id);
+      }
+      setForm({ ...form, outputTypes: updatedOutputTypes });
+    } else {
+      const val = type === "radio" ? id : value;
+      setForm({ ...form, [name]: val });
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Basic validation
+    
     if (!form.fluidKind || !form.intakeType || !form.intakeVolume || !form.urineOutput) {
       alert("Please fill in all required fields.");
       return;
     }
+
     if (isNaN(form.intakeVolume) || isNaN(form.urineOutput)) {
       alert("Volume fields must be numbers.");
       return;
     }
 
-    console.log("Submitted data:", form);
+    try {
+      const response = await axios.post("http://localhost:5000/api/fluid/submit", form);
+
+      console.log("Server response:", response.data);
+      setForm({
+        fluidKind: "",
+        intakeType: "",
+        intakeVolume: "",
+        urineOutput: "",
+        outputTypes: [],
+      });
+      alert("Data submitted successfully");
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -113,8 +141,9 @@ function App() {
                 <input
                   type="checkbox"
                   id="Vomitus"
-                  name="outputType1"
+                  name="outputTypes"
                   onChange={handleChange}
+                  checked={form.outputTypes.includes("Vomitus")}
                 />
                 Vomitus
               </label>
@@ -122,8 +151,9 @@ function App() {
                 <input
                   type="checkbox"
                   id="Diarrhoea"
-                  name="outputType2"
+                  name="outputTypes"
                   onChange={handleChange}
+                  checked={form.outputTypes.includes("Diarrhoea")}
                 />
                 Diarrhoea
               </label>
