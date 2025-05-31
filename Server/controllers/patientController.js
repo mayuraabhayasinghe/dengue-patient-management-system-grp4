@@ -115,4 +115,41 @@ const addPatient = async (req, res) => {
   }
 };
 
-module.exports = { addPatient };
+//Fetch all patients
+const getAllPatients = async (req, res) => {
+  try {
+    const patients = await PatientDetails.find({
+      dischargeDate: null,
+    })
+      .populate("user", "name email")
+      .lean(); // Convert to plain JS object for better performance;
+
+    // Format the data for frontend display
+    const formattedPatients = patients.map((patient) => {
+      return {
+        id: patient._id,
+        userId: patient.user._id,
+        name: patient.user.name,
+        email: patient.user.email,
+        weight: patient.weight,
+        age: patient.age,
+        bystanderAddress: patient.bystanderAddress,
+        bedNumber: patient.bedNumber,
+        admissionDate: patient.admissionDate,
+        gender: patient.gender,
+        // Add more fields as needed
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: formattedPatients.length,
+      data: formattedPatients,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to retrieve patients" });
+  }
+};
+
+module.exports = { addPatient, getAllPatients };

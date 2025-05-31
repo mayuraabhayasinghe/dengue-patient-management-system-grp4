@@ -80,7 +80,8 @@ const Navbar = () => {
 
           <a
             href="#contact"
-            className="text-text-1 hover:text-primary-2 cursor-pointer">
+            className="text-text-1 hover:text-primary-2 cursor-pointer"
+          >
             Contact
           </a>
         </div>
@@ -154,7 +155,8 @@ const Navbar = () => {
 
               <a
                 href="#contact"
-                className="text-text-1 hover:text-primary-2 cursor-pointer">
+                className="text-text-1 hover:text-primary-2 cursor-pointer"
+              >
                 Contact
               </a>
             </div>
