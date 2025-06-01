@@ -1,0 +1,114 @@
+import React, { useState } from "react";
+
+const AddWard = () => {
+  const [wardData, setWardData] = useState({
+    name: "",
+    type: "",
+    capacity: "",
+    description: "",
+    status: "",
+  });
+
+  const handleChange = (e) => {
+    setWardData({ ...wardData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Ward Submitted:", wardData);
+    // Add API POST request here if needed
+  };
+
+  return (
+    <div className="min-h-screen bg-green-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl bg-white shadow-md rounded-lg p-8">
+        <h2 className="text-3xl font-bold text-center text-green-700 mb-6">Add New Ward</h2>
+        <form onSubmit={handleSubmit} className="grid gap-6">
+          {/* Ward Name */}
+          <div>
+            <label className="block font-semibold text-gray-700">Ward Name</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Enter ward name"
+              value={wardData.name}
+              onChange={handleChange}
+              className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400"
+              required
+            />
+          </div>
+
+          {/* Type Dropdown */}
+          <div>
+            <label className="block font-semibold text-gray-700">Type</label>
+            <select
+              name="type"
+              value={wardData.type}
+              onChange={handleChange}
+              className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400"
+              required
+            >
+              <option value="">Select Type</option>
+              <option value="General">General</option>
+              <option value="Pediatric">Pediatric</option>
+              <option value="Intensive Care">Intensive Care</option>
+            </select>
+          </div>
+
+          {/* Capacity */}
+          <div>
+            <label className="block font-semibold text-gray-700">Capacity</label>
+            <input
+              type="number"
+              name="capacity"
+              placeholder="Enter number of beds"
+              value={wardData.capacity}
+              onChange={handleChange}
+              className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400"
+              required
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block font-semibold text-gray-700">Description</label>
+            <textarea
+              name="description"
+              placeholder="Enter description"
+              value={wardData.description}
+              onChange={handleChange}
+              className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400"
+              rows={3}
+            ></textarea>
+          </div>
+
+          {/* Status Dropdown */}
+          <div>
+            <label className="block font-semibold text-gray-700">Status</label>
+            <select
+              name="status"
+              value={wardData.status}
+              onChange={handleChange}
+              className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400"
+              required
+            >
+              <option value="">Select Status</option>
+              <option value="Active">Active</option>
+              <option value="Under Maintenance">Under Maintenance</option>
+            </select>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700 transition duration-200"
+          >
+            Add Ward
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default AddWard;
