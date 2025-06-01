@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -11,87 +11,95 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Users = () => {
-  const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const users = [
-    {
-      id: 1,
-      name: "Dr. Sarah Johnson",
-      email: "sarah@denguguard.com",
-      role: "Doctor",
-      lastActive: "2 hours ago",
-      status: "active",
-    },
-    {
-      id: 2,
-      name: "Nurse Mark Williams",
-      email: "mark@denguguard.com",
-      role: "Nurse",
-      lastActive: "30 minutes ago",
-      status: "active",
-    },
-    {
-      id: 3,
-      name: "Admin User",
-      email: "admin@denguguard.com",
-      role: "Admin",
-      lastActive: "5 minutes ago",
-      status: "active",
-    },
-    {
-      id: 4,
-      name: "Dr. Lisa Chen",
-      email: "lisa@denguguard.com",
-      role: "Doctor",
-      lastActive: "1 day ago",
-      status: "inactive",
-    },
-    {
-      id: 5,
-      name: "Nurse Emma Davis",
-      email: "emma@denguguard.com",
-      role: "Nurse",
-      lastActive: "3 hours ago",
-      status: "active",
-    },
-  ];
-
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTab =
-      activeTab === "all" || user.role.toLowerCase() === activeTab;
-    return matchesSearch && matchesTab;
-  });
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/auth/getuser");
+        setUsers(res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch users:", err);
+        setError("Failed to load users. Please try again later.");
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   const getRoleIcon = (role) => {
-    switch (role.toLowerCase()) {
+    switch (role?.toLowerCase()) {
       case "doctor":
         return faUserMd;
       case "nurse":
         return faUserNurse;
+      case "admin":
+        return faUser;
+      case "patient":
+        return faUser;
       default:
         return faUser;
     }
   };
 
+  const filteredUsers = users
+    .filter((user) => {
+      const role = user?.user?.role || user?.role;
+      if (activeTab === "all") return true;
+      if (activeTab === "staff") return role === "nurse" || role === "doctor";
+      return role === activeTab;
+    })
+    .filter((user) => {
+      const name = user?.fullName || user?.user?.name || user?.name || "";
+      const email = user?.email || user?.user?.email || "";
+      return (
+        name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
+
   const handleAddUser = () => {
-    activeTab === "doctor" || "nurse"
-      ? navigate("/admin/staffRegistration")
-      : navigate("/admin/add-admin");
+    if (activeTab === "doctor" || activeTab === "nurse") {
+      navigate("/admin/staffRegistration");
+    } else if (activeTab === "admin") {
+      navigate("/admin/add-admin");
+    } else {
+      // Default action if needed
+      navigate("/admin/add-user");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-1"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+        <p>{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
-        {activeTab !== "all" && (
+        {activeTab !== "all" && activeTab !== "patient" && (
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -127,7 +135,7 @@ const Users = () => {
           </div>
 
           <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-            {["all", "doctor", "nurse", "admin"].map((tab) => (
+            {["all", "doctor", "nurse", "admin", "patient"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -156,7 +164,7 @@ const Users = () => {
                   Role
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Active
+                  Email
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
@@ -167,56 +175,74 @@ const Users = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredUsers.map((user) => (
-                <motion.tr
-                  key={user.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary-1 flex items-center justify-center text-white">
-                        <FontAwesomeIcon icon={getRoleIcon(user.role)} />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {user.name}
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => {
+                  const userData = user.user || user;
+                  return (
+                    <motion.tr
+                      key={user._id || user.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary-1 flex items-center justify-center text-white">
+                            <FontAwesomeIcon
+                              icon={getRoleIcon(userData.role)}
+                            />
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {userData.name}
+                            </div>
+                          </div>
                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 capitalize">
+                          {userData.role}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-500">
-                          {user.email}
+                          {userData.email}
                         </div>
-                      </div>
-                    </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            userData.status === "active"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}>
+                          {userData.status || "inactive"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() =>
+                            navigate(`/admin/edit-user/${user._id || user.id}`)
+                          }
+                          className="text-blue-600 hover:text-blue-900 mr-3">
+                          <FontAwesomeIcon icon={faEdit} />
+                        </button>
+                        <button className="text-red-600 hover:text-red-900">
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      </td>
+                    </motion.tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="px-6 py-10 text-center font-medium text-gray-500">
+                    No users found
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{user.role}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">
-                      {user.lastActive}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.status === "active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}>
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-900 mr-3">
-                      <FontAwesomeIcon icon={faEdit} />
-                    </button>
-                    <button className="text-red-600 hover:text-red-900">
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </td>
-                </motion.tr>
-              ))}
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
