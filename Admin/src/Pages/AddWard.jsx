@@ -48,7 +48,6 @@ const AddWard = () => {
               className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400"
               required
             >
-              <option value="">Select Type</option>
               <option value="General">General</option>
               <option value="Pediatric">Pediatric</option>
               <option value="Intensive Care">Intensive Care</option>
@@ -92,7 +91,6 @@ const AddWard = () => {
               className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-400"
               required
             >
-              <option value="">Select Status</option>
               <option value="Active">Active</option>
               <option value="Under Maintenance">Under Maintenance</option>
             </select>
