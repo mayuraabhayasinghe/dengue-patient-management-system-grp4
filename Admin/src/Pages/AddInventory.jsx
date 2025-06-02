@@ -19,7 +19,7 @@ const AddInventory = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const now = new Date().toISOString();
@@ -32,8 +32,33 @@ const AddInventory = () => {
       updatedAt: now,
     };
 
-    console.log("Submitting data:", dataToSubmit);
-    // TODO: Send dataToSubmit to backend API using fetch/axios
+    try {
+      const response = await fetch("http://localhost:5000/api/inventory", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSubmit),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit data");
+      }
+
+      alert("Inventory item added successfully!");
+      setFormData({
+        name: "",
+        category: "",
+        stock: "",
+        threshold: "",
+        unit: "",
+        lastRestocked: "",
+        supplier: "",
+      });
+    } catch (error) {
+      console.error("Error submitting data:", error);
+      alert("Failed to add inventory item.");
+    }
   };
 
   return (
