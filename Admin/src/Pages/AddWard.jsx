@@ -102,7 +102,7 @@ const AddWard = () => {
               className="w-full border border-gray-300 p-3 rounded focus:ring-2 focus:ring-green-400"
               required
             >
-              <option value="" disabled hidden>Enter status</option>
+              <option className="" value="" disabled hidden>Enter status</option>
               <option value="Active">Active</option>
               <option value="Under Maintenance">Under Maintenance</option>
             </select>
