@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const PatientForm = () => {
   // Get patientUserId from the URL using useParams
   const { patientUserId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const patientData = location.state?.patientData || null;
 
+  const [currentDate, setCurrentDate] = useState("");
+  const [currentTime, setCurrentTime] = useState("");
   // State to hold the staff's user ID from localStorage
   const [staffUserId, setStaffUserId] = useState("");
-
   // State to manage form data
   const [formData, setFormData] = useState({
     bodyTemperature: "",
@@ -31,10 +35,32 @@ const PatientForm = () => {
     observation: "",
   });
 
-  // On component mount, extract staff user ID from localStorage
   useEffect(() => {
+    const updateDateTime = () => {
+      const now = new Date();
+      const date = now.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      const time = now.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+
+      setCurrentDate(date);
+      setCurrentTime(time);
+    };
+    updateDateTime(); // Run initially
+    const interval = setInterval(updateDateTime, 1000); // Update every second
+
+    // On component mount, extract staff user ID from localStorage
     const user = JSON.parse(localStorage.getItem("user"));
     if (user && user._id) setStaffUserId(user._id);
+
+    return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
   // Handle input change for both top-level and nested fields
@@ -115,18 +141,29 @@ const PatientForm = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-teal-400 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-md p-8 w-full max-w-4xl">
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-4xl">
         {/* Header */}
-        <div className="bg-teal-200 border border-gray-300 p-4 rounded-lg mb-6">
+        <div className="bg-blue-100 shadow-md p-5 rounded-lg mb-6">
           <div className="flex justify-between">
             <div>
-              <p className="font-bold">Patient Name : Thilak Rathnayake</p>
-              <p className="text-sm">Time : 4.08 PM</p>
+              <p className="font-semibold mb-1">
+                Patient Name : {patientData?.name || "Unknown"}
+              </p>
+              <p className="text-sm">Time : {currentTime}</p>
             </div>
             <div className="text-right">
-              <p className="font-bold">Admission Date : 12/03/2025</p>
-              <p className="text-sm">Date : 29/03/2025</p>
+              <p className="font-semibold mb-1">
+                Admission Date :{" "}
+                {new Date(
+                  patientData?.admissionDate || "Unknown"
+                ).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+              <p className="text-sm">Date : {currentDate}</p>
             </div>
           </div>
         </div>
@@ -331,6 +368,7 @@ const PatientForm = () => {
           <div className="flex justify-between mt-6">
             <button
               type="button"
+              onClick={() => navigate(-1)}
               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-full"
             >
               Back

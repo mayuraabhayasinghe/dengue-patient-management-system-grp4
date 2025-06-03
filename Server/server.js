@@ -41,6 +41,9 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/staff", require("./routes/staffRoutes"));
 app.use("/api/vitals", require("./routes/patientVitalsRoutes"));
 app.use("/api", require("./routes/notificationRoutes"));
+app.use("/api/fluid", require("./routes/fluid"));
+app.use("/api/wards", require("./routes/wardRoutes"));
+app.use("/api/inventory", require("./routes/inventoryRoutes"));
 
 io.on("connection", (socket) => {
   console.log("New client connected", socket.id);
@@ -50,10 +53,6 @@ io.on("connection", (socket) => {
     console.log("Client disconnected", socket.id);
   });
 });
-app.use("/api/fluid", require("./routes/fluid"));
-app.use("/api/wards", require("./routes/wardRoutes"));
-app.use("/api/inventory", require("./routes/inventoryRoutes"));
-
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
