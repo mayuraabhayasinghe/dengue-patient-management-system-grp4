@@ -5,6 +5,7 @@ import axios from "axios";
 import {
   faArrowLeft,
   faUser,
+  faSignOutAlt,
   faEnvelope,
   faIdBadge,
   faHeartbeat,
@@ -42,6 +43,23 @@ const Profile = () => {
 
     fetchPatientDetails();
   }, [id]);
+
+  // Handler for navigating to the PatientForm component with the patient userID
+  const handleAddVitals = () => {
+    navigate(`/patient-form/${patient.userId}`, {
+      state: { patientData: patient },
+    });
+  };
+
+  // Handler for generating reports
+  const handleGenerateReports = () => {
+    navigate(`/reports/${id}`);
+  };
+
+  // Handler for discharging the patient
+  const handleDischarge = () => {
+    navigate(`/discharge/${id}`);
+  };
 
   if (loading) {
     return (
@@ -252,11 +270,24 @@ const Profile = () => {
         </div>
 
         <div className="p-5 flex gap-6 justify-end items-center">
-          <button className="font-semibold shadow-sm text-white bg-[#00BFA5] hover:bg-[#009B8A] transition-colors py-2 px-4 rounded-lg">
+          <button
+            onClick={handleAddVitals}
+            className="font-semibold shadow-sm text-white bg-[#00BFA5] hover:bg-[#009B8A] transition-colors py-2 px-4 rounded-lg"
+          >
             + Add vitals Records
           </button>
-          <button className="font-semibold shadow-sm text-white bg-[#00BFA5] hover:bg-[#009B8A] transition-colors py-2 px-4 rounded-lg">
+          <button
+            onClick={handleGenerateReports}
+            className="font-semibold shadow-sm text-white bg-[#00BFA5] hover:bg-[#009B8A] transition-colors py-2 px-4 rounded-lg"
+          >
             Generate Reports
+          </button>
+          <button
+            onClick={handleDischarge}
+            className="font-semibold shadow-sm text-white bg-red-500 hover:bg-red-600 transition-colors py-2 px-4 rounded-lg"
+          >
+            <FontAwesomeIcon icon={faSignOutAlt} className="mr-1" />
+            Discharge
           </button>
         </div>
       </motion.div>
