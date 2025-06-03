@@ -26,6 +26,8 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/staff", require("./routes/staffRoutes"));
 app.use("/api/fluid", require("./routes/fluid"));
 app.use("/api/wards", require("./routes/wardRoutes"));
+app.use("/api/inventory", require("./routes/inventoryRoutes"));
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
