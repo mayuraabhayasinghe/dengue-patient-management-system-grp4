@@ -41,7 +41,7 @@ const App = () => {
         {/* End of new routes */}
         <Route path="/registration" element={<Registration />} />
         <Route path="/chatbot" element={<Chatbot />} />
-        <Route path="/patient-form" element={<PatientPage />} />
+        <Route path="/patient-form/:id" element={<PatientPage />} />
         <Route path="/caretaker-input-form" element={<Caretaker />} />
       </Routes>
       <ToastContainer position="top-center" autoClose={3000} />

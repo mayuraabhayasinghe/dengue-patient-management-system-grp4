@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
@@ -185,7 +185,7 @@ const Patients = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6"
+          className="grid grid-cols-1 sm:grid-cols-4 items-end gap-4 mb-6"
         >
           {/* Total Patients */}
           <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-blue-500">
@@ -202,7 +202,7 @@ const Patients = () => {
           </div>
 
           {/* Search Bar */}
-          <div className="relative sm:col-span-2">
+          <div className="relative sm:col-span-2 sm:col-start-3 sm:col-end-5">
             <input
               type="text"
               placeholder="Search patients..."
@@ -281,7 +281,7 @@ const Patients = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    onClick={() => handlePatientClick(patient.userId)}
+                    onClick={() => handlePatientClick(patient.id)}
                     className={`${
                       index % 2 === 0 ? "bg-gray-50" : "bg-white"
                     } hover:bg-gray-100 cursor-pointer transition-colors`}
