@@ -115,4 +115,84 @@ const addPatient = async (req, res) => {
   }
 };
 
-module.exports = { addPatient };
+//Fetch all patients
+const getAllPatients = async (req, res) => {
+  try {
+    const patients = await PatientDetails.find({
+      dischargeDate: null,
+    })
+      .populate("user", "name email")
+      .lean(); // Convert to plain JS object for better performance;
+
+    // Format the data for frontend display
+    const formattedPatients = patients.map((patient) => {
+      return {
+        id: patient._id,
+        userId: patient.user._id,
+        name: patient.user.name,
+        email: patient.user.email,
+        weight: patient.weight,
+        age: patient.age,
+        bystanderAddress: patient.bystanderAddress,
+        bedNumber: patient.bedNumber,
+        admissionDate: patient.admissionDate,
+        gender: patient.gender,
+        // Add more fields as needed
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: formattedPatients.length,
+      data: formattedPatients,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to retrieve patients" });
+  }
+};
+
+// Get patient details by ID
+const getPatientById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const patient = await PatientDetails.findById(id)
+      .populate("user", "name email")
+      .lean();
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        error: "Patient not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        id: patient._id,
+        userId: patient.user._id,
+        name: patient.user.name,
+        email: patient.user.email,
+        age: patient.age,
+        weight: patient.weight,
+        gender: patient.gender,
+        bystanderName: patient.bystanderName,
+        bystanderAddress: patient.bystanderAddress,
+        admissionDate: patient.admissionDate,
+        admissionTime: patient.admissionTime,
+        bedNumber: patient.bedNumber,
+        dischargeDate: patient.dischargeDate,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: "Server Error",
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { addPatient, getAllPatients, getPatientById };
