@@ -11,8 +11,10 @@ const PatientForm = () => {
 
   const [currentDate, setCurrentDate] = useState("");
   const [currentTime, setCurrentTime] = useState("");
+
   // State to hold the staff's user ID from localStorage
-  const [staffUserId, setStaffUserId] = useState("");
+  // const [staffUserId, setStaffUserId] = useState("");
+
   // State to manage form data
   const [formData, setFormData] = useState({
     bodyTemperature: "",
@@ -57,8 +59,8 @@ const PatientForm = () => {
     const interval = setInterval(updateDateTime, 1000); // Update every second
 
     // On component mount, extract staff user ID from localStorage
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user && user._id) setStaffUserId(user._id);
+    // const user = JSON.parse(localStorage.getItem("user"));
+    // if (user && user._id) setStaffUserId(user._id);
 
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
@@ -123,7 +125,7 @@ const PatientForm = () => {
       // Create request payload
       const payload = {
         user: patientUserId,
-        enteredBy: staffUserId,
+        // enteredBy: staffUserId,
         vitals: formData,
       };
 
