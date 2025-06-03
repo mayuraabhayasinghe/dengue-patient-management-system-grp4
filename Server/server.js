@@ -25,6 +25,7 @@ app.use("/api/patients", require("./routes/patientsRoutes")); // Updated this li
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/staff", require("./routes/staffRoutes"));
 app.use("/api/fluid", require("./routes/fluid"));
+app.use("/api/wards", require("./routes/wardRoutes"));
 app.use("/api/inventory", require("./routes/inventoryRoutes"));
 
 

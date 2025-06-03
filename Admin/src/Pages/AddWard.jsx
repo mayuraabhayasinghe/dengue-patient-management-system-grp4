@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const AddWard = () => {
   const [wardData, setWardData] = useState({
@@ -13,8 +14,23 @@ const AddWard = () => {
     setWardData({ ...wardData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:5000/api/wards", wardData);
+      alert("Ward added successfully!");
+      console.log(res.data);
+      setWardData({
+        name: "",
+        type: "",
+        capacity: "",
+        description: "",
+        status: "",
+      });
+    } catch (error) {
+      alert("Failed to add ward. Please check the console for errors.");
+      console.error("Error adding ward:", error);
+    }
     console.log("Ward Submitted:", wardData);
     // TODO: Add API POST request here
     // Reset form after submit
@@ -57,6 +73,7 @@ const AddWard = () => {
               className="w-full border border-gray-300 p-3 rounded focus:ring-2 focus:ring-green-400"
               required
             >
+              <option value="">Enter type</option>
               <option value="" disabled hidden>Enter type</option>
               <option value="General">General</option>
               <option value="Pediatric">Pediatric</option>
@@ -102,6 +119,7 @@ const AddWard = () => {
               className="w-full border border-gray-300 p-3 rounded focus:ring-2 focus:ring-green-400"
               required
             >
+              <option value="">Enter status</option>
               <option className="" value="" disabled hidden>Enter status</option>
               <option value="Active">Active</option>
               <option value="Under Maintenance">Under Maintenance</option>
