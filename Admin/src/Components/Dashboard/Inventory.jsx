@@ -142,10 +142,10 @@ const Inventory = () => {
         </h1>
         <div className="flex gap-3">
           <motion.button
+            onClick={() => navigate("/admin/addward")}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 bg-primary-1 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-2 transition"
-            onClick={() => setShowAddItemModal(true)}>
+            className="flex items-center gap-2 bg-primary-1 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-2 transition">
             <FontAwesomeIcon icon={faPlus} />
             <span>Add Item</span>
           </motion.button>

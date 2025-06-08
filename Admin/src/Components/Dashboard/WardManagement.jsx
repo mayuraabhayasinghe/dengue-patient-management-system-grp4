@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
 import {
   faBed,
   faPlus,
@@ -30,6 +31,7 @@ ChartJS.register(
 );
 
 const WardManagement = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -134,6 +136,7 @@ const WardManagement = () => {
             <span>Add Bed</span>
           </motion.button>
           <motion.button
+            onClick={() => navigate("/admin/addward")}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition">
