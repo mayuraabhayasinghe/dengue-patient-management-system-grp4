@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
 const connectDB = require("./config/db");
+const inventoryRoutes = require("./routes/inventoryRoutes");
 
 dotenv.config();
 connectDB();
@@ -10,7 +11,17 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+//app.use(cors());
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",   // Add your React dev server port here
+    "http://localhost:3000",   // Optional: other dev frontend ports
+    "https://yourfrontenddomain.com"  // Production domain if any
+  ],
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
