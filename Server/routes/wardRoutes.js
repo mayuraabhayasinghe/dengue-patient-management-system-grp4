@@ -1,18 +1,24 @@
 const express = require("express");
 const router = express.Router();
 const {
-  addWard,
+  createWard,
   getWards,
-  getWardById,
   updateWard,
   deleteWard,
 } = require("../controllers/wardController");
 
-router.post("/", addWard);
+// POST - Create
+router.post("/", createWard);
+
+// GET - All Wards
 router.get("/", getWards);
-router.get("/:id", getWardById);
+
+// PUT - Update by ID
 router.put("/:id", updateWard);
+
+// DELETE - Delete by ID
 router.delete("/:id", deleteWard);
 
 module.exports = router;
+
 
