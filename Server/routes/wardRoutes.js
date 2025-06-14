@@ -1,8 +1,18 @@
 const express = require("express");
 const router = express.Router();
-const { createWard, getWards } = require("../controllers/wardController");
+const {
+  addWard,
+  getWards,
+  getWardById,
+  updateWard,
+  deleteWard,
+} = require("../controllers/wardController");
 
-router.post("/", createWard);   // POST /api/wards
-router.get("/", getWards);      // GET /api/wards
+router.post("/", addWard);
+router.get("/", getWards);
+router.get("/:id", getWardById);
+router.put("/:id", updateWard);
+router.delete("/:id", deleteWard);
 
 module.exports = router;
+
