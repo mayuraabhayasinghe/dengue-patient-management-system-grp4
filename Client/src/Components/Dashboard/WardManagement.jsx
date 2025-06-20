@@ -8,54 +8,31 @@ import {
   faSearch,
   faFilter,
 } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
+import { useEffect } from "react";
 
 const WardManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeWard, setActiveWard] = useState("all");
 
   // Mock ward data
-  const wards = [
-    {
-      id: 1,
-      name: "Ward A",
-      type: "General",
-      capacity: 30,
-      occupied: 22,
-      available: 8,
-    },
-    {
-      id: 2,
-      name: "Ward B",
-      type: "ICU",
-      capacity: 15,
-      occupied: 14,
-      available: 1,
-    },
-    {
-      id: 3,
-      name: "Ward C",
-      type: "Pediatric",
-      capacity: 25,
-      occupied: 18,
-      available: 7,
-    },
-    {
-      id: 4,
-      name: "Ward D",
-      type: "Isolation",
-      capacity: 20,
-      occupied: 12,
-      available: 8,
-    },
-    {
-      id: 5,
-      name: "Ward E",
-      type: "General",
-      capacity: 30,
-      occupied: 20,
-      available: 10,
-    },
-  ];
+  const [wards, setWards] = useState([]);
+
+  useEffect(() => {
+    const fetchWards = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/wards");
+        setWards(response.data); // response.data is already an array
+        console.log("Wards loaded:", response.data);
+      } catch (error) {
+        console.error("Error fetching wards:", error.message);
+      }
+    };
+
+    fetchWards();
+  }, []);
+
+  // delete a ward
 
   // Mock bed data
   const beds = [
