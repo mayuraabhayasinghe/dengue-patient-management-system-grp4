@@ -26,6 +26,7 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/staff", require("./routes/staffRoutes"));
 app.use("/api/fluid", require("./routes/fluid"));
 app.use("/api/wards", require("./routes/wardRoutes")); // ✅ Make sure this file exists and is correct
+app.use("/api/beds", require("./routes/bedRoutes")); // ✅ Make sure this file exists and is correct
 app.use("/api/inventory", require("./routes/inventoryRoutes")); // ✅ Also make sure this file exists
 
 // Start server
