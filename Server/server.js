@@ -25,12 +25,12 @@ app.use("/api/patients", require("./routes/patientsRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/staff", require("./routes/staffRoutes"));
 app.use("/api/fluid", require("./routes/fluid"));
-app.use("/api/wards", require("./routes/wardRoutes")); // ✅ Make sure this file exists and is correct
-app.use("/api/beds", require("./routes/bedRoutes")); // ✅ Make sure this file exists and is correct
-app.use("/api/inventory", require("./routes/inventoryRoutes")); // ✅ Also make sure this file exists
+app.use("/api/wards", require("./routes/wardRoutes"));
+app.use("/api/beds", require("./routes/bedRoutes"));
+app.use("/api/inventory", require("./routes/inventoryRoutes"));
 
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
