@@ -1,293 +1,343 @@
-// src/Components/Dashboard/Inventory.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBoxes,
-  faSearch,
+  faBoxOpen,
   faPlus,
+  faSearch,
+  faEdit,
+  faTrash,
   faExclamationTriangle,
+  faFilter,
+  faFileExport,
+  faEllipsisVertical,
 } from "@fortawesome/free-solid-svg-icons";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
 
 const Inventory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [showLowStockOnly, setShowLowStockOnly] = useState(false);
+  const [inventoryItems, setInventoryItems] = useState([]);
+  const [showMobileMenu, setShowMobileMenu] = useState(null);
 
-  // Mock inventory data
-  const inventory = [
-    {
-      id: 1,
-      name: "Paracetamol 500mg",
-      category: "Medication",
-      quantity: 245,
-      threshold: 50,
-      unit: "tablets",
-    },
-    {
-      id: 2,
-      name: "IV Fluids 500ml",
-      category: "Fluids",
-      quantity: 120,
-      threshold: 30,
-      unit: "bags",
-    },
-    {
-      id: 3,
-      name: "Syringes 5ml",
-      category: "Disposables",
-      quantity: 320,
-      threshold: 100,
-      unit: "pieces",
-    },
-    {
-      id: 4,
-      name: "Oxygen Mask",
-      category: "Equipment",
-      quantity: 45,
-      threshold: 15,
-      unit: "units",
-    },
-    {
-      id: 5,
-      name: "PPE Kit",
-      category: "Protective",
-      quantity: 85,
-      threshold: 40,
-      unit: "kits",
-    },
-    {
-      id: 6,
-      name: "Bandages",
-      category: "Dressings",
-      quantity: 62,
-      threshold: 30,
-      unit: "packs",
-    },
-    {
-      id: 7,
-      name: "Antibiotics",
-      category: "Medication",
-      quantity: 28,
-      threshold: 20,
-      unit: "vials",
-    },
-  ];
+  useEffect(() => {
+    fetchInventory();
+  }, []);
 
-  // Inventory chart data
-  const inventoryData = {
-    labels: inventory.map((item) => item.name),
-    datasets: [
-      {
-        label: "Current Stock",
-        data: inventory.map((item) => item.quantity),
-        backgroundColor: "rgba(54, 162, 235, 0.6)",
-        borderColor: "rgba(54, 162, 235, 1)",
-        borderWidth: 1,
-      },
-      {
-        label: "Threshold",
-        data: inventory.map((item) => item.threshold),
-        backgroundColor: "rgba(255, 99, 132, 0.6)",
-        borderColor: "rgba(255, 99, 132, 1)",
-        borderWidth: 1,
-      },
-    ],
+  const fetchInventory = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/inventory/");
+      setInventoryItems(res.data);
+    } catch (err) {
+      console.error("Error fetching inventory:", err);
+    }
   };
 
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-    },
-    scales: {
-      x: {
-        stacked: true,
-      },
-      y: {
-        stacked: true,
-      },
-    },
+  const deleteItem = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/inventory/${id}`);
+      setInventoryItems(inventoryItems.filter((item) => item._id !== id));
+      setShowMobileMenu(null); // Close mobile menu after deletion
+    } catch (err) {
+      console.error("Error deleting item:", err);
+    }
   };
 
-  const filteredInventory = inventory.filter((item) => {
-    const matchesSearch = item.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+  const filteredItems = inventoryItems.filter((item) => {
+    const matchesSearch =
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.supplier.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory =
       activeCategory === "all" ||
-      item.category.toLowerCase() === activeCategory.toLowerCase();
-    return matchesSearch && matchesCategory;
+      item.category.toLowerCase() === activeCategory;
+    const matchesLowStock = !showLowStockOnly || item.stock < item.threshold;
+    return matchesSearch && matchesCategory && matchesLowStock;
   });
 
-  const lowStockItems = inventory.filter(
-    (item) => item.quantity <= item.threshold
-  );
+  const categories = [
+    "all",
+    ...new Set(inventoryItems.map((item) => item.category.toLowerCase())),
+  ];
 
   return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white p-4 rounded-lg shadow">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl font-semibold flex items-center">
-            <FontAwesomeIcon icon={faBoxes} className="mr-2" />
-            Inventory Management
-          </h2>
-          <button className="btn">
-            <FontAwesomeIcon icon={faPlus} className="mr-2" />
-            New Item
-          </button>
+    <div className="space-y-6 sm:px-6 lg:px-8 py-6">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+          Inventory Management
+        </h1>
+        <div className="flex flex-wrap gap-2">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 bg-primary-1 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-2 transition text-sm sm:text-base">
+            <FontAwesomeIcon icon={faPlus} />
+            <span className="hidden sm:inline">Add Item</span>
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition text-sm sm:text-base">
+            <FontAwesomeIcon icon={faFileExport} />
+            <span className="hidden sm:inline">Export</span>
+          </motion.button>
         </div>
+      </div>
 
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
+      {/* Search and Filters */}
+      <div className="bg-white p-4 rounded-lg shadow">
+        <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-1">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
-            </div>
+            <FontAwesomeIcon
+              icon={faSearch}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            />
             <input
               type="text"
-              placeholder="Search inventory items..."
-              className="pl-10 pr-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Search inventory..."
+              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-1 focus:border-transparent text-sm sm:text-base"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setActiveCategory("all")}
-              className={`px-3 py-1 rounded-lg ${
-                activeCategory === "all"
-                  ? "bg-primary-1 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}>
-              All
-            </button>
-            <button
-              onClick={() => setActiveCategory("medication")}
-              className={`px-3 py-1 rounded-lg ${
-                activeCategory === "medication"
-                  ? "bg-primary-1 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}>
-              Medication
-            </button>
-            <button
-              onClick={() => setActiveCategory("equipment")}
-              className={`px-3 py-1 rounded-lg ${
-                activeCategory === "equipment"
-                  ? "bg-primary-1 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}>
-              Equipment
-            </button>
-          </div>
-        </div>
 
-        {lowStockItems.length > 0 && (
-          <div className="mb-6 bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
-            <h3 className="font-medium text-red-800 flex items-center">
-              <FontAwesomeIcon icon={faExclamationTriangle} className="mr-2" />
-              Low Stock Alert ({lowStockItems.length} items)
-            </h3>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {lowStockItems.map((item) => (
-                <span
-                  key={item.id}
-                  className="px-3 py-1 bg-red-100 text-red-800 text-sm rounded-full">
-                  {item.name} ({item.quantity} {item.unit})
-                </span>
-              ))}
+          <div className="flex justify-between gap-2 sm:gap-3">
+            <div className="relative">
+              <FontAwesomeIcon
+                icon={faFilter}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 sm:block hidden"
+              />
+              <select
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-1 text-sm sm:text-base"
+                value={activeCategory}
+                onChange={(e) => setActiveCategory(e.target.value)}>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat} className="capitalize">
+                    {cat === "all" ? "All Categories" : cat}
+                  </option>
+                ))}
+              </select>
             </div>
+            <button
+              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm sm:text-base ${
+                showLowStockOnly
+                  ? "bg-red-100 text-red-800"
+                  : "bg-gray-100 text-gray-800"
+              }`}
+              onClick={() => setShowLowStockOnly(!showLowStockOnly)}>
+              <FontAwesomeIcon
+                icon={faExclamationTriangle}
+                className={showLowStockOnly ? "text-red-600" : "text-gray-600"}
+              />
+              <span className="hidden sm:inline">Low Stock</span>
+            </button>
           </div>
-        )}
-
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Item Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Quantity
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Threshold
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredInventory.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {item.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {item.category}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {item.quantity} {item.unit}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {item.threshold} {item.unit}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        item.quantity <= item.threshold
-                          ? "bg-red-100 text-red-800"
-                          : "bg-green-100 text-green-800"
-                      }`}>
-                      {item.quantity <= item.threshold
-                        ? "Low Stock"
-                        : "In Stock"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold mb-4">Inventory Levels</h3>
-        <div className="h-96">
-          <Bar data={inventoryData} options={chartOptions} />
+      {/* Inventory Table */}
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
+        {/* Desktop Table */}
+        <table className="min-w-full divide-y divide-gray-200 text-sm sm:text-base hidden sm:table">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left font-medium text-gray-500 uppercase">
+                Item
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500 uppercase hidden md:table-cell">
+                Category
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500 uppercase">
+                Stock Level
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500 uppercase hidden lg:table-cell">
+                Last Restocked
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500 uppercase hidden lg:table-cell">
+                Supplier
+              </th>
+              <th className="px-4 py-3 text-right font-medium text-gray-500 uppercase">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {filteredItems.map((item) => (
+              <motion.tr
+                key={item._id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className={`${
+                  item.stock < item.threshold ? "bg-red-50" : "hover:bg-gray-50"
+                }`}>
+                <td className="px-4 py-3">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                      <FontAwesomeIcon
+                        icon={faBoxOpen}
+                        className="text-blue-600 text-sm sm:text-base"
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <div className="font-medium text-gray-900">
+                        {item.name}
+                      </div>
+                      <div className="text-gray-500 text-xs sm:text-sm">
+                        {item.stock} {item.unit}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-4 py-3 hidden md:table-cell">
+                  {item.category}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center">
+                    <div className="w-full mr-2">
+                      <div className="h-2 bg-gray-200 rounded-full">
+                        <div
+                          className={`h-2 rounded-full ${
+                            item.stock < item.threshold
+                              ? "bg-red-500"
+                              : "bg-green-500"
+                          }`}
+                          style={{
+                            width: `${Math.min(
+                              100,
+                              (item.stock / item.threshold) * 100
+                            )}%`,
+                          }}></div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {Math.round((item.stock / item.threshold) * 100)}%
+                    </div>
+                  </div>
+                </td>
+                <td className="px-4 py-3 hidden lg:table-cell">
+                  {new Date(item.lastRestocked).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-3 hidden lg:table-cell">
+                  {item.supplier}
+                </td>
+                <td className="px-4 py-3 text-right space-x-2">
+                  <button className="text-blue-600 hover:text-blue-900">
+                    <FontAwesomeIcon icon={faEdit} />
+                  </button>
+                  <button
+                    className="text-red-600 hover:text-red-900"
+                    onClick={() => deleteItem(item._id)}>
+                    <FontAwesomeIcon icon={faTrash} />
+                  </button>
+                </td>
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Mobile List */}
+        <div className="sm:hidden space-y-2 p-2">
+          {filteredItems.map((item) => (
+            <motion.div
+              key={item._id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className={`bg-white p-3 rounded-lg shadow ${
+                item.stock < item.threshold ? "border-l-4 border-red-500" : ""
+              }`}>
+              <div className="flex justify-between items-start">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                    <FontAwesomeIcon
+                      icon={faBoxOpen}
+                      className="text-blue-600"
+                    />
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-900">{item.name}</div>
+                    <div className="text-gray-500 text-sm">
+                      {item.stock} {item.unit}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() =>
+                    setShowMobileMenu(
+                      showMobileMenu === item._id ? null : item._id
+                    )
+                  }
+                  className="text-gray-500 hover:text-gray-700">
+                  <FontAwesomeIcon icon={faEllipsisVertical} />
+                </button>
+              </div>
+
+              {/* Stock Level */}
+              <div className="mt-2 flex items-center">
+                <div className="w-full mr-2">
+                  <div className="h-2 bg-gray-200 rounded-full">
+                    <div
+                      className={`h-2 rounded-full ${
+                        item.stock < item.threshold
+                          ? "bg-red-500"
+                          : "bg-green-500"
+                      }`}
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          (item.stock / item.threshold) * 100
+                        )}%`,
+                      }}></div>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500">
+                  {Math.round((item.stock / item.threshold) * 100)}%
+                </div>
+              </div>
+
+              {/* Expanded Menu */}
+              {showMobileMenu === item._id && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  transition={{ duration: 0.2 }}
+                  className="mt-2 pt-2 border-t border-gray-200">
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <div className="text-gray-500">Category</div>
+                      <div>{item.category}</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500">Last Restocked</div>
+                      <div>
+                        {new Date(item.lastRestocked).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="col-span-2">
+                      <div className="text-gray-500">Supplier</div>
+                      <div>{item.supplier}</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-3 mt-3">
+                    <button className="text-blue-600 hover:text-blue-900">
+                      <FontAwesomeIcon icon={faEdit} className="mr-1" />
+                      Edit
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-900"
+                      onClick={() => deleteItem(item._id)}>
+                      <FontAwesomeIcon icon={faTrash} className="mr-1" />
+                      Delete
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+          ))}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
