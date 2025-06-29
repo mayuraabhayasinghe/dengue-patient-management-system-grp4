@@ -22,6 +22,11 @@ const staffSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    staffStatus: {
+        type: String,
+        enum: ['active', 'inactive'],
+        default: 'inactive'
+    },
     createdAt: {
         type: Date,
         default: Date.now
