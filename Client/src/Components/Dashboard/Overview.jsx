@@ -23,6 +23,9 @@ import {
   BarElement,
   Title,
 } from "chart.js";
+import { useState } from "react";
+import axios from "axios";
+import { useEffect } from "react";
 
 // Register Chart.js components
 ChartJS.register(
@@ -36,19 +39,6 @@ ChartJS.register(
 );
 
 const Overview = () => {
-  // Chart data for bed status
-  const bedData = {
-    labels: ["Occupied", "Available", "Maintenance"],
-    datasets: [
-      {
-        data: [18, 3, 2],
-        backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"],
-        borderColor: ["#2563eb", "#059669", "#d97706"],
-        borderWidth: 1,
-      },
-    ],
-  };
-
   // Chart data for patient status
   const patientStatusData = {
     labels: ["Recovering", "Critical", "Stable", "New Admissions"],
@@ -89,6 +79,48 @@ const Overview = () => {
     },
   };
 
+  const [bedCount, setBedCount] = useState({
+    totalBeds: 0,
+    availableBeds: 0,
+    underMaintenance: 0,
+  });
+
+  useEffect(() => {
+    fetchBedData();
+  }, []);
+
+  const fetchBedData = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/beds/");
+      const allBeds = response.data;
+      const availableBeds = await allBeds.filter(
+        (bed) => bed.status === "available"
+      );
+      setBedCount({
+        totalBeds: allBeds.length,
+        availableBeds: availableBeds.length,
+      });
+    } catch (error) {
+      console.log("Error", error.message);
+    }
+  };
+
+  // Chart data for bed status
+  const bedData = {
+    labels: ["Occupied", "Available", "Maintenance"],
+    datasets: [
+      {
+        data: [
+          bedCount.totalBeds,
+          bedCount.availableBeds,
+          bedCount.underMaintenance,
+        ],
+        backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"],
+        borderColor: ["#2563eb", "#059669", "#d97706"],
+        borderWidth: 1,
+      },
+    ],
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -100,14 +132,14 @@ const Overview = () => {
         {[
           {
             title: "Total Beds",
-            value: 23,
+            value: bedCount.totalBeds,
             icon: faBed,
             color: "bg-blue-100 text-blue-600",
             delay: 0.1,
           },
           {
             title: "Available Beds",
-            value: 3,
+            value: bedCount.availableBeds,
             icon: faBed,
             color: "bg-green-100 text-green-600",
             delay: 0.2,
