@@ -22,6 +22,7 @@ const Users = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // get all users
     const fetchUsers = async () => {
       try {
         const res = await axios.get("http://localhost:5000/api/auth/getuser");
@@ -34,6 +35,8 @@ const Users = () => {
         setLoading(false);
       }
     };
+
+    //
     fetchUsers();
   }, []);
 
