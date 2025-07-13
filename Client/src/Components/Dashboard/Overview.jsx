@@ -11,7 +11,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import socket from "../../socket";
 import axios from "axios"; // Add axios
 import { Pie, Bar } from "react-chartjs-2";
@@ -53,14 +53,41 @@ const Overview = () => {
           axios.get("/api/special-attention-patients"),
         ]);
 
-        setNotifications(notificationsRes.data);
-        setSpecialAttentionPatients(specialAttentionRes.data);
+        // Make sure data is an array
+        setNotifications(
+          Array.isArray(notificationsRes.data) ? notificationsRes.data : []
+        );
+        setSpecialAttentionPatients(
+          Array.isArray(specialAttentionRes.data)
+            ? specialAttentionRes.data
+            : []
+        );
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
+        setNotifications([]); // Set to empty array on error
+        setSpecialAttentionPatients([]); // Set to empty array on error
       } finally {
         setIsLoading(false);
       }
     };
+
+    // Fetch initial data(previous code)
+    // const fetchData = async () => {
+    //   setIsLoading(true);
+    //   try {
+    //     const [notificationsRes, specialAttentionRes] = await Promise.all([
+    //       axios.get("/api/notifications"),
+    //       axios.get("/api/special-attention-patients"),
+    //     ]);
+
+    //     setNotifications(notificationsRes.data);
+    //     setSpecialAttentionPatients(specialAttentionRes.data);
+    //   } catch (error) {
+    //     console.error("Error fetching dashboard data:", error);
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // };
 
     fetchData();
 
@@ -183,7 +210,9 @@ const Overview = () => {
                   Loading notifications...
                 </td>
               </tr>
-            ) : notifications.length > 0 ? (
+            ) : notifications &&
+              Array.isArray(notifications) &&
+              notifications.length > 0 ? (
               notifications.map((notification, idx) => (
                 <motion.tr
                   key={notification._id || idx}
