@@ -10,7 +10,6 @@ import AdminFooter from "./Components/Footer";
 import AddInventory from "./Pages/AddInventory";
 import AddWard from "./Pages/AddWard";
 
-
 const App = () => {
   return (
     <>
@@ -31,7 +30,6 @@ const App = () => {
         />
         <Route path="/admin/addInventory" element={<AddInventory />} />
         <Route path="/admin/addward" element={<AddWard />} />
-
       </Routes>
       <AdminFooter />
     </>
