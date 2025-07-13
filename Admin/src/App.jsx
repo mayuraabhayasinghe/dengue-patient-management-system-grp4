@@ -9,7 +9,7 @@ import AdminHome from "./Pages/AdminHome";
 import AdminFooter from "./Components/Footer";
 import AddInventory from "./Pages/AddInventory";
 import AddWard from "./Pages/AddWard";
-
+import UpdateStaffModal from "./modals/updateStaffModal";
 
 const App = () => {
   return (
@@ -31,7 +31,7 @@ const App = () => {
         />
         <Route path="/admin/addInventory" element={<AddInventory />} />
         <Route path="/admin/addward" element={<AddWard />} />
-
+        <Route path="/admin/update-staff" element={<UpdateStaffModal />} />
       </Routes>
       <AdminFooter />
     </>

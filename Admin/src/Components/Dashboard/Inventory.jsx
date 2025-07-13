@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
 import {
   faBoxOpen,
   faPlus,
@@ -37,6 +38,8 @@ const Inventory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [showLowStockOnly, setShowLowStockOnly] = useState(false);
+
+  const navigate = useNavigate();
 
   // Sample inventory data
   const inventoryItems = [
@@ -142,7 +145,7 @@ const Inventory = () => {
         </h1>
         <div className="flex gap-3">
           <motion.button
-            onClick={() => navigate("/admin/addward")}
+            onClick={() => navigate("/admin/addInventory")}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="flex items-center gap-2 bg-primary-1 text-white px-4 py-2 rounded-lg shadow hover:bg-primary-2 transition">
