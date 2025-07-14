@@ -5,7 +5,6 @@ import Overview from "../Components/Dashboard/Overview";
 import Patients from "../Components/Dashboard/Patients";
 import WardManagement from "../Components/Dashboard/WardManagement";
 import Inventory from "../Components/Dashboard/Inventory";
-import Accounts from "../Components/Dashboard/Accounts";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -39,8 +38,6 @@ const Dashboard = () => {
         return <WardManagement />;
       case "inventory":
         return <Inventory />;
-      case "account":
-        return <Accounts />;
       default:
         return <Overview />;
     }
@@ -51,7 +48,6 @@ const Dashboard = () => {
     { id: "patients", label: "Patients", icon: faUserInjured },
     { id: "ward", label: "Ward Management", icon: faHospitalUser },
     { id: "inventory", label: "Inventory", icon: faBoxes },
-    { id: "account", label: "Accounts", icon: faUserShield },
   ];
 
   return (

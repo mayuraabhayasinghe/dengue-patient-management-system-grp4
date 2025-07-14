@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -20,6 +20,7 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
+import axios from "axios";
 
 ChartJS.register(
   CategoryScale,
@@ -32,6 +33,57 @@ ChartJS.register(
 );
 
 const Overview = () => {
+  const [userData, setUserData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userCount, setUserCount] = useState({
+    patient: 0,
+    doctor: 0,
+    nurse: 0,
+  });
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/auth/getuser");
+        if (res.data) {
+          setUserData(res.data);
+
+          // Count roles
+          let counts = {
+            patient: 0,
+            doctor: 0,
+            nurse: 0,
+          };
+
+          res.data.forEach((user) => {
+            const role = user?.user?.role || user?.role;
+            if (role && counts[role] !== undefined) {
+              counts[role]++;
+            }
+          });
+
+          setUserCount(counts);
+          console.log("Role Counts:", counts);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("Fetch error:", error);
+        setUserData([]);
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  // Filter only patient users
+  const filteredUsers = userData.filter((user) => {
+    const role = user?.user?.role || user?.role;
+    return role === "patient";
+  });
+
+  console.log("Filtered Patients:", filteredUsers);
+
   // Data for charts
   const wardData = {
     labels: ["Ward A", "Ward B", "Ward C", "Ward D", "ICU"],
@@ -83,7 +135,7 @@ const Overview = () => {
   const stats = [
     {
       title: "Total Patients",
-      value: "45",
+      value: userCount.patient,
       change: "+12%",
       icon: faUserInjured,
       color: "bg-blue-100 text-blue-600",
@@ -97,19 +149,26 @@ const Overview = () => {
     },
     {
       title: "Total Nurses",
-      value: "18",
+      value: userCount.nurse,
       change: "+24%",
       icon: faUserNurse,
       color: "bg-purple-100 text-purple-600",
     },
     {
       title: "Total Doctors",
-      value: "6",
-      change: "+8%",
+      value: userCount.doctor,
+      change: "+18%",
       icon: faUserDoctor,
       color: "bg-yellow-100 text-yellow-600",
     },
   ];
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-1"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

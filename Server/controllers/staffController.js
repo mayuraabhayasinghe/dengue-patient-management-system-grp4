@@ -1,38 +1,20 @@
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
-const staffDetails = require("../models/staffModel");
-const { validationResult } = require("express-validator"); // Express validator for input validation
+const Staff = require("../models/staffModel");
+const { validationResult } = require("express-validator");
 
-
+// Add Staff 
 const addStaff = async (req, res) => {
   try {
-    // Input validation
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    const {
-      fullname,
-      staffEmail,
-      staffRole,
-      age,
-      phoneNumber,
-      gender,
-    } = req.body;
+    const { fullname, staffEmail, staffRole, age, phoneNumber, gender } = req.body;
 
-    // Generate raw password
-    const namePart = fullname.slice(0, 3).toLowerCase();
-    const agePart = String(age).slice(-2);
-    const emailPart = staffEmail.slice(0, 3).toLowerCase();
-    const randomPart = Math.floor(10 + Math.random() * 90);
-    const rawPassword = `${namePart}${agePart}${emailPart}#${randomPart}`;
-
-    // Hash the password
+    const rawPassword = `${fullname.slice(0, 3).toLowerCase()}${String(age).slice(-2)}${staffEmail.slice(0, 3).toLowerCase()}#${Math.floor(10 + Math.random() * 90)}`;
     const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
-    // Create user
     const newUser = await User.create({
       name: fullname,
       email: staffEmail,
@@ -40,24 +22,15 @@ const addStaff = async (req, res) => {
       role: staffRole,
     });
 
-    if (!newUser) {
-      return res.status(500).json({ message: "User creation failed" });
-    }
-
-    // Create staff details
-    const newStaffDetails = await staffDetails.create({
+    const newStaff = await Staff.create({
       user: newUser._id,
       fullName: fullname,
       age,
       gender,
       phoneNumber,
+      staffStatus: 'inactive'
     });
 
-    if (!newStaffDetails) {
-      return res.status(500).json({ message: "Staff details creation failed" });
-    }
-
-    // Email notification
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -70,18 +43,70 @@ const addStaff = async (req, res) => {
       from: process.env.EMAIL_USER,
       to: staffEmail,
       subject: "DengueGuard Staff Login",
-      text: `Hello ${fullname},\n\nHere is the login password for Staff (Role: ${staffRole}):\n\nPassword: ${rawPassword}\n\nPlease keep it safe.\n\nThank you.`,
+      text: `Hello ${fullname},\n\nHere is your login password (Role: ${staffRole}):\nPassword: ${rawPassword}\n\nPlease keep it safe.\n\nThanks.`,
     };
 
     await transporter.sendMail(mailFormat);
+    res.status(201).json({ message: "Staff registered successfully." });
 
-    // Success response
-    return res.status(201).json({ message: "Staff registered successfully." });
   } catch (error) {
     console.error("Error in addStaff:", error);
-    return res.status(500).json({ message: "Registration failed", error: error.message });
+    res.status(500).json({ message: "Registration failed", error: error.message });
   }
 };
 
+// Get All Staff
+const getAllStaff = async (req, res) => {
+  try {
+    const staff = await Staff.find().populate("user", "email role");
+    res.status(200).json(staff);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch staff", error: error.message });
+  }
+};
 
-module.exports = { addStaff };
+// Get Staff by ID
+const getStaffById = async (req, res) => {
+  try {
+    const staff = await Staff.findById(req.params.id).populate("user", "email role");
+    if (!staff) return res.status(404).json({ message: "Staff not found" });
+    res.status(200).json(staff);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch staff", error: error.message });
+  }
+};
+
+// Update Staff
+const updateStaff = async (req, res) => {
+  try {
+    const updated = await Staff.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ message: "Staff not found" });
+    res.status(200).json({ message: "Staff updated successfully", staff: updated });
+  } catch (error) {
+    res.status(500).json({ message: "Update failed", error: error.message });
+  }
+};
+
+// Delete Staff
+const deleteStaff = async (req, res) => {
+  try {
+    const staff = await Staff.findById(req.params.id);
+    if (!staff) return res.status(404).json({ message: "Staff not found" });
+
+    // Optional: Also delete associated user account
+    await User.findByIdAndDelete(staff.user);
+
+    await Staff.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "Staff deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Deletion failed", error: error.message });
+  }
+};
+
+module.exports = {
+  addStaff,
+  getAllStaff,
+  getStaffById,
+  updateStaff,
+  deleteStaff,
+};

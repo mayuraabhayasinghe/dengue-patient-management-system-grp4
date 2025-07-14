@@ -72,3 +72,82 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+exports.getUserById = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Try finding in Staff first
+    let user = await Staff.findOne({ user: userId }).populate("user");
+    if (!user) {
+      // If not found in Staff, try Patient
+      user = await Patient.findOne({ user: userId }).populate("user");
+    }
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error in getUserById:", error);
+    res.status(500).json({ error: "Failed to fetch user details" });
+  }
+};
+
+exports.updateUserById = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const updates = req.body;
+
+    // Update User model fields (name, email, role)
+    const updatedUser = await User.findByIdAndUpdate(userId, {
+      name: updates.name,
+      email: updates.email,
+      role: updates.role,
+    }, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found in User model" });
+    }
+
+    // Try updating in Staff model
+    let updatedProfile = await Staff.findOneAndUpdate(
+      { user: userId },
+      {
+        fullName: updates.fullName || updatedUser.name,
+        age: updates.age,
+        gender: updates.gender,
+        phoneNumber: updates.phoneNumber,
+        staffStatus: updates.staffStatus, // optional
+      },
+      { new: true }
+    ).populate("user");
+
+    if (!updatedProfile) {
+      // Try updating in Patient model if not staff
+      updatedProfile = await Patient.findOneAndUpdate(
+        { user: userId },
+        {
+          fullName: updates.fullName || updatedUser.name,
+          age: updates.age,
+          gender: updates.gender,
+          phoneNumber: updates.phoneNumber,
+          patientStatus: updates.patientStatus, // optional
+        },
+        { new: true }
+      ).populate("user");
+    }
+
+    if (!updatedProfile) {
+      return res.status(404).json({ error: "User profile not found in Staff or Patient" });
+    }
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user: updatedProfile
+    });
+  } catch (error) {
+    console.error("Error in updateUserById:", error);
+    res.status(500).json({ error: "Failed to update user" });
+  }
+};
