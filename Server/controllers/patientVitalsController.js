@@ -51,29 +51,32 @@ exports.submitVitals = async (req, res) => {
     await newVitals.save();
     console.log("Vitals saved successfully");
 
-    // Check each vital sign against thresholds
-    for (const [field, value] of Object.entries(vitals)) {
-      const rule = vitalRules[field];
-      if (!rule) continue;
+    // Process all vitals (both regular and nested)
+    await processAllVitals(user, vitals);
 
-      // Handle nested fields (e.g., bloodPressureSupine.systolic)
-      const fieldParts = field.split(".");
-      let actualValue = value;
-      if (fieldParts.length > 1) {
-        actualValue = fieldParts.reduce((obj, key) => obj?.[key], vitals);
-      }
+    // // Check each vital sign against thresholds
+    // for (const [field, value] of Object.entries(vitals)) {
+    //   const rule = vitalRules[field];
+    //   if (!rule) continue;
 
-      if (actualValue !== undefined && rule.condition(actualValue)) {
-        await emitNotification({
-          patientId: user,
-          vital: field,
-          value: `${actualValue}${rule.unit}`,
-          condition: `Critical - ${
-            actualValue > rule.threshold ? "High" : "Low"
-          }`,
-        });
-      }
-    }
+    //   // Handle nested fields (e.g., bloodPressureSupine.systolic)
+    //   const fieldParts = field.split(".");
+    //   let actualValue = value;
+    //   if (fieldParts.length > 1) {
+    //     actualValue = fieldParts.reduce((obj, key) => obj?.[key], vitals);
+    //   }
+
+    //   if (actualValue !== undefined && rule.condition(actualValue)) {
+    //     await emitNotification({
+    //       patientId: user,
+    //       vital: field,
+    //       value: `${actualValue}${rule.unit}`,
+    //       condition: `Critical - ${
+    //         actualValue > rule.threshold ? "High" : "Low"
+    //       }`,
+    //     });
+    //   }
+    // }
 
     res.status(201).json({
       message: "Vitals submitted successfully",
@@ -84,6 +87,91 @@ exports.submitVitals = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+// Helper function to process all vitals
+async function processAllVitals(userId, vitals) {
+  try {
+    // Process flat (non-nested) vitals
+    for (const [field, value] of Object.entries(vitals)) {
+      // Skip empty values or objects (we'll handle nested objects separately)
+      if (
+        value === "" ||
+        value === null ||
+        value === undefined ||
+        typeof value === "object"
+      ) {
+        continue;
+      }
+
+      // Convert to number for proper comparison
+      const numValue = Number(value);
+      if (isNaN(numValue)) continue;
+
+      // Check if this field has a rule
+      const rule = vitalRules[field];
+      if (!rule) continue;
+
+      // Check if the condition is met
+      if (rule.condition(numValue)) {
+        console.log(
+          `Critical vital detected: ${field} = ${numValue}${rule.unit}`
+        );
+
+        await emitNotification({
+          patientId: userId,
+          vital: field,
+          value: `${numValue}${rule.unit}`,
+          condition: `Critical - ${numValue > rule.threshold ? "High" : "Low"}`,
+        });
+      }
+    }
+
+    // Process nested objects
+    const nestedFields = Object.keys(vitals).filter(
+      (key) => typeof vitals[key] === "object" && vitals[key] !== null
+    );
+
+    for (const nestedField of nestedFields) {
+      const nestedObj = vitals[nestedField];
+
+      for (const [subField, value] of Object.entries(nestedObj)) {
+        // Skip empty values
+        if (value === "" || value === null || value === undefined) {
+          continue;
+        }
+
+        // Convert to number
+        const numValue = Number(value);
+        if (isNaN(numValue)) continue;
+
+        // Construct full field name for rule lookup (e.g., "bloodPressureSupine.systolic")
+        const fullFieldName = `${nestedField}.${subField}`;
+        const rule = vitalRules[fullFieldName];
+
+        if (!rule) continue;
+
+        // Check if condition is met
+        if (rule.condition(numValue)) {
+          console.log(
+            `Critical nested vital detected: ${fullFieldName} = ${numValue}${rule.unit}`
+          );
+
+          await emitNotification({
+            patientId: userId,
+            vital: fullFieldName,
+            value: `${numValue}${rule.unit}`,
+            condition: `Critical - ${
+              numValue > rule.threshold ? "High" : "Low"
+            }`,
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error processing vitals:", error);
+    // We don't throw the error so the main function can still complete
+  }
+}
 
 exports.getVitals = async (req, res) => {
   try {
