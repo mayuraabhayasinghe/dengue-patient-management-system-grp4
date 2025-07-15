@@ -6,6 +6,7 @@ const notificationSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  bedNumber: { type: String, required: true },
   message: { type: String, required: true },
   timestamp: { type: Date, default: Date.now },
   vital: String,

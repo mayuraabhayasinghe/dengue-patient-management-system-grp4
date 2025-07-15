@@ -6,6 +6,7 @@ exports.getNotifications = async (req, res) => {
   try {
     // Get the most recent notifications (limited to 10)
     const notifications = await Notification.find({})
+      .populate("patientId", "name bedNumber") // Populate patient details
       .sort({ timestamp: -1 })
       .limit(10);
 

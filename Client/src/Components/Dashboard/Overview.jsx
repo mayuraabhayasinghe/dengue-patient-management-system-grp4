@@ -287,7 +287,7 @@ const Overview = () => {
                     {new Date(notification.timestamp).toLocaleTimeString()}
                   </td>
                   <td className="p-3">{notification.bedNumber}</td>
-                  <td className="p-3">{notification.name}</td>
+                  <td className="p-3">{notification.patientId.name}</td>
                   <td className="p-3">
                     <span className="font-semibold text-red-600">
                       {notification.message}

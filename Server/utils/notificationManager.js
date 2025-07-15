@@ -30,6 +30,7 @@ async function emitNotification({ patientId, vital, value, condition }) {
 
     const newNotification = await Notification.create({
       patientId: patientId,
+      bedNumber: bedNumber,
       message: message,
       timestamp: new Date(),
       vital: vital,
