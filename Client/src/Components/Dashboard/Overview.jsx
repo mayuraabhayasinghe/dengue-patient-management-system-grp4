@@ -40,7 +40,7 @@ ChartJS.register(
 const Overview = () => {
   const [notifications, setNotifications] = useState([]);
   const [specialAttentionPatients, setSpecialAttentionPatients] = useState([]);
-  const [reminderAlerts, setReminderAlerts] = useState([]);
+  // const [reminderAlerts, setReminderAlerts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [bedCount, setBedCount] = useState({
     totalBeds: 0,
@@ -54,9 +54,15 @@ const Overview = () => {
       setIsLoading(true);
       try {
         const [notificationsRes, specialAttentionRes] = await Promise.all([
-          axios.get("/api/notifications"),
-          axios.get("/api/special-attention-patients"),
+          axios.get("http://localhost:5000/api/notifications"),
+          axios.get("http://localhost:5000/api/special-attention-patients"),
         ]);
+
+        console.log("Initial notifications data:", notificationsRes.data);
+        console.log(
+          "Initial special attention data:",
+          specialAttentionRes.data
+        );
 
         // Make sure data is an array
         setNotifications(
@@ -106,14 +112,43 @@ const Overview = () => {
     if (socket.connected) {
       // Socket event listeners for real-time updates
       socket.on("notification", (newNotification) => {
-        console.log("New notification received:", newNotification);
-        setNotifications((prev) => [newNotification, ...prev.slice(0, 9)]);
+        try {
+          console.log("New notification received:", newNotification);
+          setNotifications((prev) => {
+            const updated = [newNotification, ...prev.slice(0, 9)];
+            console.log("Updated notifications array:", updated);
+            return updated;
+          });
+        } catch (error) {
+          console.error("Error processing notification:", error);
+        }
       });
 
+      // socket.on("notification", (newNotification) => {
+      //   console.log("New notification received:", newNotification);
+      //   setNotifications((prev) => [newNotification, ...prev.slice(0, 9)]);
+      // });
+
       socket.on("specialAttentionUpdate", (updatedList) => {
-        console.log("Special attention update received:", updatedList);
-        setSpecialAttentionPatients(updatedList);
+        try {
+          console.log("Special attention update received:", updatedList);
+          if (Array.isArray(updatedList)) {
+            setSpecialAttentionPatients(updatedList);
+          } else {
+            console.error(
+              "Received non-array special attention data:",
+              updatedList
+            );
+          }
+        } catch (error) {
+          console.error("Error processing special attention update:", error);
+        }
       });
+
+      // socket.on("specialAttentionUpdate", (updatedList) => {
+      //   console.log("Special attention update received:", updatedList);
+      //   setSpecialAttentionPatients(updatedList);
+      // });
 
       // socket.on("reminder", (reminder) => {
       //   setReminderAlerts((prev) => [reminder, ...prev.slice(0, 4)]);
