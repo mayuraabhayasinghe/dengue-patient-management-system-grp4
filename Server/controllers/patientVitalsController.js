@@ -1,28 +1,55 @@
 const PatientVital = require("../models/staffPatientVitals");
-const PatientDetails = require("../models/patientModel");
 const { emitNotification } = require("../utils/notificationManager");
 
 // Define vital thresholds and conditions
 const vitalRules = {
-  bodyTemperature: { threshold: 37.5, condition: (v) => v > 37.5, unit: '°C' },
-  wbc: { threshold: 5000, condition: (v) => v < 5000, unit: '/mm³' },
-  plt: { threshold: 130000, condition: (v) => v < 130000, unit: '/mm³' },
-  hctPvc: { threshold: 20, condition: (v) => v > 20, unit: '%' },
-  'bloodPressureSupine.systolic': { threshold: 90, condition: (v) => v < 90, unit: 'mmHg' },
-  'bloodPressureSupine.meanArterialPressure': { threshold: 60, condition: (v) => v < 60, unit: 'mmHg' },
-  'bloodPressureSupine.pulsePressure': { threshold: 20, condition: (v) => v <= 20, unit: 'mmHg' },
-  pulseRate: { threshold: 100, condition: (v) => v > 100, unit: '/min' },
-  respiratoryRate: { threshold: 15, condition: (v) => v > 15, unit: '/min' },
-  capillaryRefillTime: { threshold: 2.5, condition: (v) => v > 2.5, unit: 'sec' }
+  bodyTemperature: { threshold: 37.5, condition: (v) => v > 37.5, unit: "°C" },
+  wbc: { threshold: 5000, condition: (v) => v < 5000, unit: "/mm³" },
+  plt: { threshold: 130000, condition: (v) => v < 130000, unit: "/mm³" },
+  hctPvc: { threshold: 20, condition: (v) => v > 20, unit: "%" },
+  "bloodPressureSupine.systolic": {
+    threshold: 90,
+    condition: (v) => v < 90,
+    unit: "mmHg",
+  },
+  "bloodPressureSupine.meanArterialPressure": {
+    threshold: 60,
+    condition: (v) => v < 60,
+    unit: "mmHg",
+  },
+  "bloodPressureSupine.pulsePressure": {
+    threshold: 20,
+    condition: (v) => v <= 20,
+    unit: "mmHg",
+  },
+  pulseRate: { threshold: 100, condition: (v) => v > 100, unit: "/min" },
+  respiratoryRate: { threshold: 15, condition: (v) => v > 15, unit: "/min" },
+  capillaryRefillTime: {
+    threshold: 2.5,
+    condition: (v) => v > 2.5,
+    unit: "sec",
+  },
 };
 
 exports.submitVitals = async (req, res) => {
   try {
-    const { user, enteredBy, vitals } = req.body;
+    const { user, vitals } = req.body;
+
+    // Debug log
+    console.log("Received vital submission for user:", user);
+    console.log("Vitals data:", vitals);
+
+    // Check if user ID is valid before proceeding
+    if (!user) {
+      return res.status(400).json({
+        error: "User ID is required for vital signs submission",
+      });
+    }
 
     // Save vitals to the database
-    const newVitals = new PatientVital({ user, enteredBy, vitals });
+    const newVitals = new PatientVital({ user, vitals });
     await newVitals.save();
+    console.log("Vitals saved successfully");
 
     // Check each vital sign against thresholds
     for (const [field, value] of Object.entries(vitals)) {
@@ -30,7 +57,7 @@ exports.submitVitals = async (req, res) => {
       if (!rule) continue;
 
       // Handle nested fields (e.g., bloodPressureSupine.systolic)
-      const fieldParts = field.split('.');
+      const fieldParts = field.split(".");
       let actualValue = value;
       if (fieldParts.length > 1) {
         actualValue = fieldParts.reduce((obj, key) => obj?.[key], vitals);
@@ -41,16 +68,17 @@ exports.submitVitals = async (req, res) => {
           patientId: user,
           vital: field,
           value: `${actualValue}${rule.unit}`,
-          condition: `Critical - ${actualValue > rule.threshold ? 'High' : 'Low'}`
+          condition: `Critical - ${
+            actualValue > rule.threshold ? "High" : "Low"
+          }`,
         });
       }
     }
 
-    res.status(201).json({ 
+    res.status(201).json({
       message: "Vitals submitted successfully",
-      data: newVitals 
+      data: newVitals,
     });
-
   } catch (error) {
     console.error("Vitals Submission Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -69,7 +97,6 @@ exports.getVitals = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch vitals" });
   }
 };
-
 
 // const PatientVital = require("../models/staffPatientVitals");
 // const Notification = require("../models/NotificationModel");
@@ -189,4 +216,3 @@ exports.getVitals = async (req, res) => {
 //     res.status(500).json({ error: "Internal Server Error" });
 //   }
 // };
-

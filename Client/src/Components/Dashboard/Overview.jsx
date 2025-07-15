@@ -97,13 +97,21 @@ const Overview = () => {
     fetchData();
     fetchBedData();
 
+    // Ensure socket is connected
+    if (!socket.connected) {
+      console.log("Socket not connected, attempting to connect...");
+      socket.connect();
+    }
+
     if (socket.connected) {
       // Socket event listeners for real-time updates
       socket.on("notification", (newNotification) => {
+        console.log("New notification received:", newNotification);
         setNotifications((prev) => [newNotification, ...prev.slice(0, 9)]);
       });
 
       socket.on("specialAttentionUpdate", (updatedList) => {
+        console.log("Special attention update received:", updatedList);
         setSpecialAttentionPatients(updatedList);
       });
 
@@ -247,7 +255,8 @@ const Overview = () => {
                   <td className="p-3">{notification.name}</td>
                   <td className="p-3">
                     <span className="font-semibold text-red-600">
-                      {notification.vital}: {notification.value}
+                      {notification.message}
+                      {/* {notification.vital}: {notification.value} */}
                     </span>
                   </td>
                 </motion.tr>

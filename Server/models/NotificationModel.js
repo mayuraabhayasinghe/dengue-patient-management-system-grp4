@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const notificationSchema = new mongoose.Schema({
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "PatientDetails",
+    ref: "User",
     required: true,
   },
   message: { type: String, required: true },

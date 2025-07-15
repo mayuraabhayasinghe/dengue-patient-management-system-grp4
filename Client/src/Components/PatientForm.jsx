@@ -4,7 +4,7 @@ import axios from "axios";
 
 const PatientForm = () => {
   // Get patientUserId from the URL using useParams
-  const { patientUserId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const patientData = location.state?.patientData || null;
@@ -38,6 +38,10 @@ const PatientForm = () => {
   });
 
   useEffect(() => {
+    // console.log("Route params:", useParams());
+    // console.log("patientUserId from params:", patientUserId);
+    // console.log("Current URL:", window.location.pathname);
+
     const updateDateTime = () => {
       const now = new Date();
       const date = now.toLocaleDateString("en-US", {
@@ -116,15 +120,15 @@ const PatientForm = () => {
     e.preventDefault();
 
     // Safety check
-    if (!staffUserId) {
-      alert("Staff user ID not found. Please log in again.");
-      return;
-    }
+    // if (!staffUserId) {
+    //   alert("Staff user ID not found. Please log in again.");
+    //   return;
+    // }
 
     try {
       // Create request payload
       const payload = {
-        user: patientUserId,
+        user: id,
         // enteredBy: staffUserId,
         vitals: formData,
       };
@@ -134,6 +138,8 @@ const PatientForm = () => {
         "http://localhost:5000/api/vitals/add",
         payload
       );
+
+      console.log("Vitals submitted successfully:", res.data);
 
       // Success message
       alert("Vitals submitted successfully");

@@ -15,21 +15,26 @@ async function emitNotification({ patientId, vital, value, condition }) {
     const patientDetails = await PatientDetails.findOne({
       user: patientId,
     }).populate("user");
-    if (!patientDetails) return;
+
+    if (!patientDetails) {
+      console.error("Patient details not found for ID:", patientId);
+      return;
+    }
+
+    // Debug log
+    console.log("Found patient details:", patientDetails.user.name);
 
     const name = patientDetails.user.name;
     const bedNumber = patientDetails.bedNumber;
     const message = `${name}'s ${vital} is critical - ${value}. Condition: ${condition}`;
 
     const newNotification = await Notification.create({
-      patient: patientId,
-      name,
-      bedNumber,
-      vital,
-      value,
-      condition,
-      message,
+      patientId: patientId,
+      message: message,
       timestamp: new Date(),
+      vital: vital,
+      value: value,
+      condition: condition,
     });
 
     // Emit to dashboard clients
