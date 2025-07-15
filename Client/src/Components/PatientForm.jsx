@@ -11,6 +11,7 @@ const PatientForm = () => {
 
   const [currentDate, setCurrentDate] = useState("");
   const [currentTime, setCurrentTime] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // State to hold the staff's user ID from localStorage
   // const [staffUserId, setStaffUserId] = useState("");
@@ -119,6 +120,11 @@ const PatientForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Prevent double submission
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
     // Safety check
     // if (!staffUserId) {
     //   alert("Staff user ID not found. Please log in again.");
@@ -143,6 +149,28 @@ const PatientForm = () => {
 
       // Success message
       alert("Vitals submitted successfully");
+      setIsSubmitting(false);
+      // Reset form after successful submission
+      setFormData({
+        bodyTemperature: "",
+        hctPvc: "",
+        pulseRate: "",
+        wbc: "",
+        plt: "",
+        bloodPressureSupine: {
+          systolic: "",
+          diastolic: "",
+          pulsePressure: "",
+          meanArterialPressure: "",
+        },
+        bloodPressureSitting: {
+          systolic: "",
+          diastolic: "",
+        },
+        respiratoryRate: "",
+        capillaryRefillTime: "",
+        observation: "",
+      });
     } catch (error) {
       console.error("Error submitting vitals:", error);
       alert("Submission failed.");
@@ -383,10 +411,19 @@ const PatientForm = () => {
             </button>
             <button
               type="submit"
+              disabled={isSubmitting}
+              className={`bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-full ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </button>
+            {/* <button
+              type="submit"
               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-full"
             >
               Submit
-            </button>
+            </button> */}
           </div>
         </form>
       </div>
