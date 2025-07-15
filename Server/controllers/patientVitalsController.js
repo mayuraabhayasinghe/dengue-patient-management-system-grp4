@@ -173,13 +173,27 @@ async function processAllVitals(userId, vitals) {
   }
 }
 
-exports.getVitals = async (req, res) => {
+exports.getPatientVitals = async (req, res) => {
   try {
     const { patientId } = req.params;
+
+    if (!patientId) {
+      return res.status(400).json({
+        success: false,
+        error: "Patient ID is required",
+      });
+    }
+
+    // Find vitals for the patient, sorted by date (newest first)
     const vitals = await PatientVital.find({ user: patientId })
       .sort({ createdAt: -1 })
-      .limit(10);
-    res.status(200).json(vitals);
+      .limit(10); // Get the 10 most recent records
+
+    return res.status(200).json({
+      success: true,
+      count: vitals.length,
+      data: vitals,
+    });
   } catch (error) {
     console.error("Error fetching vitals:", error);
     res.status(500).json({ error: "Failed to fetch vitals" });

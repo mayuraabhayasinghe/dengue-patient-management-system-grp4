@@ -10,11 +10,17 @@ import {
   faIdBadge,
   faHeartbeat,
   faBed,
-  faTint,
+  faChartLine,
   faCalendarDay,
   faNotesMedical,
   faMapMarkerAlt,
-  faPhone,
+  faWaveSquare,
+  faTemperatureHigh,
+  faLungs,
+  faHeartPulse,
+  faClock,
+  faDroplet,
+  faTachometerAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -22,7 +28,9 @@ const Profile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [patient, setPatient] = useState(null);
+  const [vitals, setVitals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [vitalsLoading, setVitalsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -44,10 +52,42 @@ const Profile = () => {
     fetchPatientDetails();
   }, [id]);
 
+  // Fetch patient vitals
+  useEffect(() => {
+    const fetchPatientVitals = async () => {
+      if (!patient || !patient.userId) return;
+
+      try {
+        setVitalsLoading(true);
+        const response = await axios.get(
+          `http://localhost:5000/api/vitals/patient/${patient.userId}`
+        );
+        setVitals(response.data.data);
+      } catch (error) {
+        console.error("Error fetching patient vitals:", error);
+      } finally {
+        setVitalsLoading(false);
+      }
+    };
+
+    fetchPatientVitals();
+  }, [patient]);
+
   // Handler for navigating to the PatientForm component with the patient userID
   const handleAddVitals = () => {
     navigate(`/patient-form/${patient.userId}`, {
       state: { patientData: patient },
+    });
+  };
+
+  // Format date function
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -194,9 +234,31 @@ const Profile = () => {
         transition={{ delay: 0.2 }}
         className="bg-white shadow-lg rounded-lg overflow-hidden"
       >
-        <div className="bg-[#00BFA5] text-white p-4 md:p-6">
+        <div className="bg-[#00BFA5] text-white p-4 md:p-6 mb-3">
           <h1 className="text-2xl md:text-3xl font-bold">{patient.name}</h1>
           <p className="">Bed Number : {patient.bedNumber}</p>
+        </div>
+
+        <div className="p-5 flex gap-6 justify-end items-center">
+          <button
+            onClick={handleAddVitals}
+            className="font-semibold shadow-sm text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-4 rounded-lg"
+          >
+            + Add vitals Records
+          </button>
+          <button
+            onClick={handleGenerateReports}
+            className="font-semibold shadow-sm text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-4 rounded-lg"
+          >
+            Generate Reports
+          </button>
+          <button
+            onClick={handleDischarge}
+            className="font-semibold shadow-sm text-white bg-red-500 hover:bg-red-600 transition-colors py-2 px-4 rounded-lg"
+          >
+            <FontAwesomeIcon icon={faSignOutAlt} className="mr-1" />
+            Discharge
+          </button>
         </div>
 
         <div className="grid bg-[#E5F8F6] shadow-lg grid-cols-1 md:grid-cols-2 gap-6 rounded-lg m-5 p-4 md:p-6">
@@ -269,27 +331,201 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="p-5 flex gap-6 justify-end items-center">
-          <button
-            onClick={handleAddVitals}
-            className="font-semibold shadow-sm text-white bg-[#00BFA5] hover:bg-[#009B8A] transition-colors py-2 px-4 rounded-lg"
-          >
-            + Add vitals Records
-          </button>
-          <button
-            onClick={handleGenerateReports}
-            className="font-semibold shadow-sm text-white bg-[#00BFA5] hover:bg-[#009B8A] transition-colors py-2 px-4 rounded-lg"
-          >
-            Generate Reports
-          </button>
-          <button
-            onClick={handleDischarge}
-            className="font-semibold shadow-sm text-white bg-red-500 hover:bg-red-600 transition-colors py-2 px-4 rounded-lg"
-          >
-            <FontAwesomeIcon icon={faSignOutAlt} className="mr-1" />
-            Discharge
-          </button>
-        </div>
+        {/* Add Patient Vitals Table */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mt-6 bg-white shadow-lg rounded-lg overflow-hidden m-3"
+        >
+          <div className="bg-blue-100 text-black p-3 md:p-4 flex justify-between items-center">
+            <h2 className="text-lg font-bold">Recent Vitals Records</h2>
+            <button
+              onClick={handleAddVitals}
+              className="text-white  bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-3 rounded-lg"
+            >
+              + Add New
+            </button>
+          </div>
+
+          <div className="p-4 md:p-6">
+            {vitalsLoading ? (
+              <div className="text-center py-10">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+                <p className="mt-3 text-gray-600">Loading vitals...</p>
+              </div>
+            ) : vitals.length === 0 ? (
+              <div className="text-center py-10">
+                <p className="text-gray-500">
+                  No vitals records found for this patient.
+                </p>
+                <button
+                  onClick={handleAddVitals}
+                  className="mt-4 font-semibold shadow-sm text-white bg-[#00BFA5] hover:bg-[#009B8A] transition-colors py-2 px-4 rounded-lg"
+                >
+                  Add First Vitals Record
+                </button>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Date & Time
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon
+                          icon={faTemperatureHigh}
+                          className="mr-1"
+                        />
+                        Temp
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon icon={faHeartPulse} className="mr-1" />
+                        Pulse
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon
+                          icon={faTachometerAlt}
+                          className="mr-1"
+                        />
+                        BP (Supine)
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon
+                          icon={faTachometerAlt}
+                          className="mr-1"
+                        />
+                        BP (Sitting)
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon icon={faWaveSquare} className="mr-1" />
+                        PP
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon icon={faChartLine} className="mr-1" />
+                        MAP
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon icon={faDroplet} className="mr-1" />
+                        HCT/PVC
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon icon={faLungs} className="mr-1" />
+                        Resp
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon icon={faClock} className="mr-1" />
+                        CRFT
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon
+                          icon={faNotesMedical}
+                          className="mr-1"
+                        />
+                        Notes
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {vitals.map((vital, index) => (
+                      <tr
+                        key={vital._id}
+                        className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                      >
+                        <td className="px-3 py-3 whitespace-nowrap text-xs font-medium text-gray-900">
+                          {formatDate(vital.timestamp)}
+                        </td>
+                        <td
+                          className={`px-3 py-3 whitespace-nowrap text-xs ${
+                            parseFloat(vital.vitals.bodyTemperature) > 37.5
+                              ? "text-red-600 font-bold"
+                              : "text-black"
+                          }`}
+                        >
+                          {vital.vitals.bodyTemperature || "-"} °C
+                        </td>
+                        <td
+                          className={`px-3 py-3 whitespace-nowrap text-xs ${
+                            parseFloat(vital.vitals.pulseRate) > 100
+                              ? "text-red-600 font-bold"
+                              : "text-black"
+                          }`}
+                        >
+                          {vital.vitals.pulseRate || "-"} /min
+                        </td>
+                        <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
+                          {vital.vitals.bloodPressureSupine?.systolic || "-"}/
+                          {vital.vitals.bloodPressureSupine?.diastolic || "-"}
+                        </td>
+                        <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
+                          {vital.vitals.bloodPressureSitting?.systolic || "-"}/
+                          {vital.vitals.bloodPressureSitting?.diastolic || "-"}
+                        </td>
+                        <td
+                          className={`px-3 py-3 whitespace-nowrap text-xs ${
+                            parseFloat(
+                              vital.vitals.bloodPressureSupine?.pulsePressure
+                            ) <= 20
+                              ? "text-red-600 font-bold"
+                              : "text-black"
+                          }`}
+                        >
+                          {vital.vitals.bloodPressureSupine?.pulsePressure ||
+                            "-"}
+                        </td>
+                        <td
+                          className={`px-3 py-3 whitespace-nowrap text-xs ${
+                            parseFloat(
+                              vital.vitals.bloodPressureSupine
+                                ?.meanArterialPressure
+                            ) < 60
+                              ? "text-red-600 font-bold"
+                              : "text-black"
+                          }`}
+                        >
+                          {vital.vitals.bloodPressureSupine
+                            ?.meanArterialPressure || "-"}
+                        </td>
+                        <td
+                          className={`px-3 py-3 whitespace-nowrap text-xs ${
+                            parseFloat(vital.vitals.hctPvc) > 20
+                              ? "text-red-600 font-bold"
+                              : "text-black"
+                          }`}
+                        >
+                          {vital.vitals.hctPvc || "-"}%
+                        </td>
+                        <td
+                          className={`px-3 py-3 whitespace-nowrap text-xs ${
+                            parseFloat(vital.vitals.respiratoryRate) > 15
+                              ? "text-red-600 font-bold"
+                              : "text-black"
+                          }`}
+                        >
+                          {vital.vitals.respiratoryRate || "-"}/min
+                        </td>
+                        <td
+                          className={`px-3 py-3 whitespace-nowrap text-xs ${
+                            parseFloat(vital.vitals.capillaryRefillTime) > 2.5
+                              ? "text-red-600 font-bold"
+                              : "text-black"
+                          }`}
+                        >
+                          {vital.vitals.capillaryRefillTime || "-"}s
+                        </td>
+                        <td className="px-3 py-3 text-xs text-black max-w-xs truncate">
+                          {vital.vitals.observation || "-"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </motion.div>
       </motion.div>
     </motion.div>
   );
