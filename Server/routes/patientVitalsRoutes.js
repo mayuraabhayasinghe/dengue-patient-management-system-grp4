@@ -1,8 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { addVitals } = require("../controllers/patientVitalsController");
+const {
+  submitVitals,
+  getPatientVitals,
+} = require("../controllers/patientVitalsController");
 
-router.post("/add", addVitals);
-// router.get("/all", getAllVitals);
+router.post("/add", submitVitals);
+router.get("/patient/:patientId", getPatientVitals);
 
 module.exports = router;

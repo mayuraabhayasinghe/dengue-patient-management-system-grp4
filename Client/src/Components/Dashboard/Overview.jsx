@@ -11,7 +11,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
-import React from "react";
+import { useEffect, useState } from "react";
+import socket from "../../socket";
+import axios from "axios"; // Add axios
 import { Pie, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -23,9 +25,6 @@ import {
   BarElement,
   Title,
 } from "chart.js";
-import { useState } from "react";
-import axios from "axios";
-import { useEffect } from "react";
 
 // Register Chart.js components
 ChartJS.register(
@@ -39,6 +38,159 @@ ChartJS.register(
 );
 
 const Overview = () => {
+  const [notifications, setNotifications] = useState([]);
+  const [specialAttentionPatients, setSpecialAttentionPatients] = useState([]);
+  // const [reminderAlerts, setReminderAlerts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [bedCount, setBedCount] = useState({
+    totalBeds: 0,
+    availableBeds: 0,
+    underMaintenance: 0,
+  });
+
+  useEffect(() => {
+    // Fetch initial data
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [notificationsRes, specialAttentionRes] = await Promise.all([
+          axios.get("http://localhost:5000/api/notifications"),
+          axios.get("http://localhost:5000/api/special-attention-patients"),
+        ]);
+
+        console.log("Initial notifications data:", notificationsRes.data);
+        console.log(
+          "Initial special attention data:",
+          specialAttentionRes.data
+        );
+
+        // Make sure data is an array
+        setNotifications(
+          Array.isArray(notificationsRes.data) ? notificationsRes.data : []
+        );
+        setSpecialAttentionPatients(
+          Array.isArray(specialAttentionRes.data)
+            ? specialAttentionRes.data
+            : []
+        );
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        setNotifications([]); // Set to empty array on error
+        setSpecialAttentionPatients([]); // Set to empty array on error
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Fetch initial data(previous code)
+    // const fetchData = async () => {
+    //   setIsLoading(true);
+    //   try {
+    //     const [notificationsRes, specialAttentionRes] = await Promise.all([
+    //       axios.get("/api/notifications"),
+    //       axios.get("/api/special-attention-patients"),
+    //     ]);
+
+    //     setNotifications(notificationsRes.data);
+    //     setSpecialAttentionPatients(specialAttentionRes.data);
+    //   } catch (error) {
+    //     console.error("Error fetching dashboard data:", error);
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // };
+
+    fetchData();
+    fetchBedData();
+
+    // Ensure socket is connected
+    if (!socket.connected) {
+      console.log("Socket not connected, attempting to connect...");
+      socket.connect();
+    }
+
+    if (socket.connected) {
+      // Socket event listeners for real-time updates
+      socket.on("notification", (newNotification) => {
+        try {
+          console.log("New notification received:", newNotification);
+          setNotifications((prev) => {
+            const updated = [newNotification, ...prev.slice(0, 9)];
+            console.log("Updated notifications array:", updated);
+            return updated;
+          });
+        } catch (error) {
+          console.error("Error processing notification:", error);
+        }
+      });
+
+      // socket.on("notification", (newNotification) => {
+      //   console.log("New notification received:", newNotification);
+      //   setNotifications((prev) => [newNotification, ...prev.slice(0, 9)]);
+      // });
+
+      socket.on("specialAttentionUpdate", (updatedList) => {
+        try {
+          console.log("Special attention update received:", updatedList);
+          if (Array.isArray(updatedList)) {
+            setSpecialAttentionPatients(updatedList);
+          } else {
+            console.error(
+              "Received non-array special attention data:",
+              updatedList
+            );
+          }
+        } catch (error) {
+          console.error("Error processing special attention update:", error);
+        }
+      });
+
+      // socket.on("specialAttentionUpdate", (updatedList) => {
+      //   console.log("Special attention update received:", updatedList);
+      //   setSpecialAttentionPatients(updatedList);
+      // });
+
+      // socket.on("reminder", (reminder) => {
+      //   setReminderAlerts((prev) => [reminder, ...prev.slice(0, 4)]);
+      // });
+    }
+    return () => {
+      if (socket.connected) {
+        socket.off("notification");
+        socket.off("specialAttentionUpdate");
+        // socket.off("reminder");
+      }
+    };
+  }, []);
+
+  const fetchBedData = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/beds/");
+      const allBeds = response.data;
+      const availableBeds = await allBeds.filter(
+        (bed) => bed.status === "available"
+      );
+      setBedCount({
+        totalBeds: allBeds.length,
+        availableBeds: availableBeds.length,
+      });
+    } catch (error) {
+      console.log("Error", error.message);
+    }
+  };
+  // Chart data for bed status
+  // const bedData = {
+  //   labels: ["Occupied", "Available", "Maintenance"],
+  //   datasets: [
+  //     {
+  //       data: [18, 3, 2],
+  //       backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"],
+  //       borderColor: ["#2563eb", "#059669", "#d97706"],
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
+
   // Chart data for patient status
   const patientStatusData = {
     labels: ["Recovering", "Critical", "Stable", "New Admissions"],
@@ -79,31 +231,163 @@ const Overview = () => {
     },
   };
 
-  const [bedCount, setBedCount] = useState({
-    totalBeds: 0,
-    availableBeds: 0,
-    underMaintenance: 0,
-  });
+  // Modified JSX for Notifications section
+  const renderNotificationsSection = () => (
+    <motion.div
+      className="p-5 bg-white rounded-xl shadow-md"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.4 }}
+    >
+      <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <FontAwesomeIcon icon={faBell} className="text-blue-500" />
+          Recent Notifications
+        </h2>
+        <div className="relative flex-1 max-w-xs">
+          <input
+            type="text"
+            placeholder="Search notifications..."
+            className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <FontAwesomeIcon
+            icon={faSearch}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          />
+        </div>
+      </div>
 
-  useEffect(() => {
-    fetchBedData();
-  }, []);
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-blue-50 text-blue-800">
+            <tr>
+              <th className="p-3 text-left rounded-tl-lg">Time</th>
+              <th className="p-3 text-left">Bed</th>
+              <th className="p-3 text-left">Patient</th>
+              <th className="p-3 text-left rounded-tr-lg">Message</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {isLoading ? (
+              <tr>
+                <td colSpan="4" className="p-3 text-center">
+                  Loading notifications...
+                </td>
+              </tr>
+            ) : notifications &&
+              Array.isArray(notifications) &&
+              notifications.length > 0 ? (
+              notifications.map((notification, idx) => (
+                <motion.tr
+                  key={notification._id || idx}
+                  whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.05)" }}
+                  className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                >
+                  <td className="p-3 font-medium">
+                    {new Date(notification.timestamp).toLocaleTimeString()}
+                  </td>
+                  <td className="p-3">{notification.bedNumber}</td>
+                  <td className="p-3">{notification.patientId.name}</td>
+                  <td className="p-3">
+                    <span className="font-semibold text-red-600">
+                      {notification.message}
+                      {/* {notification.vital}: {notification.value} */}
+                    </span>
+                  </td>
+                </motion.tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="p-3 text-center text-gray-500">
+                  No notifications yet
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </motion.div>
+  );
 
-  const fetchBedData = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/beds/");
-      const allBeds = response.data;
-      const availableBeds = await allBeds.filter(
-        (bed) => bed.status === "available"
-      );
-      setBedCount({
-        totalBeds: allBeds.length,
-        availableBeds: availableBeds.length,
-      });
-    } catch (error) {
-      console.log("Error", error.message);
-    }
-  };
+  // Modified JSX for Special Attention section
+  const renderSpecialAttentionSection = () => (
+    <motion.div
+      className="p-5 bg-white rounded-xl shadow-md lg:col-span-2"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.6 }}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <FontAwesomeIcon
+            icon={faExclamationTriangle}
+            className="text-red-500"
+          />
+          Patients Needing Special Attention
+        </h2>
+        <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">
+          {specialAttentionPatients.length} Cases
+        </span>
+      </div>
+
+      {isLoading ? (
+        <div className="text-center py-8">Loading patient data...</div>
+      ) : specialAttentionPatients.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          {specialAttentionPatients.map((patient) => (
+            <motion.div
+              key={patient._id}
+              whileHover={{ y: -5 }}
+              className="bg-white border border-red-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-3">
+                  <span className="text-red-600 font-bold">
+                    {patient.bedNumber}
+                  </span>
+                </div>
+                <h3 className="font-medium">{patient.name}</h3>
+                <div className="mt-2">
+                  <span className="px-2 py-1 bg-gray-800 text-white text-xs rounded">
+                    Bed {patient.bedNumber}
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">
+                    {new Date(patient.lastCritical).toLocaleTimeString()}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-8 text-gray-500">
+          No patients currently require special attention
+        </div>
+      )}
+    </motion.div>
+  );
+
+  // useEffect(() => {
+  //   fetchBedData();
+  // }, []);
+
+  // const fetchBedData = async () => {
+  //   try {
+  //     const response = await axios.get("http://localhost:5000/api/beds/");
+  //     const allBeds = response.data;
+  //     const availableBeds = await allBeds.filter(
+  //       (bed) => bed.status === "available"
+  //     );
+  //     setBedCount({
+  //       totalBeds: allBeds.length,
+  //       availableBeds: availableBeds.length,
+  //     });
+  //   } catch (error) {
+  //     console.log("Error", error.message);
+  //   }
+  // };
 
   // Chart data for bed status
   const bedData = {
@@ -126,7 +410,8 @@ const Overview = () => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="space-y-6">
+      className="space-y-6"
+    >
       {/* Stats Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {[
@@ -164,7 +449,8 @@ const Overview = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: stat.delay }}
-            className={`p-5 rounded-xl shadow-md flex items-center justify-between ${stat.color}`}>
+            className={`p-5 rounded-xl shadow-md flex items-center justify-between ${stat.color}`}
+          >
             <div>
               <p className="text-sm font-medium">{stat.title}</p>
               <p className="text-2xl font-bold">{stat.value}</p>
@@ -183,7 +469,8 @@ const Overview = () => {
           className="p-5 bg-white rounded-xl shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}>
+          transition={{ delay: 0.2 }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon icon={faUserNurse} className="text-blue-500" />
@@ -204,7 +491,8 @@ const Overview = () => {
               <motion.div
                 key={i}
                 whileHover={{ scale: 1.02 }}
-                className="flex gap-3 w-full items-center">
+                className="flex gap-3 w-full items-center"
+              >
                 <div className="bg-blue-500 text-white p-2 rounded-lg w-12 text-center font-medium">
                   10{i + 1}
                 </div>
@@ -221,7 +509,8 @@ const Overview = () => {
               <motion.div
                 key={i + 3}
                 whileHover={{ scale: 1.02 }}
-                className="flex gap-3 w-full items-center">
+                className="flex gap-3 w-full items-center"
+              >
                 <div className="bg-blue-500 text-white p-2 rounded-lg w-12 text-center font-medium">
                   20{i + 1}
                 </div>
@@ -241,7 +530,8 @@ const Overview = () => {
           className="p-5 bg-white rounded-xl shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}>
+          transition={{ delay: 0.3 }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon icon={faChartPie} className="text-blue-500" />
@@ -254,11 +544,13 @@ const Overview = () => {
         </motion.div>
 
         {/* Notifications */}
-        <motion.div
+        {renderNotificationsSection()}
+        {/* <motion.div
           className="p-5 bg-white rounded-xl shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}>
+          transition={{ delay: 0.4 }}
+        >
           <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon icon={faBell} className="text-blue-500" />
@@ -316,7 +608,8 @@ const Overview = () => {
                   <motion.tr
                     key={idx}
                     whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.05)" }}
-                    className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
+                    className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                  >
                     <td className="p-3 font-medium">{n.ref}</td>
                     <td className="p-3">{n.msg}</td>
                     <td className={`p-3 font-semibold ${n.color} rounded`}>
@@ -327,14 +620,15 @@ const Overview = () => {
               </tbody>
             </table>
           </div>
-        </motion.div>
+        </motion.div> */}
 
         {/* Patient Status Chart */}
         <motion.div
           className="p-5 bg-white rounded-xl shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}>
+          transition={{ delay: 0.5 }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon icon={faChartLine} className="text-blue-500" />
@@ -347,11 +641,13 @@ const Overview = () => {
         </motion.div>
 
         {/* Special Attention */}
-        <motion.div
+        {renderSpecialAttentionSection()}
+        {/* <motion.div
           className="p-5 bg-white rounded-xl shadow-md lg:col-span-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}>
+          transition={{ delay: 0.6 }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon
@@ -364,13 +660,13 @@ const Overview = () => {
               5 Cases
             </span>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {[...Array(5)].map((_, i) => (
               <motion.div
                 key={i}
                 whileHover={{ y: -5 }}
-                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+              >
                 <div className="flex flex-col items-center text-center">
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
                     <span className="text-blue-600 font-bold">{i + 1}</span>
@@ -390,7 +686,7 @@ const Overview = () => {
               </motion.div>
             ))}
           </div>
-        </motion.div>
+        </motion.div> */}
       </div>
     </motion.div>
   );
