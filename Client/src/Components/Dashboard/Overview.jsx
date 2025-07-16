@@ -8,6 +8,7 @@ import {
   faExclamationTriangle,
   faChartLine,
   faChartPie,
+  faCross,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
@@ -47,7 +48,7 @@ const Overview = () => {
     availableBeds: 0,
     underMaintenance: 0,
   });
-
+  const [staffData, setStaffData] = useState([]);
   useEffect(() => {
     // Fetch initial data
     const fetchData = async () => {
@@ -57,12 +58,6 @@ const Overview = () => {
           axios.get("http://localhost:5000/api/notifications"),
           axios.get("http://localhost:5000/api/special-attention-patients"),
         ]);
-
-        console.log("Initial notifications data:", notificationsRes.data);
-        console.log(
-          "Initial special attention data:",
-          specialAttentionRes.data
-        );
 
         // Make sure data is an array
         setNotifications(
@@ -102,6 +97,7 @@ const Overview = () => {
 
     fetchData();
     fetchBedData();
+    fetchStaffData();
 
     // Ensure socket is connected
     if (!socket.connected) {
@@ -163,6 +159,8 @@ const Overview = () => {
     };
   }, []);
 
+  // Fetch bed data
+
   const fetchBedData = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/beds/");
@@ -178,6 +176,20 @@ const Overview = () => {
       console.log("Error", error.message);
     }
   };
+
+  // fetch staff data
+
+  const fetchStaffData = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/staff/");
+      const data = res.data;
+
+      setStaffData(data);
+    } catch (error) {
+      console.log("Error fetching staff data:", error.message);
+    }
+  };
+
   // Chart data for bed status
   // const bedData = {
   //   labels: ["Occupied", "Available", "Maintenance"],
@@ -237,8 +249,7 @@ const Overview = () => {
       className="p-5 bg-white rounded-xl shadow-md"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 }}
-    >
+      transition={{ delay: 0.4 }}>
       <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <FontAwesomeIcon icon={faBell} className="text-blue-500" />
@@ -281,8 +292,7 @@ const Overview = () => {
                 <motion.tr
                   key={notification._id || idx}
                   whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.05)" }}
-                  className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
-                >
+                  className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
                   <td className="p-3 font-medium">
                     {new Date(notification.timestamp).toLocaleTimeString()}
                   </td>
@@ -315,8 +325,7 @@ const Overview = () => {
       className="p-5 bg-white rounded-xl shadow-md lg:col-span-2"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.6 }}
-    >
+      transition={{ delay: 0.6 }}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <FontAwesomeIcon
@@ -338,8 +347,7 @@ const Overview = () => {
             <motion.div
               key={patient._id}
               whileHover={{ y: -5 }}
-              className="bg-white border border-red-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
-            >
+              className="bg-white border border-red-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex flex-col items-center text-center">
                 <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-3">
                   <span className="text-red-600 font-bold">
@@ -410,8 +418,7 @@ const Overview = () => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="space-y-6"
-    >
+      className="space-y-6">
       {/* Stats Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {[
@@ -449,8 +456,7 @@ const Overview = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: stat.delay }}
-            className={`p-5 rounded-xl shadow-md flex items-center justify-between ${stat.color}`}
-          >
+            className={`p-5 rounded-xl shadow-md flex items-center justify-between ${stat.color}`}>
             <div>
               <p className="text-sm font-medium">{stat.title}</p>
               <p className="text-2xl font-bold">{stat.value}</p>
@@ -469,8 +475,7 @@ const Overview = () => {
           className="p-5 bg-white rounded-xl shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+          transition={{ delay: 0.2 }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon icon={faUserNurse} className="text-blue-500" />
@@ -487,41 +492,34 @@ const Overview = () => {
           </div>
 
           <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ scale: 1.02 }}
-                className="flex gap-3 w-full items-center"
-              >
-                <div className="bg-blue-500 text-white p-2 rounded-lg w-12 text-center font-medium">
-                  10{i + 1}
-                </div>
-                <div className="bg-gray-100 flex-1 p-2 rounded-lg">
-                  Nurse {String.fromCharCode(65 + i)}. Perera
-                </div>
-                <div className="bg-green-500 rounded-lg text-white p-2 w-10 h-10 flex items-center justify-center">
-                  <FontAwesomeIcon icon={faCheck} />
-                </div>
-              </motion.div>
-            ))}
-
-            {[...Array(2)].map((_, i) => (
-              <motion.div
-                key={i + 3}
-                whileHover={{ scale: 1.02 }}
-                className="flex gap-3 w-full items-center"
-              >
-                <div className="bg-blue-500 text-white p-2 rounded-lg w-12 text-center font-medium">
-                  20{i + 1}
-                </div>
-                <div className="bg-gray-100 flex-1 p-2 rounded-lg">
-                  Nurse {String.fromCharCode(68 + i)}. Silva
-                </div>
-                <div className="bg-red-500 rounded-lg text-white p-2 w-10 h-10 flex items-center justify-center">
-                  <FontAwesomeIcon icon={faXmark} />
-                </div>
-              </motion.div>
-            ))}
+            {staffData &&
+            staffData.filter((staff) => staff.staffStatus === "active").length >
+              0 ? (
+              staffData
+                .filter((staff) => staff.staffStatus === "active")
+                .map((staff, i) => (
+                  <motion.div
+                    key={i}
+                    whileHover={{ scale: 1.02 }}
+                    className="flex gap-3 w-full items-center">
+                    <div className="bg-blue-500 text-white p-2 rounded-lg w-12 text-center font-medium">
+                      10{i + 1}
+                    </div>
+                    <div className="bg-100 flex-1 flex items-center gap-5 p-2 rounded-lg">
+                      <p className="bg-green-200 p-1 rounded-lg w-20 text-center">
+                        {staff.user.role.charAt(0).toUpperCase() +
+                          staff.user.role.slice(1)}
+                      </p>
+                      {staff.fullName.charAt(0).toUpperCase() +
+                        staff.fullName.slice(1)}
+                    </div>
+                  </motion.div>
+                ))
+            ) : (
+              <div className="flex items-center justify-center h-50">
+                No active staff
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -530,8 +528,7 @@ const Overview = () => {
           className="p-5 bg-white rounded-xl shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
+          transition={{ delay: 0.3 }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon icon={faChartPie} className="text-blue-500" />
@@ -627,8 +624,7 @@ const Overview = () => {
           className="p-5 bg-white rounded-xl shadow-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
+          transition={{ delay: 0.5 }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FontAwesomeIcon icon={faChartLine} className="text-blue-500" />
