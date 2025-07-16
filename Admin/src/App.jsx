@@ -10,6 +10,7 @@ import AdminFooter from "./Components/Footer";
 import AddInventory from "./Pages/AddInventory";
 import AddWard from "./Pages/AddWard";
 import UpdateStaffModal from "./modals/updateStaffModal";
+import UserProfile from "./Pages/UserProfile";
 
 const App = () => {
   return (
@@ -32,6 +33,7 @@ const App = () => {
         <Route path="/admin/addInventory" element={<AddInventory />} />
         <Route path="/admin/addward" element={<AddWard />} />
         <Route path="/admin/update-staff" element={<UpdateStaffModal />} />
+        <Route path="/auth/:userId" element={<UserProfile />} />
       </Routes>
       <AdminFooter />
     </>

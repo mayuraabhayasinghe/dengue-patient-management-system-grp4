@@ -10,7 +10,7 @@ import {
   faUserNurse,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 const Users = () => {
@@ -20,6 +20,9 @@ const Users = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [userData, setUserData] = useState([]);
+
+  const { userId } = useParams();
 
   useEffect(() => {
     // get all users
@@ -36,9 +39,24 @@ const Users = () => {
       }
     };
 
+    // // fetch users by Id
+    // const fetchUserById = async () => {
+    //   try {
+    //     const res = await axios.get(`http://localhost:5000/api/auth/${userId}`);
+    //     setUserData(res.data || {});
+    //   } catch (error) {
+    //     log.error("Failed to fetch user by ID:", error.message);
+    //     setUserData([]);
+    //   }
+    // };
+
     //
     fetchUsers();
+    // fetchUserById();
   }, []);
+  const handleUserClick = (userId) => {
+    navigate(`/auth/${userId}`);
+  };
 
   const getRoleIcon = (role) => {
     switch (role?.toLowerCase()) {
@@ -187,7 +205,10 @@ const Users = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.3 }}
-                      className="hover:bg-gray-50">
+                      onClick={() =>
+                        handleUserClick(userData._id || userData.id)
+                      }
+                      className="hover:bg-gray-50 cursor-pointer">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary-1 flex items-center justify-center text-white">
