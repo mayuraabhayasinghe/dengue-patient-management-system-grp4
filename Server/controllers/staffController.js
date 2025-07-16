@@ -79,10 +79,35 @@ const getStaffById = async (req, res) => {
 // Update Staff
 const updateStaff = async (req, res) => {
   try {
-    const updated = await Staff.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updated) return res.status(404).json({ message: "Staff not found" });
-    res.status(200).json({ message: "Staff updated successfully", staff: updated });
+    const staffId = req.params.id;
+
+    // Optional: Split update data between staff and user
+    const { userUpdates, ...staffUpdates } = req.body;
+
+    // Update staff fields
+    const updatedStaff = await Staff.findByIdAndUpdate(
+      staffId,
+      staffUpdates,
+      { new: true }
+    ).populate("user");
+
+    if (!updatedStaff) {
+      return res.status(404).json({ message: "Staff not found" });
+    }
+
+    // If user update data is included, update that too
+    if (userUpdates && updatedStaff.user?._id) {
+      await User.findByIdAndUpdate(updatedStaff.user._id, userUpdates, { new: true });
+      await updatedStaff.populate("user"); // refresh populated user
+    }
+
+    res.status(200).json({
+      message: "Staff updated successfully",
+      staff: updatedStaff,
+    });
+
   } catch (error) {
+    console.error("Error updating staff:", error);
     res.status(500).json({ message: "Update failed", error: error.message });
   }
 };
