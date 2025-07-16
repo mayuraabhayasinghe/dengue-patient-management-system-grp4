@@ -13,7 +13,7 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
+import { Line, Bar } from "react-chartjs-2";
 import {
   faArrowLeft,
   faUser,
@@ -161,91 +161,25 @@ const Profile = () => {
 
   //function to format chart date
   const formatChartDate = (dateString) => {
+    if (!dateString) return "";
+
     const date = new Date(dateString);
     return (
       date.toLocaleDateString() +
       " " +
-      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true, // This ensures AM/PM is included
+      })
     );
   };
 
-  // Uncomment this section if you want to use mock data for testing
-  //   // Mock data - in a real app, you would fetch this from an API
-  //   const patientData = {
-  //     1: {
-  //       id: 1,
-  //       name: "Anura Kumara",
-  //       email: "anura@example.com",
-  //       age: 32,
-  //       status: "Active",
-  //       ward: "Ward 1",
-  //       bloodType: "A+",
-  //       admissionDate: "2025-05-15",
-  //       diagnosis: "Dengue Fever",
-  //       treatment: "Supportive care with hydration",
-  //       notes: "Patient responding well to treatment",
-  //     },
-  //     2: {
-  //       id: 2,
-  //       name: "Sanath Nishantha",
-  //       email: "sanath@example.com",
-  //       age: 28,
-  //       status: "Recovered",
-  //       ward: "Ward 2",
-  //       bloodType: "B-",
-  //       admissionDate: "2024-12-20",
-  //       diagnosis: "Dengue Hemorrhagic Fever",
-  //       treatment: "IV fluids and platelet transfusion",
-  //       notes: "Discharged on 2025-01-05",
-  //     },
-  //     3: {
-  //       id: 3,
-  //       name: "Chamara Sampath",
-  //       email: "chamara@example.com",
-  //       age: 45,
-  //       status: "Critical",
-  //       ward: "Ward 3",
-  //       bloodType: "O+",
-  //       admissionDate: "2025-05-10",
-  //       diagnosis: "Severe Dengue",
-  //       treatment: "ICU monitoring and aggressive fluid management",
-  //       notes: "Critical condition, requires close monitoring",
-  //     },
-  //     4: {
-  //       id: 4,
-  //       name: "Namal Perera",
-  //       email: "namal@example.com",
-  //       age: 22,
-  //       status: "Monitoring",
-  //       ward: "Ward 1",
-  //       bloodType: "AB+",
-  //       admissionDate: "2025-03-15",
-  //       diagnosis: "Dengue Fever",
-  //       treatment: "Oral hydration and symptom management",
-  //       notes: "Fever subsiding, platelet count stable",
-  //     },
-  //     5: {
-  //       id: 5,
-  //       name: "Sunil Perera",
-  //       email: "sunil@example.com",
-  //       age: 60,
-  //       status: "Recovered",
-  //       ward: "Ward 4",
-  //       bloodType: "A-",
-  //       admissionDate: "2025-05-12",
-  //       diagnosis: "Dengue Fever with warning signs",
-  //       treatment: "IV fluids and close monitoring",
-  //       notes: "Discharged on 2023-09-25",
-  //     },
-  //   };
-
-  //   const patient = patientData[id];
-
-  //   if (!patient) {
-  //     return (
-  //       <div className="p-6 text-center text-red-500">Patient not found</div>
-  //     );
-  //   }
+  // function to format just the date without time
+  const formatDateOnly = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
 
   return (
     <motion.div
@@ -422,10 +356,13 @@ const Profile = () => {
                           autoSkip: true,
                           maxTicksLimit: 10,
                           callback: function (value, index) {
-                            // Display shorter labels on the chart
+                            // Display shorter labels on the chart with AM/PM
                             const label = this.getLabelForValue(value);
                             const parts = label.split(" ");
-                            return parts[1]; // Show only time portion on chart
+                            // Get the time part and the AM/PM indicator
+                            const timeParts = parts[1].split(":");
+                            const amPm = parts[2] || ""; // Extract AM/PM if available
+                            return `${timeParts[0]}:${timeParts[1]} ${amPm}`;
                           },
                         },
                       },
@@ -486,21 +423,20 @@ const Profile = () => {
               </div>
             ) : vitals.length > 0 ? (
               <div className="h-52">
-                <Line
+                <Bar
                   data={{
                     labels: vitals
                       .slice(0, 10)
-                      .map((v) => formatChartDate(v.timestamp)),
+                      .map((v) => formatDateOnly(v.timestamp)),
                     datasets: [
                       {
                         label: "Platelet Count (/mm³)",
                         data: vitals.slice(0, 10).map((v) => v.vitals.plt),
+                        backgroundColor: "rgba(153, 102, 255, 0.7)",
                         borderColor: "rgb(153, 102, 255)",
-                        backgroundColor: "rgba(153, 102, 255, 0.1)",
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 3,
-                        pointBackgroundColor: "rgb(153, 102, 255)",
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        hoverBackgroundColor: "rgba(153, 102, 255, 0.9)",
                       },
                     ],
                   }}
@@ -511,25 +447,18 @@ const Profile = () => {
                       x: {
                         title: {
                           display: true,
-                          text: "Date & Time",
+                          text: "Date",
                         },
                         ticks: {
                           maxRotation: 45,
                           minRotation: 45,
-                          autoSkip: true,
-                          maxTicksLimit: 10,
-                          callback: function (value, index) {
-                            const label = this.getLabelForValue(value);
-                            const parts = label.split(" ");
-                            return parts[1]; // Show only time portion
-                          },
                         },
                       },
                       y: {
                         beginAtZero: false,
                         title: {
                           display: true,
-                          text: "/mm³",
+                          text: "Platelets (/mm³)",
                         },
                         ticks: {
                           callback: function (value) {
@@ -552,9 +481,10 @@ const Profile = () => {
                               : "";
                           },
                           label: function (context) {
-                            return `Platelets: ${parseInt(
-                              context.parsed.y
-                            ).toLocaleString()}/mm³`;
+                            const value = parseInt(context.parsed.y);
+                            return `Platelets: ${value.toLocaleString()}/mm³${
+                              value < 130000 ? " (Low)" : ""
+                            }`;
                           },
                         },
                       },
@@ -619,9 +549,13 @@ const Profile = () => {
                           autoSkip: true,
                           maxTicksLimit: 10,
                           callback: function (value, index) {
+                            // Display shorter labels on the chart with AM/PM
                             const label = this.getLabelForValue(value);
                             const parts = label.split(" ");
-                            return parts[1]; // Show only time
+                            // Get the time part and the AM/PM indicator
+                            const timeParts = parts[1].split(":");
+                            const amPm = parts[2] || ""; // Extract AM/PM if available
+                            return `${timeParts[0]}:${timeParts[1]} ${amPm}`;
                           },
                         },
                       },
