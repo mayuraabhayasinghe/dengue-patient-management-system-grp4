@@ -3,12 +3,23 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
 import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import {
   faArrowLeft,
   faUser,
   faSignOutAlt,
-  faEnvelope,
+  faTint,
   faIdBadge,
-  faHeartbeat,
   faBed,
   faChartLine,
   faCalendarDay,
@@ -23,6 +34,18 @@ import {
   faTachometerAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 const Profile = () => {
   const { id } = useParams();
@@ -136,6 +159,17 @@ const Profile = () => {
     );
   }
 
+  //function to format chart date
+  const formatChartDate = (dateString) => {
+    const date = new Date(dateString);
+    return (
+      date.toLocaleDateString() +
+      " " +
+      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    );
+  };
+
+  // Uncomment this section if you want to use mock data for testing
   //   // Mock data - in a real app, you would fetch this from an API
   //   const patientData = {
   //     1: {
@@ -331,7 +365,313 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Add Patient Vitals Table */}
+        {/* Vital Signs Charts */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 m-3"
+        >
+          {/* Temperature Chart */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-md font-semibold mb-3 flex items-center gap-2">
+              <FontAwesomeIcon
+                icon={faTemperatureHigh}
+                className="text-red-500"
+              />
+              Temperature History
+            </h3>
+            {vitalsLoading ? (
+              <div className="h-52 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : vitals.length > 0 ? (
+              <div className="h-52">
+                <Line
+                  data={{
+                    labels: vitals
+                      .slice(0, 10)
+                      .map((v) => formatChartDate(v.timestamp)),
+                    datasets: [
+                      {
+                        label: "Temperature (°C)",
+                        data: vitals
+                          .slice(0, 10)
+                          .map((v) => v.vitals.bodyTemperature),
+                        borderColor: "rgb(255, 99, 132)",
+                        backgroundColor: "rgba(255, 99, 132, 0.1)",
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointBackgroundColor: "rgb(255, 99, 132)",
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                      x: {
+                        title: {
+                          display: true,
+                          text: "Date & Time",
+                        },
+                        ticks: {
+                          maxRotation: 45,
+                          minRotation: 45,
+                          autoSkip: true,
+                          maxTicksLimit: 10,
+                          callback: function (value, index) {
+                            // Display shorter labels on the chart
+                            const label = this.getLabelForValue(value);
+                            const parts = label.split(" ");
+                            return parts[1]; // Show only time portion on chart
+                          },
+                        },
+                      },
+                      y: {
+                        beginAtZero: false,
+                        min: 35,
+                        max: 40,
+                        title: {
+                          display: true,
+                          text: "°C",
+                        },
+                        ticks: {
+                          callback: function (value) {
+                            return value + "°C";
+                          },
+                        },
+                      },
+                    },
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                      tooltip: {
+                        callbacks: {
+                          title: function (tooltipItems) {
+                            // Show full date and time in tooltip
+                            return vitals[tooltipItems[0].dataIndex].timestamp
+                              ? formatChartDate(
+                                  vitals[tooltipItems[0].dataIndex].timestamp
+                                )
+                              : "";
+                          },
+                          label: function (context) {
+                            return `Temperature: ${context.parsed.y}°C`;
+                          },
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="h-52 flex items-center justify-center text-gray-500">
+                No temperature data available
+              </div>
+            )}
+          </div>
+
+          {/* Platelet Count Chart */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-md font-semibold mb-3 flex items-center gap-2">
+              <FontAwesomeIcon icon={faDroplet} className="text-purple-500" />
+              Platelet Count History
+            </h3>
+            {vitalsLoading ? (
+              <div className="h-52 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : vitals.length > 0 ? (
+              <div className="h-52">
+                <Line
+                  data={{
+                    labels: vitals
+                      .slice(0, 10)
+                      .map((v) => formatChartDate(v.timestamp)),
+                    datasets: [
+                      {
+                        label: "Platelet Count (/mm³)",
+                        data: vitals.slice(0, 10).map((v) => v.vitals.plt),
+                        borderColor: "rgb(153, 102, 255)",
+                        backgroundColor: "rgba(153, 102, 255, 0.1)",
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointBackgroundColor: "rgb(153, 102, 255)",
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                      x: {
+                        title: {
+                          display: true,
+                          text: "Date & Time",
+                        },
+                        ticks: {
+                          maxRotation: 45,
+                          minRotation: 45,
+                          autoSkip: true,
+                          maxTicksLimit: 10,
+                          callback: function (value, index) {
+                            const label = this.getLabelForValue(value);
+                            const parts = label.split(" ");
+                            return parts[1]; // Show only time portion
+                          },
+                        },
+                      },
+                      y: {
+                        beginAtZero: false,
+                        title: {
+                          display: true,
+                          text: "/mm³",
+                        },
+                        ticks: {
+                          callback: function (value) {
+                            return value.toLocaleString();
+                          },
+                        },
+                      },
+                    },
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                      tooltip: {
+                        callbacks: {
+                          title: function (tooltipItems) {
+                            return vitals[tooltipItems[0].dataIndex].timestamp
+                              ? formatChartDate(
+                                  vitals[tooltipItems[0].dataIndex].timestamp
+                                )
+                              : "";
+                          },
+                          label: function (context) {
+                            return `Platelets: ${parseInt(
+                              context.parsed.y
+                            ).toLocaleString()}/mm³`;
+                          },
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="h-52 flex items-center justify-center text-gray-500">
+                No platelet count data available
+              </div>
+            )}
+          </div>
+
+          {/* MAP Chart */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-md font-semibold mb-3 flex items-center gap-2">
+              <FontAwesomeIcon icon={faChartLine} className="text-blue-500" />
+              Mean Arterial Pressure History
+            </h3>
+            {vitalsLoading ? (
+              <div className="h-52 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : vitals.length > 0 ? (
+              <div className="h-52">
+                <Line
+                  data={{
+                    labels: vitals
+                      .slice(0, 10)
+                      .map((v) => formatChartDate(v.timestamp)),
+                    datasets: [
+                      {
+                        label: "MAP (mmHg)",
+                        data: vitals
+                          .slice(0, 10)
+                          .map(
+                            (v) =>
+                              v.vitals.bloodPressureSupine?.meanArterialPressure
+                          ),
+                        borderColor: "rgb(54, 162, 235)",
+                        backgroundColor: "rgba(54, 162, 235, 0.1)",
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointBackgroundColor: "rgb(54, 162, 235)",
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                      x: {
+                        title: {
+                          display: true,
+                          text: "Date & Time",
+                        },
+                        ticks: {
+                          maxRotation: 45,
+                          minRotation: 45,
+                          autoSkip: true,
+                          maxTicksLimit: 10,
+                          callback: function (value, index) {
+                            const label = this.getLabelForValue(value);
+                            const parts = label.split(" ");
+                            return parts[1]; // Show only time
+                          },
+                        },
+                      },
+                      y: {
+                        beginAtZero: false,
+                        min: 40,
+                        max: 120,
+                        title: {
+                          display: true,
+                          text: "mmHg",
+                        },
+                        ticks: {
+                          callback: function (value) {
+                            return value + " mmHg";
+                          },
+                        },
+                      },
+                    },
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                      tooltip: {
+                        callbacks: {
+                          title: function (tooltipItems) {
+                            return vitals[tooltipItems[0].dataIndex].timestamp
+                              ? formatChartDate(
+                                  vitals[tooltipItems[0].dataIndex].timestamp
+                                )
+                              : "";
+                          },
+                          label: function (context) {
+                            return `MAP: ${context.parsed.y} mmHg`;
+                          },
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="h-52 flex items-center justify-center text-gray-500">
+                No MAP data available
+              </div>
+            )}
+          </div>
+        </motion.div>
+        {/* End of vital signs charts Section */}
+
+        {/* Patient Vitals Table */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -406,6 +746,14 @@ const Profile = () => {
                       <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         <FontAwesomeIcon icon={faChartLine} className="mr-1" />
                         MAP
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon icon={faDroplet} className="mr-1" />
+                        PLT
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon icon={faTint} className="mr-1" />
+                        WBC
                       </th>
                       <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         <FontAwesomeIcon icon={faDroplet} className="mr-1" />
@@ -490,6 +838,24 @@ const Profile = () => {
                         </td>
                         <td
                           className={`px-3 py-3 whitespace-nowrap text-xs ${
+                            parseFloat(vital.vitals.plt) < 130000
+                              ? "text-red-600 font-bold"
+                              : "text-black"
+                          }`}
+                        >
+                          {vital.vitals.plt || "-"} /mm³
+                        </td>
+                        <td
+                          className={`px-3 py-3 whitespace-nowrap text-xs ${
+                            parseFloat(vital.vitals.wbc) < 5000
+                              ? "text-red-600 font-bold"
+                              : "text-black"
+                          }`}
+                        >
+                          {vital.vitals.wbc || "-"} /mm³
+                        </td>
+                        <td
+                          className={`px-3 py-3 whitespace-nowrap text-xs ${
                             parseFloat(vital.vitals.hctPvc) > 20
                               ? "text-red-600 font-bold"
                               : "text-black"
@@ -526,6 +892,7 @@ const Profile = () => {
             )}
           </div>
         </motion.div>
+        {/* End of Patient Vitals Table */}
       </motion.div>
     </motion.div>
   );
