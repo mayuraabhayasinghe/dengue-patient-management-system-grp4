@@ -46,7 +46,7 @@ const getPatientFluidData = async (req, res) => {
     }
 
     // Get all fluid data for this patient, sorted by timestamp (newest first)
-    const fluidData = await FluidData.find({ patientId })
+    const fluidData = await Fluid.find({ patientId })
       .sort({ timestamp: -1 })
       .lean();
 

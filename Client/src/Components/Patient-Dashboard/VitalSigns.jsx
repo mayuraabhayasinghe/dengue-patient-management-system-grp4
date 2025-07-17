@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDroplet, faTint } from "@fortawesome/free-solid-svg-icons";
 import { Line, Bar } from "react-chartjs-2";
 
 const VitalSigns = () => {
@@ -15,6 +17,8 @@ const VitalSigns = () => {
         const token = localStorage.getItem("token");
         const userId = localStorage.getItem("userId");
 
+        console.log("Fetching data for user:", userId);
+
         if (!token || !userId) {
           throw new Error("Authentication required");
         }
@@ -27,11 +31,14 @@ const VitalSigns = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        if (patientResponse.data.success) {
-          setPatient(patientResponse.data.data);
+        if (!patientResponse.data.success) {
+          throw new Error("Failed to fetch patient data");
         }
 
-        const patientId = patient.id || patient._id;
+        const patientData = patientResponse.data.data;
+        setPatient(patientData);
+
+        const patientId = patientData.id || patientData._id;
 
         // Get fluid data
         const fluidResponse = await axios.get(
@@ -80,121 +87,144 @@ const VitalSigns = () => {
       <h1 className="text-2xl font-bold mb-6">Fluid Balance Record</h1>
 
       {patient && (
-        <div className="bg-blue-100 p-4 rounded-lg mb-6">
-          <div className="font-semibold">Patient: {patient.name}</div>
-          <div>Admission Date: {patient.admissionDate}</div>
+        <div className="bg-blue-100 flex flex-col gap-3 p-4 rounded-lg mb-6">
+          <div className="font-semibold">
+            Patient: <span className="font-normal">{patient.name}</span>
+          </div>
+          <div className="font-semibold">
+            Admission Date:
+            <span className="font-normal">
+              {" "}
+              {new Date(patient.admissionDate).toLocaleDateString()}
+            </span>
+          </div>
         </div>
       )}
-
-      {/* Fluid Input Table */}
-      <motion.div
-        variants={cardVariants}
-        initial="hidden"
-        animate="visible"
-        transition={{ duration: 0.3 }}
-        className="bg-white rounded-lg shadow-md p-6 mb-8"
-      >
-        <div className="flex items-center mb-4">
-          <div className="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-            <FontAwesomeIcon icon={faDroplet} size="lg" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+        {/* Fluid Input Table */}
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ duration: 0.3 }}
+          className="bg-white rounded-lg shadow-md p-6 mb-5"
+        >
+          <div className="flex items-center mb-4">
+            <div className="p-2 rounded-full bg-blue-100 text-blue-600 mr-4">
+              <FontAwesomeIcon icon={faDroplet} size="sm" />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Fluid Input Records
+            </h2>
           </div>
-          <h2 className="text-xl font-semibold text-gray-800">
-            Fluid Input Records
-          </h2>
-        </div>
 
-        {inputData.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="py-2 px-4 border-b text-left">Date</th>
-                  <th className="py-2 px-4 border-b text-left">Time</th>
-                  <th className="py-2 px-4 border-b text-left">Fluid Kind</th>
-                  <th className="py-2 px-4 border-b text-left">Intake Type</th>
-                  <th className="py-2 px-4 border-b text-left">Volume (ml)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {inputData.map((item) => (
-                  <tr key={item._id} className="hover:bg-gray-50">
-                    <td className="py-2 px-4 border-b">{item.formattedDate}</td>
-                    <td className="py-2 px-4 border-b">{item.formattedTime}</td>
-                    <td className="py-2 px-4 border-b">{item.fluidKind}</td>
-                    <td className="py-2 px-4 border-b">{item.intakeType}</td>
-                    <td className="py-2 px-4 border-b">{item.intakeVolume}</td>
+          {inputData.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-xs lg:text-sm bg-white">
+                <thead className="bg-gray-100 ">
+                  <tr>
+                    <th className="py-2 px-4 border-b text-left">Date</th>
+                    <th className="py-2 px-4 border-b text-left">Time</th>
+                    <th className="py-2 px-4 border-b text-left">Fluid Kind</th>
+                    <th className="py-2 px-4 border-b text-left">
+                      Intake Type
+                    </th>
+                    <th className="py-2 px-4 border-b text-left">
+                      Volume (ml)
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="text-center py-4 text-gray-500">
-            No fluid input records available
-          </div>
-        )}
-      </motion.div>
+                </thead>
+                <tbody>
+                  {inputData.map((item) => (
+                    <tr key={item._id} className="hover:bg-gray-50">
+                      <td className="py-2 px-4 border-b">
+                        {item.formattedDate}
+                      </td>
+                      <td className="py-2 px-4 border-b">
+                        {item.formattedTime}
+                      </td>
+                      <td className="py-2 px-4 border-b">{item.fluidKind}</td>
+                      <td className="py-2 px-4 border-b">{item.intakeType}</td>
+                      <td className="py-2 px-4 border-b">
+                        {item.intakeVolume}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-4 text-gray-500">
+              No fluid input records available
+            </div>
+          )}
+        </motion.div>
 
-      {/* Fluid Output Table */}
-      <motion.div
-        variants={cardVariants}
-        initial="hidden"
-        animate="visible"
-        transition={{ duration: 0.3, delay: 0.2 }}
-        className="bg-white rounded-lg shadow-md p-6"
-      >
-        <div className="flex items-center mb-4">
-          <div className="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-            <FontAwesomeIcon icon={faTint} size="lg" />
+        {/* Fluid Output Table */}
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="bg-white rounded-lg shadow-md mb-5 p-6"
+        >
+          <div className="flex items-center mb-4">
+            <div className="p-2 rounded-full bg-purple-100 text-yellow-300 mr-4">
+              <FontAwesomeIcon icon={faTint} size="sm" />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Fluid Output Records
+            </h2>
           </div>
-          <h2 className="text-xl font-semibold text-gray-800">
-            Fluid Output Records
-          </h2>
-        </div>
 
-        {outputData.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="py-2 px-4 border-b text-left">Date</th>
-                  <th className="py-2 px-4 border-b text-left">Time</th>
-                  <th className="py-2 px-4 border-b text-left">
-                    Urine Output (ml)
-                  </th>
-                  <th className="py-2 px-4 border-b text-left">
-                    Other Output Signs
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {outputData.map((item) => (
-                  <tr key={item._id} className="hover:bg-gray-50">
-                    <td className="py-2 px-4 border-b">{item.formattedDate}</td>
-                    <td className="py-2 px-4 border-b">{item.formattedTime}</td>
-                    <td className="py-2 px-4 border-b">{item.urineOutput}</td>
-                    <td className="py-2 px-4 border-b">
-                      {item.outputTypes.length > 0 ? (
-                        <ul className="list-disc list-inside">
-                          {item.outputTypes.map((type, index) => (
-                            <li key={index}>{type}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        "None"
-                      )}
-                    </td>
+          {outputData.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-xs lg:text-sm bg-white">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="py-2 px-4 border-b text-left">Date</th>
+                    <th className="py-2 px-4 border-b text-left">Time</th>
+                    <th className="py-2 px-4 border-b text-left">
+                      Urine Output (ml)
+                    </th>
+                    <th className="py-2 px-4 border-b text-left">
+                      Other Output Signs
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="text-center py-4 text-gray-500">
-            No fluid output records available
-          </div>
-        )}
-      </motion.div>
+                </thead>
+                <tbody>
+                  {outputData.map((item) => (
+                    <tr key={item._id} className="hover:bg-gray-50">
+                      <td className="py-2 px-4 border-b">
+                        {item.formattedDate}
+                      </td>
+                      <td className="py-2 px-4 border-b">
+                        {item.formattedTime}
+                      </td>
+                      <td className="py-2 px-4 border-b">{item.urineOutput}</td>
+                      <td className="py-2 px-4 border-b">
+                        {item.outputTypes.length > 0 ? (
+                          <ul className="list-disc list-inside">
+                            {item.outputTypes.map((type, index) => (
+                              <li key={index}>{type}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          "None"
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-4 text-gray-500">
+              No fluid output records available
+            </div>
+          )}
+        </motion.div>
+      </div>
     </div>
   );
 };
