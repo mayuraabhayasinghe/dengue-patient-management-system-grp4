@@ -7,8 +7,6 @@ import {
   faUsers,
   faChartLine,
   faSignOutAlt,
-  faUser,
-  faHome,
   faBook,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
@@ -38,7 +36,6 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center justify-between gap-8">
-          <LinkItem icon={faHome} label="Home" to="/admin" />
           <LinkItem
             icon={faTachometerAlt}
             label="Dashboard"
