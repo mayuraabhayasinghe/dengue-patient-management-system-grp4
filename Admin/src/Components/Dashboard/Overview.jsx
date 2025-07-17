@@ -21,6 +21,7 @@ import {
   ArcElement,
 } from "chart.js";
 import axios from "axios";
+import { data } from "react-router-dom";
 
 ChartJS.register(
   CategoryScale,
@@ -34,6 +35,8 @@ ChartJS.register(
 
 const Overview = () => {
   const [userData, setUserData] = useState([]);
+  const [bedData, setBedData] = useState([]);
+  const [wardData, setWardData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userCount, setUserCount] = useState({
     patient: 0,
@@ -42,28 +45,40 @@ const Overview = () => {
   });
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchUsersAndBeds = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/getuser");
-        if (res.data) {
-          setUserData(res.data);
+        const [userRes, bedRes, wardRes] = await Promise.all([
+          axios.get("http://localhost:5000/api/auth/getuser"),
+          axios.get("http://localhost:5000/api/beds"),
+          axios.get("http://localhost:5000/api/wards"),
+        ]);
 
-          // Count roles
-          let counts = {
+        if (userRes.data) {
+          setUserData(userRes.data);
+
+          // Count user roles
+          const counts = {
             patient: 0,
             doctor: 0,
             nurse: 0,
           };
 
-          res.data.forEach((user) => {
+          userRes.data.forEach((user) => {
             const role = user?.user?.role || user?.role;
-            if (role && counts[role] !== undefined) {
+            if (role && counts.hasOwnProperty(role)) {
               counts[role]++;
             }
           });
 
           setUserCount(counts);
-          console.log("Role Counts:", counts);
+        }
+        // Set bed data
+        if (bedRes.data) {
+          setBedData(bedRes.data);
+        }
+        // Set ward data
+        if (wardRes.data) {
+          setWardData(wardRes.data);
         }
         setLoading(false);
       } catch (error) {
@@ -73,24 +88,29 @@ const Overview = () => {
       }
     };
 
-    fetchUsers();
+    fetchUsersAndBeds();
   }, []);
+  // available beds
+  const availableBeds = bedData.filter((bed) => bed.status === "available");
 
-  // Filter only patient users
-  const filteredUsers = userData.filter((user) => {
-    const role = user?.user?.role || user?.role;
-    return role === "patient";
+  // count beds by ward
+  const occupiedBedsByWard = wardData.map((ward) => {
+    const count = bedData.filter(
+      (bed) =>
+        (bed.ward._id === ward._id || bed.ward.name === ward.name) &&
+        bed.status === "occupied"
+    ).length;
+    return String(count);
   });
 
-  console.log("Filtered Patients:", filteredUsers);
-
   // Data for charts
-  const wardData = {
-    labels: ["Ward A", "Ward B", "Ward C", "Ward D", "ICU"],
+  const wardChartData = {
+    labels: wardData.map((ward) => ward.name),
     datasets: [
       {
         label: "Bed Occupancy",
-        data: [65, 59, 80, 81, 56],
+        data: occupiedBedsByWard,
+        // data: bedsByWard.map((ward) => ward.capacity),
         backgroundColor: [
           "rgba(54, 162, 235, 0.6)",
           "rgba(255, 99, 132, 0.6)",
@@ -136,28 +156,24 @@ const Overview = () => {
     {
       title: "Total Patients",
       value: userCount.patient,
-      change: "+12%",
       icon: faUserInjured,
       color: "bg-blue-100 text-blue-600",
     },
     {
       title: "Available Beds",
-      value: "26",
-      change: "-5%",
+      value: availableBeds.length,
       icon: faBed,
       color: "bg-green-100 text-green-600",
     },
     {
       title: "Total Nurses",
       value: userCount.nurse,
-      change: "+24%",
       icon: faUserNurse,
       color: "bg-purple-100 text-purple-600",
     },
     {
       title: "Total Doctors",
       value: userCount.doctor,
-      change: "+18%",
       icon: faUserDoctor,
       color: "bg-yellow-100 text-yellow-600",
     },
@@ -184,7 +200,7 @@ const Overview = () => {
               <div>
                 <p className="text-sm font-medium">{stat.title}</p>
                 <p className="text-2xl font-bold">{stat.value}</p>
-                <p className="text-xs">{stat.change} from yesterday</p>
+                {/* <p className="text-xs">{stat.change} from yesterday</p> */}
               </div>
               <div className="p-3 rounded-full bg-white bg-opacity-30">
                 <FontAwesomeIcon icon={stat.icon} size="lg" />
@@ -203,7 +219,7 @@ const Overview = () => {
           className="bg-white p-4 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Ward Occupancy</h2>
           <Bar
-            data={wardData}
+            data={wardChartData}
             options={{
               responsive: true,
               plugins: {
@@ -217,7 +233,7 @@ const Overview = () => {
 
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacity: 0.5 }}
           transition={{ delay: 0.4 }}
           className="bg-white p-4 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Patient Distribution</h2>
@@ -234,31 +250,6 @@ const Overview = () => {
           />
         </motion.div>
       </div>
-
-      {/* Recent Activity */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="bg-white p-4 rounded-lg shadow">
-        <h2 className="text-lg font-semibold mb-4">Recent Alerts</h2>
-        <div className="space-y-3">
-          {[
-            "Low stock alert for Paracetamol",
-            "New admission in Ward B",
-            "Dr. Smith has a canceled appointment",
-            "System maintenance scheduled for tonight",
-          ].map((alert, index) => (
-            <div
-              key={index}
-              className="flex items-center p-3 border-b border-gray-100 last:border-0">
-              <div className="h-2 w-2 rounded-full bg-red-500 mr-3"></div>
-              <p className="text-sm">{alert}</p>
-              <span className="ml-auto text-xs text-gray-500">2h ago</span>
-            </div>
-          ))}
-        </div>
-      </motion.div>
     </div>
   );
 };
