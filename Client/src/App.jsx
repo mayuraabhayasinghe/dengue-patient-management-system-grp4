@@ -13,6 +13,7 @@ import { ToastContainer } from "react-toastify";
 import Patients from "./Components/Dashboard/Patients";
 import Profile from "./Components/Dashboard/Profile";
 import PatientDashboard from "./Pages/PatientDashboard";
+import ReportGenerate from "./Pages/ReportGenerate";
 
 const App = () => {
   return (
@@ -43,6 +44,7 @@ const App = () => {
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/patient-form/:id" element={<PatientPage />} />
         <Route path="/caretaker-input-form/:userId" element={<Caretaker />} />
+        <Route path="/reports/:patientId" element={<ReportGenerate />} />
       </Routes>
       <ToastContainer position="top-center" autoClose={3000} />
       <Footer />
