@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 const PatientDetails = require("../models/patientModel");
 const { validationResult } = require("express-validator"); // Express validator for input validation
+const Bed = require("../models/bedModel");
 
 const addPatient = async (req, res) => {
   try {
@@ -90,6 +91,20 @@ const addPatient = async (req, res) => {
       admissionTime,
       bedNumber,
     });
+
+    // Update the bed with patient ID
+    const updatedBed = await Bed.findOneAndUpdate(
+      { number: bedNumber },
+      {
+        patient: newPatientDetails._id,
+        status: "occupied"
+      },
+      { new: true }
+    );
+
+    if (!updatedBed) {
+      return res.status(404).json({ message: "Bed not found to update with patient" });
+    }
 
     // Send email to bystander with the raw password
     const transporter = nodemailer.createTransport({
