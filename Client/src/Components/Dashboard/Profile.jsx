@@ -3,12 +3,23 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
 import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
+import { Line, Bar } from "react-chartjs-2";
+import {
   faArrowLeft,
   faUser,
   faSignOutAlt,
-  faEnvelope,
+  faTint,
   faIdBadge,
-  faHeartbeat,
   faBed,
   faChartLine,
   faCalendarDay,
@@ -23,6 +34,18 @@ import {
   faTachometerAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 const Profile = () => {
   const { id } = useParams();
@@ -136,82 +159,27 @@ const Profile = () => {
     );
   }
 
-  //   // Mock data - in a real app, you would fetch this from an API
-  //   const patientData = {
-  //     1: {
-  //       id: 1,
-  //       name: "Anura Kumara",
-  //       email: "anura@example.com",
-  //       age: 32,
-  //       status: "Active",
-  //       ward: "Ward 1",
-  //       bloodType: "A+",
-  //       admissionDate: "2025-05-15",
-  //       diagnosis: "Dengue Fever",
-  //       treatment: "Supportive care with hydration",
-  //       notes: "Patient responding well to treatment",
-  //     },
-  //     2: {
-  //       id: 2,
-  //       name: "Sanath Nishantha",
-  //       email: "sanath@example.com",
-  //       age: 28,
-  //       status: "Recovered",
-  //       ward: "Ward 2",
-  //       bloodType: "B-",
-  //       admissionDate: "2024-12-20",
-  //       diagnosis: "Dengue Hemorrhagic Fever",
-  //       treatment: "IV fluids and platelet transfusion",
-  //       notes: "Discharged on 2025-01-05",
-  //     },
-  //     3: {
-  //       id: 3,
-  //       name: "Chamara Sampath",
-  //       email: "chamara@example.com",
-  //       age: 45,
-  //       status: "Critical",
-  //       ward: "Ward 3",
-  //       bloodType: "O+",
-  //       admissionDate: "2025-05-10",
-  //       diagnosis: "Severe Dengue",
-  //       treatment: "ICU monitoring and aggressive fluid management",
-  //       notes: "Critical condition, requires close monitoring",
-  //     },
-  //     4: {
-  //       id: 4,
-  //       name: "Namal Perera",
-  //       email: "namal@example.com",
-  //       age: 22,
-  //       status: "Monitoring",
-  //       ward: "Ward 1",
-  //       bloodType: "AB+",
-  //       admissionDate: "2025-03-15",
-  //       diagnosis: "Dengue Fever",
-  //       treatment: "Oral hydration and symptom management",
-  //       notes: "Fever subsiding, platelet count stable",
-  //     },
-  //     5: {
-  //       id: 5,
-  //       name: "Sunil Perera",
-  //       email: "sunil@example.com",
-  //       age: 60,
-  //       status: "Recovered",
-  //       ward: "Ward 4",
-  //       bloodType: "A-",
-  //       admissionDate: "2025-05-12",
-  //       diagnosis: "Dengue Fever with warning signs",
-  //       treatment: "IV fluids and close monitoring",
-  //       notes: "Discharged on 2023-09-25",
-  //     },
-  //   };
+  //function to format chart date
+  const formatChartDate = (dateString) => {
+    if (!dateString) return "";
 
-  //   const patient = patientData[id];
+    const date = new Date(dateString);
+    return (
+      date.toLocaleDateString() +
+      " " +
+      date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true, // This ensures AM/PM is included
+      })
+    );
+  };
 
-  //   if (!patient) {
-  //     return (
-  //       <div className="p-6 text-center text-red-500">Patient not found</div>
-  //     );
-  //   }
+  // function to format just the date without time
+  const formatDateOnly = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
 
   return (
     <motion.div
@@ -331,7 +299,313 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Add Patient Vitals Table */}
+        {/* Vital Signs Charts */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 m-3"
+        >
+          {/* Temperature Chart */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-md font-semibold mb-3 flex items-center gap-2">
+              <FontAwesomeIcon
+                icon={faTemperatureHigh}
+                className="text-red-500"
+              />
+              Temperature History
+            </h3>
+            {vitalsLoading ? (
+              <div className="h-52 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : vitals.length > 0 ? (
+              <div className="h-52">
+                <Line
+                  data={{
+                    labels: vitals
+                      .slice(0, 10)
+                      .map((v) => formatChartDate(v.timestamp)),
+                    datasets: [
+                      {
+                        label: "Temperature (°C)",
+                        data: vitals
+                          .slice(0, 10)
+                          .map((v) => v.vitals.bodyTemperature),
+                        borderColor: "rgb(255, 99, 132)",
+                        backgroundColor: "rgba(255, 99, 132, 0.1)",
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointBackgroundColor: "rgb(255, 99, 132)",
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                      x: {
+                        title: {
+                          display: true,
+                          text: "Date & Time",
+                        },
+                        ticks: {
+                          maxRotation: 45,
+                          minRotation: 45,
+                          autoSkip: true,
+                          maxTicksLimit: 10,
+                          callback: function (value, index) {
+                            // Display shorter labels on the chart with AM/PM
+                            const label = this.getLabelForValue(value);
+                            const parts = label.split(" ");
+                            // Get the time part and the AM/PM indicator
+                            const timeParts = parts[1].split(":");
+                            const amPm = parts[2] || ""; // Extract AM/PM if available
+                            return `${timeParts[0]}:${timeParts[1]} ${amPm}`;
+                          },
+                        },
+                      },
+                      y: {
+                        beginAtZero: false,
+                        min: 35,
+                        max: 40,
+                        title: {
+                          display: true,
+                          text: "°C",
+                        },
+                        ticks: {
+                          callback: function (value) {
+                            return value + "°C";
+                          },
+                        },
+                      },
+                    },
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                      tooltip: {
+                        callbacks: {
+                          title: function (tooltipItems) {
+                            // Show full date and time in tooltip
+                            return vitals[tooltipItems[0].dataIndex].timestamp
+                              ? formatChartDate(
+                                  vitals[tooltipItems[0].dataIndex].timestamp
+                                )
+                              : "";
+                          },
+                          label: function (context) {
+                            return `Temperature: ${context.parsed.y}°C`;
+                          },
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="h-52 flex items-center justify-center text-gray-500">
+                No temperature data available
+              </div>
+            )}
+          </div>
+
+          {/* Platelet Count Chart */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-md font-semibold mb-3 flex items-center gap-2">
+              <FontAwesomeIcon icon={faDroplet} className="text-purple-500" />
+              Platelet Count History
+            </h3>
+            {vitalsLoading ? (
+              <div className="h-52 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : vitals.length > 0 ? (
+              <div className="h-52">
+                <Bar
+                  data={{
+                    labels: vitals
+                      .slice(0, 10)
+                      .map((v) => formatDateOnly(v.timestamp)),
+                    datasets: [
+                      {
+                        label: "Platelet Count (/mm³)",
+                        data: vitals.slice(0, 10).map((v) => v.vitals.plt),
+                        backgroundColor: "rgba(153, 102, 255, 0.7)",
+                        borderColor: "rgb(153, 102, 255)",
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        hoverBackgroundColor: "rgba(153, 102, 255, 0.9)",
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                      x: {
+                        title: {
+                          display: true,
+                          text: "Date",
+                        },
+                        ticks: {
+                          maxRotation: 45,
+                          minRotation: 45,
+                        },
+                      },
+                      y: {
+                        beginAtZero: false,
+                        title: {
+                          display: true,
+                          text: "Platelets (/mm³)",
+                        },
+                        ticks: {
+                          callback: function (value) {
+                            return value.toLocaleString();
+                          },
+                        },
+                      },
+                    },
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                      tooltip: {
+                        callbacks: {
+                          title: function (tooltipItems) {
+                            return vitals[tooltipItems[0].dataIndex].timestamp
+                              ? formatChartDate(
+                                  vitals[tooltipItems[0].dataIndex].timestamp
+                                )
+                              : "";
+                          },
+                          label: function (context) {
+                            const value = parseInt(context.parsed.y);
+                            return `Platelets: ${value.toLocaleString()}/mm³${
+                              value < 130000 ? " (Low)" : ""
+                            }`;
+                          },
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="h-52 flex items-center justify-center text-gray-500">
+                No platelet count data available
+              </div>
+            )}
+          </div>
+
+          {/* MAP Chart */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-md font-semibold mb-3 flex items-center gap-2">
+              <FontAwesomeIcon icon={faChartLine} className="text-blue-500" />
+              Mean Arterial Pressure History
+            </h3>
+            {vitalsLoading ? (
+              <div className="h-52 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : vitals.length > 0 ? (
+              <div className="h-52">
+                <Line
+                  data={{
+                    labels: vitals
+                      .slice(0, 10)
+                      .map((v) => formatChartDate(v.timestamp)),
+                    datasets: [
+                      {
+                        label: "MAP (mmHg)",
+                        data: vitals
+                          .slice(0, 10)
+                          .map(
+                            (v) =>
+                              v.vitals.bloodPressureSupine?.meanArterialPressure
+                          ),
+                        borderColor: "rgb(54, 162, 235)",
+                        backgroundColor: "rgba(54, 162, 235, 0.1)",
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointBackgroundColor: "rgb(54, 162, 235)",
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                      x: {
+                        title: {
+                          display: true,
+                          text: "Date & Time",
+                        },
+                        ticks: {
+                          maxRotation: 45,
+                          minRotation: 45,
+                          autoSkip: true,
+                          maxTicksLimit: 10,
+                          callback: function (value, index) {
+                            // Display shorter labels on the chart with AM/PM
+                            const label = this.getLabelForValue(value);
+                            const parts = label.split(" ");
+                            // Get the time part and the AM/PM indicator
+                            const timeParts = parts[1].split(":");
+                            const amPm = parts[2] || ""; // Extract AM/PM if available
+                            return `${timeParts[0]}:${timeParts[1]} ${amPm}`;
+                          },
+                        },
+                      },
+                      y: {
+                        beginAtZero: false,
+                        min: 40,
+                        max: 120,
+                        title: {
+                          display: true,
+                          text: "mmHg",
+                        },
+                        ticks: {
+                          callback: function (value) {
+                            return value + " mmHg";
+                          },
+                        },
+                      },
+                    },
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                      tooltip: {
+                        callbacks: {
+                          title: function (tooltipItems) {
+                            return vitals[tooltipItems[0].dataIndex].timestamp
+                              ? formatChartDate(
+                                  vitals[tooltipItems[0].dataIndex].timestamp
+                                )
+                              : "";
+                          },
+                          label: function (context) {
+                            return `MAP: ${context.parsed.y} mmHg`;
+                          },
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="h-52 flex items-center justify-center text-gray-500">
+                No MAP data available
+              </div>
+            )}
+          </div>
+        </motion.div>
+        {/* End of vital signs charts Section */}
+
+        {/* Patient Vitals Table */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -406,6 +680,14 @@ const Profile = () => {
                       <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         <FontAwesomeIcon icon={faChartLine} className="mr-1" />
                         MAP
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon icon={faDroplet} className="mr-1" />
+                        PLT
+                      </th>
+                      <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <FontAwesomeIcon icon={faTint} className="mr-1" />
+                        WBC
                       </th>
                       <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         <FontAwesomeIcon icon={faDroplet} className="mr-1" />
@@ -490,6 +772,24 @@ const Profile = () => {
                         </td>
                         <td
                           className={`px-3 py-3 whitespace-nowrap text-xs ${
+                            parseFloat(vital.vitals.plt) < 130000
+                              ? "text-red-600 font-bold"
+                              : "text-black"
+                          }`}
+                        >
+                          {vital.vitals.plt || "-"} /mm³
+                        </td>
+                        <td
+                          className={`px-3 py-3 whitespace-nowrap text-xs ${
+                            parseFloat(vital.vitals.wbc) < 5000
+                              ? "text-red-600 font-bold"
+                              : "text-black"
+                          }`}
+                        >
+                          {vital.vitals.wbc || "-"} /mm³
+                        </td>
+                        <td
+                          className={`px-3 py-3 whitespace-nowrap text-xs ${
                             parseFloat(vital.vitals.hctPvc) > 20
                               ? "text-red-600 font-bold"
                               : "text-black"
@@ -526,6 +826,7 @@ const Profile = () => {
             )}
           </div>
         </motion.div>
+        {/* End of Patient Vitals Table */}
       </motion.div>
     </motion.div>
   );

@@ -42,7 +42,7 @@ const App = () => {
         <Route path="/registration" element={<Registration />} />
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/patient-form/:id" element={<PatientPage />} />
-        <Route path="/caretaker-input-form" element={<Caretaker />} />
+        <Route path="/caretaker-input-form/:userId" element={<Caretaker />} />
       </Routes>
       <ToastContainer position="top-center" autoClose={3000} />
       <Footer />

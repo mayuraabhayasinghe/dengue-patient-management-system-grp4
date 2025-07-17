@@ -1,149 +1,230 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { motion } from "framer-motion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDroplet, faTint } from "@fortawesome/free-solid-svg-icons";
 import { Line, Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-// Register ChartJS components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
 
 const VitalSigns = () => {
-  // Mock vital signs data
-  const [vitalSigns, setVitalSigns] = useState({
-    temperature: 37.5,
-    heartRate: 88,
-    bloodPressure: "120/80",
-    platelets: 85000,
-    weight: 72,
-    hydration: "Adequate",
-  });
+  const [fluidData, setFluidData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [patient, setPatient] = useState(null);
 
-  // Chart data for temperature
-  const tempChartData = {
-    labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Today"],
-    datasets: [
-      {
-        label: "Temperature (°C)",
-        data: [38.2, 39.1, 38.5, 37.8, 37.6, 37.3, 37.5],
-        borderColor: "rgb(239, 68, 68)",
-        backgroundColor: "rgba(239, 68, 68, 0.1)",
-        tension: 0.3,
-        fill: true,
-      },
-    ],
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const userId = localStorage.getItem("userId");
+
+        console.log("Fetching data for user:", userId);
+
+        if (!token || !userId) {
+          throw new Error("Authentication required");
+        }
+
+        setLoading(true);
+
+        // Get patient details first
+        const patientResponse = await axios.get(
+          `http://localhost:5000/api/patients/user/${userId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (!patientResponse.data.success) {
+          throw new Error("Failed to fetch patient data");
+        }
+
+        const patientData = patientResponse.data.data;
+        setPatient(patientData);
+
+        const patientId = patientData.id || patientData._id;
+
+        // Get fluid data
+        const fluidResponse = await axios.get(
+          `http://localhost:5000/api/fluid/patient/${patientId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (fluidResponse.data.success) {
+          setFluidData(fluidResponse.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(error.message || "Failed to load data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Filter data for input and output tables
+  const inputData = fluidData.filter((item) => item.hasInputData);
+  const outputData = fluidData.filter((item) => item.hasOutputData);
+
+  // Animation variants for smooth rendering
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
   };
 
-  // Chart data for platelets
-  const plateletChartData = {
-    labels: ["Day 1", "Day 3", "Day 5", "Today"],
-    datasets: [
-      {
-        label: "Platelet Count (per μL)",
-        data: [45000, 60000, 75000, 85000],
-        backgroundColor: "rgba(59, 130, 246, 0.7)",
-        borderColor: "rgb(59, 130, 246)",
-        borderWidth: 1,
-      },
-    ],
-  };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-1"></div>
+      </div>
+    );
+  }
 
-  // Chart options
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      tooltip: {
-        mode: "index",
-        intersect: false,
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: false,
-      },
-    },
-  };
+  if (error) {
+    return <div className="p-4 text-red-500">{error}</div>;
+  }
 
   return (
-    <div>
-      {" "}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-6">
-          Vital Signs Monitoring
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-lg font-medium text-gray-700 mb-4">
-              Current Readings
-            </h3>
-            <div className="space-y-4">
-              {Object.entries(vitalSigns).map(([key, value]) => (
-                <div
-                  key={key}
-                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <span className="capitalize text-gray-700">
-                    {key.replace(/([A-Z])/g, " $1")}:
-                  </span>
-                  <span className="font-medium">
-                    {typeof value === "number" && key !== "weight"
-                      ? value.toLocaleString()
-                      : value}
-                    {key === "temperature" && "°C"}
-                    {key === "weight" && " kg"}
-                    {key === "platelets" && "/μL"}
-                  </span>
-                </div>
-              ))}
-            </div>
+    <div className="w-full gap-6 mb-6">
+      <h1 className="text-2xl font-bold mb-6">Fluid Balance Record</h1>
+
+      {patient && (
+        <div className="bg-blue-100 flex flex-col gap-3 p-4 rounded-lg mb-6">
+          <div className="font-semibold">
+            Patient: <span className="font-normal">{patient.name}</span>
           </div>
-          <div>
-            <h3 className="text-lg font-medium text-gray-700 mb-4">
-              Trend Charts
-            </h3>
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-md font-medium text-gray-600 mb-2">
-                  Temperature History
-                </h4>
-                <div className="h-48">
-                  <Line data={tempChartData} options={chartOptions} />
-                </div>
-              </div>
-              <div>
-                <h4 className="text-md font-medium text-gray-600 mb-2">
-                  Platelet Count History
-                </h4>
-                <div className="h-48">
-                  <Bar data={plateletChartData} options={chartOptions} />
-                </div>
-              </div>
-            </div>
+          <div className="font-semibold">
+            Admission Date:
+            <span className="font-normal">
+              {" "}
+              {new Date(patient.admissionDate).toLocaleDateString()}
+            </span>
           </div>
         </div>
-      </motion.div>
+      )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+        {/* Fluid Input Table */}
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ duration: 0.3 }}
+          className="bg-white rounded-lg shadow-md p-6 mb-5"
+        >
+          <div className="flex items-center mb-4">
+            <div className="p-2 rounded-full bg-blue-100 text-blue-600 mr-4">
+              <FontAwesomeIcon icon={faDroplet} size="sm" />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Fluid Input Records
+            </h2>
+          </div>
+
+          {inputData.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-xs lg:text-sm bg-white">
+                <thead className="bg-gray-100 ">
+                  <tr>
+                    <th className="py-2 px-4 border-b text-left">Date</th>
+                    <th className="py-2 px-4 border-b text-left">Time</th>
+                    <th className="py-2 px-4 border-b text-left">Fluid Kind</th>
+                    <th className="py-2 px-4 border-b text-left">
+                      Intake Type
+                    </th>
+                    <th className="py-2 px-4 border-b text-left">
+                      Volume (ml)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inputData.map((item) => (
+                    <tr key={item._id} className="hover:bg-gray-50">
+                      <td className="py-2 px-4 border-b">
+                        {item.formattedDate}
+                      </td>
+                      <td className="py-2 px-4 border-b">
+                        {item.formattedTime}
+                      </td>
+                      <td className="py-2 px-4 border-b">{item.fluidKind}</td>
+                      <td className="py-2 px-4 border-b">{item.intakeType}</td>
+                      <td className="py-2 px-4 border-b">
+                        {item.intakeVolume}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-4 text-gray-500">
+              No fluid input records available
+            </div>
+          )}
+        </motion.div>
+
+        {/* Fluid Output Table */}
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="bg-white rounded-lg shadow-md mb-5 p-6"
+        >
+          <div className="flex items-center mb-4">
+            <div className="p-2 rounded-full bg-purple-100 text-yellow-300 mr-4">
+              <FontAwesomeIcon icon={faTint} size="sm" />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Fluid Output Records
+            </h2>
+          </div>
+
+          {outputData.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-xs lg:text-sm bg-white">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="py-2 px-4 border-b text-left">Date</th>
+                    <th className="py-2 px-4 border-b text-left">Time</th>
+                    <th className="py-2 px-4 border-b text-left">
+                      Urine Output (ml)
+                    </th>
+                    <th className="py-2 px-4 border-b text-left">
+                      Other Output Signs
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {outputData.map((item) => (
+                    <tr key={item._id} className="hover:bg-gray-50">
+                      <td className="py-2 px-4 border-b">
+                        {item.formattedDate}
+                      </td>
+                      <td className="py-2 px-4 border-b">
+                        {item.formattedTime}
+                      </td>
+                      <td className="py-2 px-4 border-b">{item.urineOutput}</td>
+                      <td className="py-2 px-4 border-b">
+                        {item.outputTypes.length > 0 ? (
+                          <ul className="list-disc list-inside">
+                            {item.outputTypes.map((type, index) => (
+                              <li key={index}>{type}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          "None"
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-4 text-gray-500">
+              No fluid output records available
+            </div>
+          )}
+        </motion.div>
+      </div>
     </div>
   );
 };

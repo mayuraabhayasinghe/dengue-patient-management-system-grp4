@@ -195,4 +195,49 @@ const getPatientById = async (req, res) => {
   }
 };
 
-module.exports = { addPatient, getAllPatients, getPatientById };
+// Get patient details by user ID
+const getPatientByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find patient details where the user field matches the provided userId
+    const patient = await PatientDetails.findOne({ user: userId })
+      .populate("user", "name email")
+      .lean();
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        error: "Patient not found for this user",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        id: patient._id,
+        userId: patient.user._id,
+        name: patient.user.name,
+        email: patient.user.email,
+        age: patient.age,
+        weight: patient.weight,
+        gender: patient.gender,
+        bystanderName: patient.bystanderName,
+        bystanderAddress: patient.bystanderAddress,
+        admissionDate: patient.admissionDate,
+        admissionTime: patient.admissionTime,
+        bedNumber: patient.bedNumber,
+        dischargeDate: patient.dischargeDate,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching patient by user ID:", error);
+    res.status(500).json({
+      success: false,
+      error: "Server Error",
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { addPatient, getAllPatients, getPatientById, getPatientByUserId };
