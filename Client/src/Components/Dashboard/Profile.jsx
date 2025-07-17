@@ -19,7 +19,8 @@ import {
   faUser,
   faSignOutAlt,
   faTint,
-  faIdBadge,
+  faWater,
+  faFlask,
   faBed,
   faChartLine,
   faCalendarDay,
@@ -55,7 +56,10 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [vitalsLoading, setVitalsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [fluidData, setFluidData] = useState([]);
+  const [fluidLoading, setFluidLoading] = useState(true);
 
+  //For fetch patient data
   useEffect(() => {
     const fetchPatientDetails = async () => {
       try {
@@ -96,6 +100,42 @@ const Profile = () => {
     fetchPatientVitals();
   }, [patient]);
 
+  // Fetch fluid data for the patient
+  useEffect(() => {
+    const fetchFluidData = async () => {
+      if (!patient || !patient.id) return;
+
+      try {
+        setFluidLoading(true);
+        const response = await axios.get(
+          `http://localhost:5000/api/fluid/patient/${patient.id}`
+        );
+
+        if (response.data.success) {
+          setFluidData(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching fluid data:", error);
+      } finally {
+        setFluidLoading(false);
+      }
+    };
+
+    fetchFluidData();
+  }, [patient]);
+
+  // Filter data for input and output tables
+  const inputData = fluidData.filter(
+    (item) =>
+      item.fluidKind !== "Not mentioned" ||
+      item.intakeType !== "Not mentioned" ||
+      item.intakeVolume !== 0
+  );
+
+  const outputData = fluidData.filter(
+    (item) => item.urineOutput !== 0 || item.outputTypes.length > 0
+  );
+
   // Handler for navigating to the PatientForm component with the patient userID
   const handleAddVitals = () => {
     navigate(`/patient-form/${patient.userId}`, {
@@ -122,6 +162,13 @@ const Profile = () => {
   // Handler for discharging the patient
   const handleDischarge = () => {
     navigate(`/discharge/${id}`);
+  };
+
+  // Add this function to handle adding fluid data
+  const handleAddFluidData = () => {
+    if (patient && patient.userId) {
+      navigate(`/caretaker-input-form/${patient.userId}`);
+    }
   };
 
   if (loading) {
@@ -604,6 +651,192 @@ const Profile = () => {
           </div>
         </motion.div>
         {/* End of vital signs charts Section */}
+
+        {/* Fluid Data Tables */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 m-3"
+        >
+          {/* Fluid Input Table */}
+          <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div className="bg-blue-100 p-3 md:p-4 flex justify-between items-center">
+              <h2 className="text-lg font-bold flex items-center">
+                <FontAwesomeIcon
+                  icon={faDroplet}
+                  className="mr-2 text-blue-600"
+                />
+                Fluid Input Records
+              </h2>
+              <button
+                onClick={handleAddFluidData}
+                className="text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-3 rounded-lg text-sm"
+              >
+                + Add New
+              </button>
+            </div>
+
+            <div className="p-2">
+              {fluidLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="mt-2 text-sm text-gray-600">
+                    Loading fluid data...
+                  </p>
+                </div>
+              ) : inputData.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No fluid input records found.</p>
+                </div>
+              ) : (
+                <div className="overflow-y-auto" style={{ maxHeight: "300px" }}>
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50 sticky top-0">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Time
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Fluid Kind
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Intake Type
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Volume (ml)
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {inputData.map((item, index) => (
+                        <tr
+                          key={item._id}
+                          className={
+                            index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                          }
+                        >
+                          <td className="px-3 py-2 whitespace-nowrap text-xs font-medium text-gray-900">
+                            {item.formattedDate}
+                          </td>
+                          <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                            {item.formattedTime}
+                          </td>
+                          <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                            {item.fluidKind}
+                          </td>
+                          <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                            {item.intakeType}
+                          </td>
+                          <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                            {item.intakeVolume} ml
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Fluid Output Table */}
+          <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div className="bg-purple-100 p-3 md:p-4 flex justify-between items-center">
+              <h2 className="text-lg font-bold flex items-center">
+                <FontAwesomeIcon
+                  icon={faDroplet}
+                  className="mr-2 text-yellow-400"
+                />
+                Fluid Output Records
+              </h2>
+              <button
+                onClick={handleAddFluidData}
+                className="text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-3 rounded-lg text-sm"
+              >
+                + Add New
+              </button>
+            </div>
+
+            <div className="p-2">
+              {fluidLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500 mx-auto"></div>
+                  <p className="mt-2 text-sm text-gray-600">
+                    Loading fluid data...
+                  </p>
+                </div>
+              ) : outputData.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">
+                    No fluid output records found.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-y-auto" style={{ maxHeight: "300px" }}>
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50 sticky top-0">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Time
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Urine Output (ml)
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Other Output Signs
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {outputData.map((item, index) => (
+                        <tr
+                          key={item._id}
+                          className={
+                            index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                          }
+                        >
+                          <td className="px-3 py-2 whitespace-nowrap text-xs font-medium text-gray-900">
+                            {item.formattedDate}
+                          </td>
+                          <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                            {item.formattedTime}
+                          </td>
+                          <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                            {item.urineOutput} ml
+                          </td>
+                          <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                            {item.outputTypes && item.outputTypes.length > 0 ? (
+                              <span className="inline-flex flex-wrap gap-1">
+                                {item.outputTypes.map((type, i) => (
+                                  <span
+                                    key={i}
+                                    className="px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs"
+                                  >
+                                    {type}
+                                  </span>
+                                ))}
+                              </span>
+                            ) : (
+                              "None"
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
+        {/* End of Fluid Data Tables */}
 
         {/* Patient Vitals Table */}
         <motion.div
