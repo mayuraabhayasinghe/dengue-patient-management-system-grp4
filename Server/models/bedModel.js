@@ -12,11 +12,8 @@ const bedSchema = new mongoose.Schema({
         default: "available",
     },
     patient: {
-        type: String,
-        default: null,
-    },
-    admissionDate: {
-        type: Date,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PatientDetails",
         default: null,
     },
     ward: {
