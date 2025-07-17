@@ -254,7 +254,7 @@ const Profile = () => {
           <p className="">Bed Number : {patient.bedNumber}</p>
         </div>
 
-        <div className="p-5 flex gap-6 justify-end items-center">
+        <div className="p-5 flex flex-col md:flex-row gap-6 justify-center md:justify-end items-end md:items-center">
           <button
             onClick={handleAddVitals}
             className="font-semibold shadow-sm text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-4 rounded-lg"
