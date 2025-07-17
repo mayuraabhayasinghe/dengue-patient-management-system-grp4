@@ -155,8 +155,8 @@ const Profile = () => {
   };
 
   // Handler for generating reports
-  const handleGenerateReports = () => {
-    navigate(`/reports/${id}`);
+  const handleGenerateReports = (patientId) => {
+    navigate(`/reports/${patientId}`);
   };
 
   // Handler for discharging the patient
@@ -176,8 +176,7 @@ const Profile = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="p-6 flex justify-center items-center h-full"
-      >
+        className="p-6 flex justify-center items-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading patient details...</p>
@@ -191,14 +190,12 @@ const Profile = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="p-6 text-center text-red-500"
-      >
+        className="p-6 text-center text-red-500">
         {error || "Patient not found"}
         <div className="mt-4">
           <button
             onClick={() => navigate(-1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-          >
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
             Back to Patients List
           </button>
         </div>
@@ -233,12 +230,10 @@ const Profile = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="p-4 md:p-6"
-    >
+      className="p-4 md:p-6">
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 mb-6 text-blue-600 hover:text-blue-800 transition-colors"
-      >
+        className="flex items-center gap-2 mb-6 text-blue-600 hover:text-blue-800 transition-colors">
         <FontAwesomeIcon icon={faArrowLeft} />
         <span>Back to Patients</span>
       </button>
@@ -247,8 +242,7 @@ const Profile = () => {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="bg-white shadow-lg rounded-lg overflow-hidden"
-      >
+        className="bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="bg-[#00BFA5] text-white p-4 md:p-6 mb-3">
           <h1 className="text-2xl md:text-3xl font-bold">{patient.name}</h1>
           <p className="">Bed Number : {patient.bedNumber}</p>
@@ -257,20 +251,17 @@ const Profile = () => {
         <div className="p-5 flex flex-col md:flex-row gap-6 justify-center md:justify-end items-end md:items-center">
           <button
             onClick={handleAddVitals}
-            className="font-semibold shadow-sm text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-4 rounded-lg"
-          >
+            className="font-semibold shadow-sm text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-4 rounded-lg">
             + Add vitals Records
           </button>
           <button
-            onClick={handleGenerateReports}
-            className="font-semibold shadow-sm text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-4 rounded-lg"
-          >
+            onClick={() => handleGenerateReports(patient.id)}
+            className="font-semibold shadow-sm text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-4 rounded-lg">
             Generate Reports
           </button>
           <button
             onClick={handleDischarge}
-            className="font-semibold shadow-sm text-white bg-red-500 hover:bg-red-600 transition-colors py-2 px-4 rounded-lg"
-          >
+            className="font-semibold shadow-sm text-white bg-red-500 hover:bg-red-600 transition-colors py-2 px-4 rounded-lg">
             <FontAwesomeIcon icon={faSignOutAlt} className="mr-1" />
             Discharge
           </button>
@@ -351,8 +342,7 @@ const Profile = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 m-3"
-        >
+          className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 m-3">
           {/* Temperature Chart */}
           <div className="bg-white rounded-lg shadow p-4">
             <h3 className="text-md font-semibold mb-3 flex items-center gap-2">
@@ -843,14 +833,12 @@ const Profile = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="mt-6 bg-white shadow-lg rounded-lg overflow-hidden m-3"
-        >
+          className="mt-6 bg-white shadow-lg rounded-lg overflow-hidden m-3">
           <div className="bg-blue-100 text-black p-3 md:p-4 flex justify-between items-center">
             <h2 className="text-lg font-bold">Recent Vitals Records</h2>
             <button
               onClick={handleAddVitals}
-              className="text-white  bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-3 rounded-lg"
-            >
+              className="text-white  bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-3 rounded-lg">
               + Add New
             </button>
           </div>
@@ -868,8 +856,7 @@ const Profile = () => {
                 </p>
                 <button
                   onClick={handleAddVitals}
-                  className="mt-4 font-semibold shadow-sm text-white bg-[#00BFA5] hover:bg-[#009B8A] transition-colors py-2 px-4 rounded-lg"
-                >
+                  className="mt-4 font-semibold shadow-sm text-white bg-[#00BFA5] hover:bg-[#009B8A] transition-colors py-2 px-4 rounded-lg">
                   Add First Vitals Record
                 </button>
               </div>
@@ -947,8 +934,7 @@ const Profile = () => {
                     {vitals.map((vital, index) => (
                       <tr
                         key={vital._id}
-                        className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
-                      >
+                        className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
                         <td className="px-3 py-3 whitespace-nowrap text-xs font-medium text-gray-900">
                           {formatDate(vital.timestamp)}
                         </td>
@@ -957,8 +943,7 @@ const Profile = () => {
                             parseFloat(vital.vitals.bodyTemperature) > 37.5
                               ? "text-red-600 font-bold"
                               : "text-black"
-                          }`}
-                        >
+                          }`}>
                           {vital.vitals.bodyTemperature || "-"} °C
                         </td>
                         <td
@@ -966,8 +951,7 @@ const Profile = () => {
                             parseFloat(vital.vitals.pulseRate) > 100
                               ? "text-red-600 font-bold"
                               : "text-black"
-                          }`}
-                        >
+                          }`}>
                           {vital.vitals.pulseRate || "-"} /min
                         </td>
                         <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
@@ -985,8 +969,7 @@ const Profile = () => {
                             ) <= 20
                               ? "text-red-600 font-bold"
                               : "text-black"
-                          }`}
-                        >
+                          }`}>
                           {vital.vitals.bloodPressureSupine?.pulsePressure ||
                             "-"}
                         </td>
@@ -998,8 +981,7 @@ const Profile = () => {
                             ) < 60
                               ? "text-red-600 font-bold"
                               : "text-black"
-                          }`}
-                        >
+                          }`}>
                           {vital.vitals.bloodPressureSupine
                             ?.meanArterialPressure || "-"}
                         </td>
@@ -1008,8 +990,7 @@ const Profile = () => {
                             parseFloat(vital.vitals.plt) < 130000
                               ? "text-red-600 font-bold"
                               : "text-black"
-                          }`}
-                        >
+                          }`}>
                           {vital.vitals.plt || "-"} /mm³
                         </td>
                         <td
@@ -1017,8 +998,7 @@ const Profile = () => {
                             parseFloat(vital.vitals.wbc) < 5000
                               ? "text-red-600 font-bold"
                               : "text-black"
-                          }`}
-                        >
+                          }`}>
                           {vital.vitals.wbc || "-"} /mm³
                         </td>
                         <td
@@ -1026,8 +1006,7 @@ const Profile = () => {
                             parseFloat(vital.vitals.hctPvc) > 20
                               ? "text-red-600 font-bold"
                               : "text-black"
-                          }`}
-                        >
+                          }`}>
                           {vital.vitals.hctPvc || "-"}%
                         </td>
                         <td
@@ -1035,8 +1014,7 @@ const Profile = () => {
                             parseFloat(vital.vitals.respiratoryRate) > 15
                               ? "text-red-600 font-bold"
                               : "text-black"
-                          }`}
-                        >
+                          }`}>
                           {vital.vitals.respiratoryRate || "-"}/min
                         </td>
                         <td
@@ -1044,8 +1022,7 @@ const Profile = () => {
                             parseFloat(vital.vitals.capillaryRefillTime) > 2.5
                               ? "text-red-600 font-bold"
                               : "text-black"
-                          }`}
-                        >
+                          }`}>
                           {vital.vitals.capillaryRefillTime || "-"}s
                         </td>
                         <td className="px-3 py-3 text-xs text-black max-w-xs truncate">
