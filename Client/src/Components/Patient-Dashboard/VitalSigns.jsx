@@ -88,12 +88,12 @@ const VitalSigns = () => {
 
       {patient && (
         <div className="bg-blue-100 flex flex-col gap-3 p-4 rounded-lg mb-6">
-          <div className="font-semibold">
-            Patient: <span className="font-normal">{patient.name}</span>
+          <div className="font-normal">
+            Patient: <span className="font-semibold">{patient.name}</span>
           </div>
-          <div className="font-semibold">
+          <div className="font-normal">
             Admission Date:
-            <span className="font-normal">
+            <span className="font-semibold">
               {" "}
               {new Date(patient.admissionDate).toLocaleDateString()}
             </span>
