@@ -8,6 +8,7 @@ import {
   faChartLine,
   faSignOutAlt,
   faBook,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
@@ -41,8 +42,13 @@ const Navbar = () => {
             label="Dashboard"
             to="/admin/dashboard"
           />
-          <LinkItem icon={faChartLine} label="Reports" to="/admin/reports" />
+          <LinkItem
+            icon={faUser}
+            label="Register"
+            to="/admin/staffRegistration"
+          />
           <LinkItem icon={faBook} label="Feedbacks" to="/admin/feedback" />
+          <LinkItem icon={faSignOutAlt} label="Logout" to="/admin/fee" />
         </div>
 
         {/* Mobile Menu Toggle */}
