@@ -7,12 +7,12 @@ import {
   faEnvelope,
   faUserDoctor,
   faUserNurse,
-  faSpinner,
   faClipboard,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const StaffRegistration = () => {
   const [formData, setFormData] = useState({
@@ -23,6 +23,7 @@ const StaffRegistration = () => {
     age: "",
     gender: "",
   });
+  const navigate = useNavigate();
 
   // Handle input change
   const handleChange = (e) => {
@@ -34,14 +35,11 @@ const StaffRegistration = () => {
     e.preventDefault();
 
     try {
-      console.log("Sending form data:", formData);
-
       const res = await axios.post(
         "http://localhost:5000/api/staff/add",
         formData
       );
       toast.success("Staff registered successfully!");
-      console.log("Response:", res.data);
 
       // Reset form after submitting
       setFormData({
@@ -49,6 +47,8 @@ const StaffRegistration = () => {
         phoneNumber: "",
         staffEmail: "",
         staffRole: "",
+        age: "",
+        gender: "",
       });
     } catch (error) {
       toast.error("Error registering staff");
@@ -83,19 +83,16 @@ const StaffRegistration = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen flex items-center justify-center bg-background-1 p-4"
-    >
+      className="min-h-screen flex items-center justify-center bg-background-1 p-4">
       <motion.div
         initial={{ scale: 0.95 }}
         animate={{ scale: 1 }}
-        className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-2xl"
-      >
+        className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-2xl">
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-center mb-8"
-        >
+          className="text-center mb-8">
           <h2 className="text-3xl font-bold text-teal-800 mb-2">
             Staff Registration
           </h2>
@@ -107,8 +104,7 @@ const StaffRegistration = () => {
           initial="hidden"
           animate="visible"
           onSubmit={handleSubmit}
-          className="space-y-6"
-        >
+          className="space-y-6">
           {/* Name Field */}
           <motion.div variants={itemVariants} className="space-y-2">
             <label className="flex items-center text-gray-700 font-medium">
@@ -152,8 +148,7 @@ const StaffRegistration = () => {
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 border-gray-300 focus:ring-teal-200"
-            >
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 border-gray-300 focus:ring-teal-200">
               <option value="" disabled>
                 Select gender
               </option>
@@ -211,8 +206,7 @@ const StaffRegistration = () => {
                   formData.staffRole === "doctor"
                     ? "bg-teal-100 border-2 border-teal-500"
                     : "bg-gray-100 border-2 border-transparent"
-                }`}
-              >
+                }`}>
                 <input
                   type="radio"
                   name="staffRole"
@@ -235,8 +229,7 @@ const StaffRegistration = () => {
                   formData.staffRole === "nurse"
                     ? "bg-teal-100 border-2 border-teal-500"
                     : "bg-gray-100 border-2 border-transparent"
-                }`}
-              >
+                }`}>
                 <input
                   type="radio"
                   name="staffRole"
@@ -255,11 +248,16 @@ const StaffRegistration = () => {
           </motion.div>
 
           {/* Submit Button */}
-          <motion.div variants={itemVariants} className="pt-4">
+          <motion.div variants={itemVariants} className="pt-4 flex gap-10">
+            <motion.button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="w-full cursor-pointer py-3 px-4 rounded-lg font-bold text-white transition bg-teal-600 hover:bg-teal-700 flex items-center justify-center">
+              Back
+            </motion.button>
             <motion.button
               type="submit"
-              className="w-full py-3 px-4 rounded-lg font-bold text-white transition bg-teal-600 hover:bg-teal-700 flex items-center justify-center"
-            >
+              className="w-full cursor-pointer py-3 px-4 rounded-lg font-bold text-white transition bg-teal-600 hover:bg-teal-700 flex items-center justify-center">
               Register Staff
             </motion.button>
           </motion.div>
