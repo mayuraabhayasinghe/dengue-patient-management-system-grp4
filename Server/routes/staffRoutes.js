@@ -1,9 +1,14 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { addStaff, getAllStaff, getStaffById, updateStaff, deleteStaff } = require('../controllers/staffController');
+const {
+  addStaff,
+  getAllStaff,
+  getStaffById,
+  updateStaff,
+  deleteStaff,
+} = require("../controllers/staffController");
 
-
-router.post('/add', addStaff);
+router.post("/add", addStaff);
 router.get("/", getAllStaff);
 router.get("/:id", getStaffById);
 router.put("/:id", updateStaff);
