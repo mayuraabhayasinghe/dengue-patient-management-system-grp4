@@ -20,7 +20,6 @@ const Users = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const [userData, setUserData] = useState([]);
 
   const { userId } = useParams();
 
@@ -38,22 +37,10 @@ const Users = () => {
         setLoading(false);
       }
     };
-
-    // // fetch users by Id
-    // const fetchUserById = async () => {
-    //   try {
-    //     const res = await axios.get(`http://localhost:5000/api/auth/${userId}`);
-    //     setUserData(res.data || {});
-    //   } catch (error) {
-    //     log.error("Failed to fetch user by ID:", error.message);
-    //     setUserData([]);
-    //   }
-    // };
-
-    //
     fetchUsers();
-    // fetchUserById();
   }, []);
+
+  // fetch users by Id
   const handleUserClick = (userId) => {
     navigate(`/auth/${userId}`);
   };

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AddInventory = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +12,7 @@ const AddInventory = () => {
     lastRestocked: "",
     supplier: "",
   });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,7 +48,7 @@ const AddInventory = () => {
         throw new Error("Failed to submit data");
       }
 
-      alert("Inventory item added successfully!");
+      toast.success("Inventory item added successfully!");
       setFormData({
         name: "",
         category: "",
@@ -57,13 +60,15 @@ const AddInventory = () => {
       });
     } catch (error) {
       console.error("Error submitting data:", error);
-      alert("Failed to add inventory item.");
+      toast.error("Failed to add inventory item.");
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white shadow-2xl rounded-md mt-8">
-      <h2 className="text-2xl font-bold mb-6 text-center">Add Inventory Item</h2>
+    <div className="max-w-2xl mx-auto p-6  bg-white shadow-2xl rounded-md my-8">
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        Add Inventory Item
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block font-medium">Item Name</label>
@@ -84,8 +89,7 @@ const AddInventory = () => {
             value={formData.category}
             onChange={handleChange}
             className="w-full p-2 border rounded"
-            required
-          >
+            required>
             <option value="">Select Category</option>
             <option value="Medication">Medication</option>
             <option value="PPE">PPE</option>
@@ -156,9 +160,18 @@ const AddInventory = () => {
           />
         </div>
 
-        <button type="submit" className="btn w-full mt-4">
-          Add Inventory
-        </button>
+        <div className="flex gap-10">
+          <button
+            onClick={() => navigate(-1)}
+            className="w-full cursor-pointer bg-green-600 text-white font-semibold py-3 px-4 rounded hover:bg-green-700 transition duration-200">
+            Back
+          </button>
+          <button
+            type="submit"
+            className="w-full cursor-pointer bg-green-600 text-white font-semibold py-3 px-4 rounded hover:bg-green-700 transition duration-200">
+            Add Item
+          </button>
+        </div>
       </form>
     </div>
   );

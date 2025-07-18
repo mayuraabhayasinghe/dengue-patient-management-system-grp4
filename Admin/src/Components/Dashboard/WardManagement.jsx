@@ -50,13 +50,13 @@ const WardManagement = () => {
         ]);
         setWards(wardsResponse.data);
         setBeds(bedsResponse.data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
@@ -188,21 +188,29 @@ const WardManagement = () => {
         transition={{ duration: 0.5 }}
         className="bg-white p-4 rounded-lg shadow">
         <h2 className="text-lg font-semibold mb-4">Ward Occupancy Overview</h2>
-        <Bar
-          data={occupancyData}
-          options={{
-            responsive: true,
-            scales: {
-              x: {
-                stacked: true,
+        {wards.length > 0 ? (
+          <Bar
+            data={occupancyData}
+            options={{
+              responsive: true,
+              scales: {
+                x: {
+                  stacked: true,
+                },
+                y: {
+                  stacked: true,
+                  max: Math.max(...wards.map((w) => w.capacity)) + 2,
+                },
               },
-              y: {
-                stacked: true,
-                max: Math.max(...wards.map((w) => w.capacity)) + 2,
-              },
-            },
-          }}
-        />
+            }}
+          />
+        ) : (
+          <div className="grid place-content-center h-20 text-lg text-gray-500">
+            <div className="flex flex-col gap-2">
+              <p>No Beds found</p>
+            </div>
+          </div>
+        )}
       </motion.div>
 
       {/* Wards List */}
