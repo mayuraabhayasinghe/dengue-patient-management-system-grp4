@@ -102,7 +102,6 @@ async function processAllVitals(userId, vitals) {
       ) {
         continue;
       }
-
       // Convert to number for proper comparison
       const numValue = Number(value);
       if (isNaN(numValue)) continue;
@@ -116,7 +115,6 @@ async function processAllVitals(userId, vitals) {
         console.log(
           `Critical vital detected: ${field} = ${numValue}${rule.unit}`
         );
-
         await emitNotification({
           patientId: userId,
           vital: field,
