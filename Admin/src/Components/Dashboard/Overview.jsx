@@ -6,8 +6,8 @@ import {
   faBed,
   faUserNurse,
   faUserDoctor,
-  faSyringe,
-  faMoneyBillWave,
+  faSadCry,
+  faSadTear,
 } from "@fortawesome/free-solid-svg-icons";
 import { Bar, Pie } from "react-chartjs-2";
 import {
@@ -21,7 +21,6 @@ import {
   ArcElement,
 } from "chart.js";
 import axios from "axios";
-import { data } from "react-router-dom";
 
 ChartJS.register(
   CategoryScale,
@@ -211,6 +210,7 @@ const Overview = () => {
       </div>
 
       {/* Charts */}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <motion.div
           initial={{ opacity: 0 }}
@@ -218,17 +218,25 @@ const Overview = () => {
           transition={{ delay: 0.2 }}
           className="bg-white p-4 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Ward Occupancy</h2>
-          <Bar
-            data={wardChartData}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: "top",
+          {wardData.length > 0 ? (
+            <Bar
+              data={wardChartData}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: {
+                    position: "top",
+                  },
                 },
-              },
-            }}
-          />
+              }}
+            />
+          ) : (
+            <div className="grid place-content-center h-full text-xl text-gray-500">
+              <div className="flex flex-col gap-2">
+                <p>No Ward Data Available</p>
+              </div>
+            </div>
+          )}
         </motion.div>
 
         <motion.div

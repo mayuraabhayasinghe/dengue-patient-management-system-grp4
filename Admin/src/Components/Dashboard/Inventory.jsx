@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBoxOpen,
   faPlus,
   faSearch,
   faEdit,
@@ -12,6 +11,7 @@ import {
   faFilter,
   faFileExport,
   faEllipsisVertical,
+  faSadTear,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Chart as ChartJS,
@@ -46,19 +46,18 @@ const Inventory = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/inventory/");
+        setInventoryItems(res.data);
+      } catch (err) {
+        console.error("Error fetching inventory:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchInventory();
   }, []);
-
-  const fetchInventory = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/inventory/");
-      setInventoryItems(res.data);
-    } catch (err) {
-      console.error("Error fetching inventory:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const deleteItem = async (id) => {
     try {
@@ -217,33 +216,45 @@ const Inventory = () => {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
-            {filteredItems.map((item) => (
-              <tr
-                key={item._id}
-                className={item.stock < item.threshold ? "bg-red-50" : ""}>
-                <td className="px-4 py-3">{item.name}</td>
-                <td className="px-4 py-3">{item.category}</td>
-                <td className="px-4 py-3">
-                  {item.stock} {item.unit}
-                </td>
-                <td className="px-4 py-3">
-                  {new Date(item.lastRestocked).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-3">{item.supplier}</td>
-                <td className="px-4 py-3 text-right space-x-2">
-                  <button className="text-blue-600 hover:text-blue-900">
-                    <FontAwesomeIcon icon={faEdit} />
-                  </button>
-                  <button
-                    onClick={() => deleteItem(item._id)}
-                    className="text-red-600 hover:text-red-900">
-                    <FontAwesomeIcon icon={faTrash} />
-                  </button>
+          {inventoryItems.length > 0 ? (
+            <tbody className="divide-y divide-gray-200">
+              {filteredItems.map((item) => (
+                <tr
+                  key={item._id}
+                  className={item.stock < item.threshold ? "bg-red-50" : ""}>
+                  <td className="px-4 py-3">{item.name}</td>
+                  <td className="px-4 py-3">{item.category}</td>
+                  <td className="px-4 py-3">
+                    {item.stock} {item.unit}
+                  </td>
+                  <td className="px-4 py-3">
+                    {new Date(item.lastRestocked).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3">{item.supplier}</td>
+                  <td className="px-4 py-3 text-right space-x-2">
+                    <button className="text-blue-600 hover:text-blue-900">
+                      <FontAwesomeIcon icon={faEdit} />
+                    </button>
+                    <button
+                      onClick={() => deleteItem(item._id)}
+                      className="text-red-600 hover:text-red-900">
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          ) : (
+            <thead>
+              <tr>
+                <td
+                  colSpan="5"
+                  className="px-6 py-10 text-center text-lg font-medium text-gray-500">
+                  No Inventories found
                 </td>
               </tr>
-            ))}
-          </tbody>
+            </thead>
+          )}
         </table>
 
         {/* Mobile View */}
@@ -302,29 +313,30 @@ const Inventory = () => {
           ))}
         </div>
       </div>
-
-      {/* Dynamic Chart */}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h2 className="text-lg font-semibold mb-4">Stock vs Threshold</h2>
-        <Line
-          data={chartData}
-          options={{
-            responsive: true,
-            plugins: {
-              legend: { position: "top" },
-              title: { display: false },
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  precision: 0,
+      {inventoryItems.length > 0 ? (
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-4">Stock vs Threshold</h2>
+          <Line
+            data={chartData}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: { position: "top" },
+                title: { display: false },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    precision: 0,
+                  },
                 },
               },
-            },
-          }}
-        />
-      </div>
+            }}
+          />
+        </div>
+      ) : null}
+      {/* Dynamic Chart */}
     </div>
   );
 };

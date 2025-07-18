@@ -11,6 +11,7 @@ import AddWard from "./Pages/AddWard";
 import UpdateStaffModal from "./modals/updateStaffModal";
 import UserProfile from "./Pages/UserProfile";
 import AddBed from "./Pages/AddBed";
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
         <Route path="/admin/update-staff" element={<UpdateStaffModal />} />
         <Route path="/auth/:userId" element={<UserProfile />} />
       </Routes>
+      <ToastContainer position="top-center" autoClose={3000} />
       <AdminFooter />
     </>
   );
