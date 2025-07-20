@@ -438,14 +438,15 @@ const Overview = () => {
           },
           {
             title: "Nurses On Duty",
-            value: 8,
+            value: staffData.filter((staff) => staff.staffStatus === "active")
+              .length,
             icon: faUserNurse,
             color: "bg-purple-100 text-purple-600",
             delay: 0.3,
           },
           {
             title: "Pending Alerts",
-            value: 5,
+            value: notifications.length,
             icon: faBell,
             color: "bg-yellow-100 text-yellow-600",
             delay: 0.4,

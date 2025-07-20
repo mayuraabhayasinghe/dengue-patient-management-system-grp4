@@ -224,11 +224,11 @@ const WardManagement = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {bed.patient || "-"}
+                    {bed.patient?.user.name ? bed.patient.user.name : "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {bed.admissionDate
-                      ? new Date(bed.admissionDate).toLocaleDateString()
+                    {bed.patient?.admissionDate
+                      ? new Date(bed.patient.admissionDate).toLocaleDateString()
                       : "-"}
                   </td>
                 </tr>
