@@ -9,6 +9,7 @@ import medical_report_img from "../../assets/images/medical_report.png";
 import ai_chatbot_img from "../../assets/images/ai_chatbot.png";
 import dashboard_img from "../../assets/images/dashboard.png";
 import { getUser, isLoggedIn } from "../../../../Server/utils/auth";
+import { toast } from "react-toastify";
 
 const Services = () => {
   const navigate = useNavigate();
@@ -22,10 +23,11 @@ const Services = () => {
 
   const handleClick = (path) => {
     if (!loggedIn) {
-      alert("Please login to access this service.");
+      toast.error("Please login to access this service.");
       navigate("/login");
     } else {
       navigate(path);
+      scrollTo(0, 0);
     }
   };
 
