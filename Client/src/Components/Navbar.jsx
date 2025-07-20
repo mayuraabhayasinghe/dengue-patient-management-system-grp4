@@ -8,6 +8,7 @@ import {
   faSignOutAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { getUser, isLoggedIn, logout } from "../../../Server/utils/auth";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +39,8 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
+    navigate("/");
+    toast.success("Logged Out successfully");
   };
 
   return (
@@ -80,8 +83,7 @@ const Navbar = () => {
 
           <a
             href="#contact"
-            className="text-text-1 hover:text-primary-2 cursor-pointer"
-          >
+            className="text-text-1 hover:text-primary-2 cursor-pointer">
             Contact
           </a>
         </div>
@@ -155,8 +157,7 @@ const Navbar = () => {
 
               <a
                 href="#contact"
-                className="text-text-1 hover:text-primary-2 cursor-pointer"
-              >
+                className="text-text-1 hover:text-primary-2 cursor-pointer">
                 Contact
               </a>
             </div>
