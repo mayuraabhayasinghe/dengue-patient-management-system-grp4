@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const Registration = () => {
   const [formData, setFormData] = useState({
@@ -14,28 +15,64 @@ const Registration = () => {
     bystanderEmail: "",
     admissionDate: "",
     admissionTime: "",
+    ward: "",
     bedNumber: "",
     dischargeDate: "",
   });
 
-  // Handle input change
+  const [wards, setWards] = useState([]);
+  const [beds, setBeds] = useState([]);
+  const [currentWard, setCurrentWard] = useState([]);
+  const [availableBeds, setAvailableBeds] = useState([]);
+
+  const navigate = useNavigate();
+
+  // Fetch all wards and beds
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const wardRes = await axios.get("http://localhost:5000/api/wards");
+        const bedRes = await axios.get("http://localhost:5000/api/beds");
+
+        setWards(wardRes.data);
+        setBeds(bedRes.data);
+      } catch (error) {
+        console.error("Error fetching wards or beds:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Filter beds by selected ward
+  useEffect(() => {
+    if (formData.ward) {
+      const filteredBeds = beds.filter(
+        (bed) => bed.ward.name === formData.ward && bed.status === "available"
+      );
+      setAvailableBeds(filteredBeds);
+    } else {
+      setAvailableBeds([]);
+    }
+  }, [formData.ward, beds]);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "ward" ? { bedNumber: "" } : {}), // reset bedNumber if ward changes
+    }));
   };
 
-  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/patients/register-patient",
         formData
       );
       toast.success("Patient registered successfully!");
-      console.log("Response:", res.data);
-
-      // Reset form after submitting
       setFormData({
         name: "",
         age: "",
@@ -46,6 +83,7 @@ const Registration = () => {
         bystanderEmail: "",
         admissionDate: "",
         admissionTime: "",
+        ward: "",
         bedNumber: "",
         dischargeDate: "",
       });
@@ -62,7 +100,6 @@ const Registration = () => {
           Patient Registration
         </h1>
 
-        {/* form */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
           {/* Patient's Name */}
           <div className="flex flex-col md:flex-row gap-6">
@@ -120,8 +157,7 @@ const Registration = () => {
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
-                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-              >
+                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]">
                 <option>Male</option>
                 <option>Female</option>
                 <option>Other</option>
@@ -203,22 +239,55 @@ const Registration = () => {
             </div>
           </div>
 
-          {/* Bed Number and Discharge Date */}
+          {/* bed and ward */}
           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex flex-col">
+              <label className="text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
+                Ward
+              </label>
+              <select
+                name="ward"
+                value={formData.ward}
+                onChange={handleChange}
+                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]">
+                <option value="">Select a ward</option>
+                {wards
+                  .filter((ward) => ward.status === "Active")
+                  .map((ward) => (
+                    <option key={ward._id} value={ward.name}>
+                      {ward.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Bed Number */}
             <div className="flex flex-col">
               <label className="text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
                 Bed Number
               </label>
-              <input
-                type="text"
+              <select
                 name="bedNumber"
                 value={formData.bedNumber}
                 onChange={handleChange}
-                placeholder="Enter bed number"
-                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
-              />
+                disabled={!formData.ward}
+                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]">
+                <option value="">Select a bed</option>
+                {availableBeds.length > 0 ? (
+                  availableBeds.map((bed) => (
+                    <option key={bed._id} value={bed.number}>
+                      Bed {bed.number}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No available beds in the ward</option>
+                )}
+              </select>
             </div>
+          </div>
 
+          {/* Discharge Date */}
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col">
               <label className="text-center font-medium bg-[#BDEFE8] rounded-lg px-4 py-2">
                 Date of Discharge
@@ -235,21 +304,19 @@ const Registration = () => {
 
           <div className="flex justify-between items-center mt-8">
             <button
+              onClick={() => navigate(-1)}
               type="button"
-              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full"
-            >
+              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full">
               Back
             </button>
             <button
               type="submit"
-              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full"
-            >
+              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full">
               Submit
             </button>
           </div>
         </form>
 
-        {/* Toast container for feedback */}
         <ToastContainer
           position="top-center"
           autoClose={2000}
