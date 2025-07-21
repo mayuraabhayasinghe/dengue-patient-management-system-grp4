@@ -81,7 +81,7 @@ const addPatient = async (req, res) => {
 
     // Create PatientDetails entry
     const newPatientDetails = await PatientDetails.create({
-      user: newUser._id,
+      user: newUser.id,
       age,
       weight,
       gender,
@@ -96,14 +96,16 @@ const addPatient = async (req, res) => {
     const updatedBed = await Bed.findOneAndUpdate(
       { number: bedNumber },
       {
-        patient: newPatientDetails._id,
-        status: "occupied"
+        patient: newPatientDetails.id,
+        status: "occupied",
       },
       { new: true }
     );
 
     if (!updatedBed) {
-      return res.status(404).json({ message: "Bed not found to update with patient" });
+      return res
+        .status(404)
+        .json({ message: "Bed not found to update with patient" });
     }
 
     // Send email to bystander with the raw password
@@ -255,4 +257,9 @@ const getPatientByUserId = async (req, res) => {
   }
 };
 
-module.exports = { addPatient, getAllPatients, getPatientById, getPatientByUserId };
+module.exports = {
+  addPatient,
+  getAllPatients,
+  getPatientById,
+  getPatientByUserId,
+};

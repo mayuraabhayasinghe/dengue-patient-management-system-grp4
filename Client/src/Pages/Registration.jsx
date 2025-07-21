@@ -157,7 +157,8 @@ const Registration = () => {
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
-                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]">
+                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
+              >
                 <option>Male</option>
                 <option>Female</option>
                 <option>Other</option>
@@ -249,7 +250,8 @@ const Registration = () => {
                 name="ward"
                 value={formData.ward}
                 onChange={handleChange}
-                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]">
+                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
+              >
                 <option value="">Select a ward</option>
                 {wards
                   .filter((ward) => ward.status === "Active")
@@ -271,7 +273,8 @@ const Registration = () => {
                 value={formData.bedNumber}
                 onChange={handleChange}
                 disabled={!formData.ward}
-                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]">
+                className="border rounded-lg px-4 py-2 focus:outline-[#00BFA5]"
+              >
                 <option value="">Select a bed</option>
                 {availableBeds.length > 0 ? (
                   availableBeds.map((bed) => (
@@ -306,12 +309,14 @@ const Registration = () => {
             <button
               onClick={() => navigate(-1)}
               type="button"
-              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full">
+              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full"
+            >
               Back
             </button>
             <button
               type="submit"
-              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full">
+              className="w-full md:w-[200px] bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full"
+            >
               Submit
             </button>
           </div>

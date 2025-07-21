@@ -482,14 +482,14 @@ const Overview = () => {
               <FontAwesomeIcon icon={faUserNurse} className="text-blue-500" />
               Ward Staff Assignments
             </h2>
-            <div className="flex gap-2">
+            {/* <div className="flex gap-2">
               <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                 Assigned: 3
               </span>
               <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                Pending: 2
+                Pending: 3
               </span>
-            </div>
+            </div> */}
           </div>
 
           <div className="space-y-3">
