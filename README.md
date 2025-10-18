@@ -3,10 +3,12 @@
 This repository contains a full-stack application with separate Admin, Client, and Server components.
 
 ## Project Structure
-├── Admin/ # Admin panel application<br/>
-├── Client/ # Client-facing application<br/>
-└── Server/ # Backend server
-
+```
+dengue-patient-management-system-grp4/
+├── Admin/   - Admin panel application<br/>
+├── Client/  - Client-facing application<br/>
+└── Server/  - Backend server
+```
 
 ## Components
 
