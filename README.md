@@ -124,7 +124,20 @@ The Server provides the backend API and business logic for both Admin and Client
 - Vite is used as the build tool for the frontend applications
 - The server follows a modular architecture for scalability
 
-## Environment Variables
+## Technologies Used
+**Frontend**
+- React.js - UI library for building component-based interfaces
+- Vite - Build tool and development server
+- Socket.io - Real-time communication with WebSockets
+- React Router - Client-side routing
+- Tailwind CSS - Styling
 
-- Server and Client components use `.env` files for configuration
-- See `.env.example` files (if available) for required variables
+**Server**
+- Node.js - JavaScript runtime environment
+- Express.js - Web application framework
+- MongoDB - NoSQL database
+- Mongoose - MongoDB object modeling
+- Socket.io - Real-time bidirectional event-based communication
+- JWT - Authentication with JSON Web Tokens
+- Nodemailer - Email sending functionality
+
