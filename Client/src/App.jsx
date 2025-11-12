@@ -3,17 +3,16 @@ import { Route, Routes } from "react-router-dom";
 import Navbar from "./Components/Navbar";
 import HomePage from "./Pages/HomePage";
 import Login from "./Pages/Login";
-import Footer from "./components/Footer";
 import Dashboard from "./Pages/Dashboard";
 import Registration from "./Pages/Registration";
 import Chatbot from "./Components/Chatbot";
 import PatientPage from "./Pages/PatientPage";
 import Caretaker from "./Pages/Caretaker";
 import { ToastContainer } from "react-toastify";
-import Patients from "./Components/Dashboard/Patients";
 import Profile from "./Components/Dashboard/Profile";
 import PatientDashboard from "./Pages/PatientDashboard";
 import ReportGenerate from "./Pages/ReportGenerate";
+import Footer from "./Components/Footer";
 
 const App = () => {
   return (
