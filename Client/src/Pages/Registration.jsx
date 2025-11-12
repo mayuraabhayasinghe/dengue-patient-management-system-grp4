@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import api from "../api/api";
 
 const Registration = () => {
   const [formData, setFormData] = useState({
@@ -31,8 +32,8 @@ const Registration = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const wardRes = await axios.get("http://localhost:5000/api/wards");
-        const bedRes = await axios.get("http://localhost:5000/api/beds");
+        const wardRes = await axios.get(`${api}/api/wards`);
+        const bedRes = await axios.get(`${api}/api/beds`);
 
         setWards(wardRes.data);
         setBeds(bedRes.data);
@@ -68,10 +69,7 @@ const Registration = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(
-        "http://localhost:5000/api/patients/register-patient",
-        formData
-      );
+      await axios.post("${api}/api/patients/register-patient", formData);
       toast.success("Patient registered successfully!");
       setFormData({
         name: "",

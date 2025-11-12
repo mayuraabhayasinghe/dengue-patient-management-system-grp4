@@ -35,10 +35,7 @@ const StaffRegistration = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/staff/add",
-        formData
-      );
+      const res = await axios.post(`${api}/api/staff/add`, formData);
       toast.success("Staff registered successfully!");
 
       // Reset form after submitting

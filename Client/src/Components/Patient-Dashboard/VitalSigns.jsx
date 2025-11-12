@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDroplet, faTint } from "@fortawesome/free-solid-svg-icons";
 import { Line, Bar } from "react-chartjs-2";
+import api from "../../api/api";
 
 const VitalSigns = () => {
   const [fluidData, setFluidData] = useState([]);
@@ -27,7 +28,7 @@ const VitalSigns = () => {
 
         // Get patient details first
         const patientResponse = await axios.get(
-          `http://localhost:5000/api/patients/user/${userId}`,
+          `${api}/api/patients/user/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -42,7 +43,7 @@ const VitalSigns = () => {
 
         // Get fluid data
         const fluidResponse = await axios.get(
-          `http://localhost:5000/api/fluid/patient/${patientId}`,
+          `${api}/api/fluid/patient/${patientId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -107,8 +108,7 @@ const VitalSigns = () => {
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.3 }}
-          className="bg-white rounded-lg shadow-md p-6 mb-5"
-        >
+          className="bg-white rounded-lg shadow-md p-6 mb-5">
           <div className="flex items-center mb-4">
             <div className="p-2 rounded-full bg-blue-100 text-blue-600 mr-4">
               <FontAwesomeIcon icon={faDroplet} size="sm" />
@@ -166,8 +166,7 @@ const VitalSigns = () => {
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="bg-white rounded-lg shadow-md mb-5 p-6"
-        >
+          className="bg-white rounded-lg shadow-md mb-5 p-6">
           <div className="flex items-center mb-4">
             <div className="p-2 rounded-full bg-purple-100 text-yellow-300 mr-4">
               <FontAwesomeIcon icon={faTint} size="sm" />

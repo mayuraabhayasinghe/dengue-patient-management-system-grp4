@@ -19,6 +19,7 @@ import {
   faClock,
   faNotesMedical,
 } from "@fortawesome/free-solid-svg-icons";
+import api from "../api/api";
 
 Chart.register(...registerables);
 
@@ -38,20 +39,18 @@ const ReportGenerate = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const patientRes = await axios.get(
-          `http://localhost:5000/api/patients/${patientId}`
-        );
+        const patientRes = await axios.get(`${api}/api/patients/${patientId}`);
         const patient = patientRes.data.data;
         setPatientData(patient);
 
         const vitalsRes = await axios.get(
-          `http://localhost:5000/api/vitals/patient/${patient.userId}`
+          `${api}/api/vitals/patient/${patient.userId}`
         );
         setVitalsData(vitalsRes.data.data);
         setVitalsLoading(false);
 
         const fluidsRes = await axios.get(
-          `http://localhost:5000/api/fluid/patient/${patientId}`
+          `${api}/api/fluid/patient/${patientId}`
         );
         const fluids = fluidsRes.data.data;
         setInputData(fluids.filter((f) => f.intakeType));

@@ -14,7 +14,7 @@ const WardManagement = () => {
   useEffect(() => {
     const fetchWards = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/wards");
+        const response = await axios.get(`${api}/api/wards`);
         setWards(response.data);
       } catch (error) {
         console.error("Error fetching wards:", error.message);
@@ -23,7 +23,7 @@ const WardManagement = () => {
 
     const fetchBeds = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/beds");
+        const response = await axios.get(`${api}/api/beds`);
         setBeds(response.data);
       } catch (error) {
         console.error("Error fetching beds:", error.message);

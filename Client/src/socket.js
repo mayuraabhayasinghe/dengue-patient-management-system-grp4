@@ -1,7 +1,8 @@
 // src/socket.js
 import { io } from "socket.io-client";
+import api from "./api/api";
 
-const socket = io("http://localhost:5000"); // Backend server URL
+const socket = io(`${api}`); // Backend server URL
 
 socket.on("connect", () => {
   console.log("Socket connected with ID:", socket.id);

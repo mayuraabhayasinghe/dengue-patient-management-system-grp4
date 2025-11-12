@@ -140,10 +140,7 @@ const PatientForm = () => {
       };
 
       // POST request to backend
-      const res = await axios.post(
-        "http://localhost:5000/api/vitals/add",
-        payload
-      );
+      const res = await axios.post(`${api}/api/vitals/add`, payload);
 
       console.log("Vitals submitted successfully:", res.data);
 
@@ -396,8 +393,7 @@ const PatientForm = () => {
             <textarea
               value={formData.observation}
               onChange={(e) => handleChange(e, null, "observation")}
-              className="w-full border border-gray-300 rounded-md p-2 min-h-[100px]"
-            ></textarea>
+              className="w-full border border-gray-300 rounded-md p-2 min-h-[100px]"></textarea>
           </div>
 
           {/* Buttons */}
@@ -405,8 +401,7 @@ const PatientForm = () => {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-full"
-            >
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-full">
               Back
             </button>
             <button
@@ -414,8 +409,7 @@ const PatientForm = () => {
               disabled={isSubmitting}
               className={`bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-full ${
                 isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
+              }`}>
               {isSubmitting ? "Submitting..." : "Submit"}
             </button>
             {/* <button

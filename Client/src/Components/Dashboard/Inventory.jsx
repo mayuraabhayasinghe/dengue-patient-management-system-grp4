@@ -13,6 +13,7 @@ import {
   faFileExport,
   faEllipsisVertical,
 } from "@fortawesome/free-solid-svg-icons";
+import api from "../../api/api";
 
 const Inventory = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,7 +28,7 @@ const Inventory = () => {
 
   const fetchInventory = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/inventory/");
+      const res = await axios.get(`${api}/api/inventory/`);
       setInventoryItems(res.data);
     } catch (err) {
       console.error("Error fetching inventory:", err);
@@ -36,7 +37,7 @@ const Inventory = () => {
 
   const deleteItem = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/inventory/${id}`);
+      await axios.delete(`${api}/api/inventory/${id}`);
       setInventoryItems(inventoryItems.filter((item) => item._id !== id));
       setShowMobileMenu(null); // Close mobile menu after deletion
     } catch (err) {

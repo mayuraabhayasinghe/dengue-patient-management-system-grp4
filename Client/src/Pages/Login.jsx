@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify"; // for popup messages
 import "react-toastify/dist/ReactToastify.css";
+import api from "../api/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -24,7 +25,7 @@ const Login = () => {
     setMissingError("");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post(`${api}/api/auth/login`, {
         email,
         password,
       });
@@ -98,8 +99,7 @@ const Login = () => {
                 <p
                   className={`text-red-500 text-sm mt-1 ${
                     emailError ? "show" : "hidden"
-                  }`}
-                >
+                  }`}>
                   {emailError}
                 </p>
               </div>

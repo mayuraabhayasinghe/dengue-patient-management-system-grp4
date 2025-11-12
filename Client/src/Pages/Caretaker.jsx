@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import api from "../api/api";
 
 function Caretaker() {
   const { userId } = useParams();
@@ -33,12 +34,9 @@ function Caretaker() {
 
         setLoading(true);
         // getPatientByUserId endpoint
-        const response = await axios.get(
-          `http://localhost:5000/api/patients/user/${userId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axios.get(`${api}/api/patients/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         if (response.data && response.data.success) {
           const patientData = response.data.data;
@@ -131,7 +129,7 @@ function Caretaker() {
       };
 
       const response = await axios.post(
-        "http://localhost:5000/api/fluid/submit",
+        ` ${api}/api/fluid/submit`,
         submissionData,
         {
           headers: { Authorization: `Bearer ${token}` }, // Add token for authentication
@@ -205,8 +203,7 @@ function Caretaker() {
                 name="intakeType"
                 className="w-full border border-gray-300 rounded-md p-2"
                 value={form.intakeType}
-                onChange={handleChange}
-              >
+                onChange={handleChange}>
                 <option value="">Select</option>
                 <option value="IV">IV</option>
                 <option value="Oral">Oral</option>
@@ -276,14 +273,12 @@ function Caretaker() {
             <button
               type="button"
               className="bg-blue-500 text-white py-2 px-7 rounded-2xl hover:bg-blue-600"
-              onClick={() => navigate(-1)}
-            >
+              onClick={() => navigate(-1)}>
               Back
             </button>
             <button
               type="submit"
-              className="bg-blue-500 text-white py-2 px-4 rounded-2xl hover:bg-blue-700"
-            >
+              className="bg-blue-500 text-white py-2 px-4 rounded-2xl hover:bg-blue-700">
               Submit
             </button>
           </div>

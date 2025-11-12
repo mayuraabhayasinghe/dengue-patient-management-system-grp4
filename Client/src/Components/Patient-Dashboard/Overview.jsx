@@ -25,6 +25,7 @@ import {
   faBell,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import api from "../../api/api";
 
 // Register ChartJS components
 ChartJS.register(
@@ -79,12 +80,9 @@ const Overview = () => {
         }
         console.log("Fetching patient data for user ID:", currentUserId);
 
-        const res = await axios.get(
-          `http://localhost:5000/api/auth/${currentUserId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await axios.get(`${api}/api/auth/${currentUserId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         if (res.data) {
           setPatientData((prev) => ({
@@ -119,7 +117,7 @@ const Overview = () => {
 
         setVitalsLoading(true);
         const response = await axios.get(
-          `http://localhost:5000/api/vitals/patient/${currentUserId}`,
+          `${api}/api/vitals/patient/${currentUserId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -252,8 +250,7 @@ const Overview = () => {
         initial="hidden"
         animate="visible"
         transition={{ duration: 0.3 }}
-        className="bg-blue-100 rounded-lg shadow-md p-6"
-      >
+        className="bg-blue-100 rounded-lg shadow-md p-6">
         <div className="flex items-center mb-3">
           <div className="pr-3">
             <FontAwesomeIcon icon={faUser} size="sm" />
@@ -283,8 +280,7 @@ const Overview = () => {
       <div className="w-full flex justify-end mt-9">
         <button
           onClick={handleAddFluidIntakeOutput}
-          className="font-semibold shadow-sm text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-4 rounded-lg"
-        >
+          className="font-semibold shadow-sm text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-4 rounded-lg">
           + Add Fluid Intake and Output
         </button>
       </div>
@@ -296,8 +292,7 @@ const Overview = () => {
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="bg-white rounded-lg shadow-md p-6 md:col-span-2 lg:col-span-1"
-        >
+          className="bg-white rounded-lg shadow-md p-6 md:col-span-2 lg:col-span-1">
           <div className="flex items-center mb-4">
             <div className="p-3 rounded-full bg-red-100 text-red-600 mr-4">
               <FontAwesomeIcon icon={faThermometerHalf} size="lg" />
@@ -412,8 +407,7 @@ const Overview = () => {
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.3 }}
-          className="bg-white rounded-lg shadow-md p-6"
-        >
+          className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center mb-4">
             <div className="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
               <FontAwesomeIcon icon={faTint} size="lg" />

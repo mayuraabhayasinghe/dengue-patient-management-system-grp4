@@ -19,7 +19,7 @@ const AddBed = () => {
   useEffect(() => {
     const fetchWards = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/wards");
+        const res = await axios.get(`${api}/api/wards`);
         setWards(res.data);
         setLoading(false);
       } catch (err) {
@@ -40,7 +40,7 @@ const AddBed = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/beds", formData);
+      await axios.post(`${api}/api/beds`, formData);
       toast.success("Bed created successfully!");
       navigate(-1);
     } catch (error) {

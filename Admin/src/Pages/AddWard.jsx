@@ -20,7 +20,7 @@ const AddWard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/wards", wardData);
+      const res = await axios.post(`${api}/api/wards`, wardData);
       toast.success("Ward added successfully!");
       setWardData({
         name: "",

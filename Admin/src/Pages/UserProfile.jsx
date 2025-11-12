@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import api from "../../../Client/src/api/api";
 
 const UserProfile = () => {
   const [userData, setUserData] = useState({
@@ -24,7 +25,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/auth/${userId}`);
+        const res = await axios.get(`${api}/api/auth/${userId}`);
         setUserData(res.data);
         setLoading(false);
         console.log("User Data:", res.data);
@@ -63,10 +64,7 @@ const UserProfile = () => {
         },
       };
 
-      const res = await axios.put(
-        `http://localhost:5000/api/staff/${userData._id}`,
-        payload
-      );
+      const res = await axios.put(`${api}/api/staff/${userData._id}`, payload);
 
       toast.success("User updated successfully");
       setIsEditing(false);

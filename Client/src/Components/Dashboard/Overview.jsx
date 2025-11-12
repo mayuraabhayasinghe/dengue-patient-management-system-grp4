@@ -26,6 +26,7 @@ import {
   BarElement,
   Title,
 } from "chart.js";
+import api from "../../api/api";
 
 // Register Chart.js components
 ChartJS.register(
@@ -55,8 +56,8 @@ const Overview = () => {
       setIsLoading(true);
       try {
         const [notificationsRes, specialAttentionRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/notifications"),
-          axios.get("http://localhost:5000/api/special-attention-patients"),
+          axios.get(`${api}/api/notifications`),
+          axios.get(`${api}/api/special-attention-patients`),
         ]);
 
         // Make sure data is an array
@@ -163,7 +164,7 @@ const Overview = () => {
 
   const fetchBedData = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/beds/");
+      const response = await axios.get(`${api}/api/beds/`);
       const allBeds = response.data;
       const availableBeds = await allBeds.filter(
         (bed) => bed.status === "available"
@@ -181,7 +182,7 @@ const Overview = () => {
 
   const fetchStaffData = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/staff/");
+      const res = await axios.get(`${api}/api/staff/`);
       const data = res.data;
 
       setStaffData(data);
@@ -383,7 +384,7 @@ const Overview = () => {
 
   // const fetchBedData = async () => {
   //   try {
-  //     const response = await axios.get("http://localhost:5000/api/beds/");
+  //     const response = await axios.get("${api}/api/beds/");
   //     const allBeds = response.data;
   //     const availableBeds = await allBeds.filter(
   //       (bed) => bed.status === "available"

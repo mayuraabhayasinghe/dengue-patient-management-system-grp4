@@ -10,6 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { isLoggedIn } from "../../../../Server/utils/auth";
 import { useNavigate } from "react-router-dom";
+import api from "../../api/api";
 
 const Feedback = () => {
   const [name, setName] = useState("");
@@ -59,7 +60,7 @@ const Feedback = () => {
 
     // Submit to backend
     try {
-      const response = await fetch("http://localhost:5000/api/feedback", {
+      const response = await fetch(`${api}/api/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

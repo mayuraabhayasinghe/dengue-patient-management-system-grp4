@@ -28,7 +28,7 @@ const Patients = () => {
       try {
         setLoading(true);
         // In production, use this to fetch from your real API
-        const response = await axios.get("http://localhost:5000/api/patients/");
+        const response = await axios.get(`${api}/api/patients/`);
         setPatients(response.data.data);
         setLoading(false);
       } catch (error) {
@@ -123,8 +123,7 @@ const Patients = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="p-5 text-center text-gray-600"
-      >
+        className="p-5 text-center text-gray-600">
         Loading patients...
       </motion.div>
     );
@@ -135,13 +134,11 @@ const Patients = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="p-5 text-center text-red-600"
-      >
+        className="p-5 text-center text-red-600">
         <p className="text-lg">{error}</p>
         <button
           className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-          onClick={() => window.location.reload()}
-        >
+          onClick={() => window.location.reload()}>
           Retry
         </button>
       </motion.div>
@@ -153,14 +150,12 @@ const Patients = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="p-4 md:p-6"
-    >
+      className="p-4 md:p-6">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="mb-6"
-      >
+        className="mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <h2 className="text-2xl font-semibold text-gray-800">
             Registered Patients
@@ -185,8 +180,7 @@ const Patients = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="grid grid-cols-1 sm:grid-cols-4 items-end gap-4 mb-6"
-        >
+          className="grid grid-cols-1 sm:grid-cols-4 items-end gap-4 mb-6">
           {/* Total Patients */}
           <div className="bg-white shadow-md rounded-lg p-4 border-l-4 border-blue-500">
             <div className="flex items-center justify-between">
@@ -284,8 +278,7 @@ const Patients = () => {
                     onClick={() => handlePatientClick(patient.id)}
                     className={`${
                       index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                    } hover:bg-gray-100 cursor-pointer transition-colors`}
-                  >
+                    } hover:bg-gray-100 cursor-pointer transition-colors`}>
                     <td className="p-3 md:p-4 border-b border-gray-200">
                       {patient.name}
                     </td>
@@ -320,8 +313,7 @@ const Patients = () => {
                     <td className="p-3 md:p-4 border-b border-gray-200">
                       <button
                         // onClick={(e) => handleDischargePatient(e, patient.userId)}
-                        className="text-white py-2 px-3 rounded text-sm bg-red-500 hover:bg-red-600"
-                      >
+                        className="text-white py-2 px-3 rounded text-sm bg-red-500 hover:bg-red-600">
                         <FontAwesomeIcon icon={faSignOutAlt} className="mr-1" />
                         Discharge
                       </button>

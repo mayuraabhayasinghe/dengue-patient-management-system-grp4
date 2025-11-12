@@ -35,6 +35,7 @@ import {
   faTachometerAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import api from "../../api/api";
 
 // Register Chart.js components
 ChartJS.register(
@@ -64,9 +65,7 @@ const Profile = () => {
     const fetchPatientDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `http://localhost:5000/api/patients/${id}`
-        );
+        const response = await axios.get(`${api}/api/patients/${id}`);
         setPatient(response.data.data);
         setLoading(false);
       } catch (error) {
@@ -87,7 +86,7 @@ const Profile = () => {
       try {
         setVitalsLoading(true);
         const response = await axios.get(
-          `http://localhost:5000/api/vitals/patient/${patient.userId}`
+          `${api}/api/vitals/patient/${patient.userId}`
         );
         setVitals(response.data.data);
       } catch (error) {
@@ -108,7 +107,7 @@ const Profile = () => {
       try {
         setFluidLoading(true);
         const response = await axios.get(
-          `http://localhost:5000/api/fluid/patient/${patient.id}`
+          `${api}/api/fluid/patient/${patient.id}`
         );
 
         if (response.data.success) {
@@ -647,8 +646,7 @@ const Profile = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 m-3"
-        >
+          className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 m-3">
           {/* Fluid Input Table */}
           <div className="bg-white shadow-lg rounded-lg overflow-hidden">
             <div className="bg-blue-100 p-3 md:p-4 flex justify-between items-center">
@@ -661,8 +659,7 @@ const Profile = () => {
               </h2>
               <button
                 onClick={handleAddFluidData}
-                className="text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-3 rounded-lg text-sm"
-              >
+                className="text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-3 rounded-lg text-sm">
                 + Add New
               </button>
             </div>
@@ -707,8 +704,7 @@ const Profile = () => {
                           key={item._id}
                           className={
                             index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                          }
-                        >
+                          }>
                           <td className="px-3 py-2 whitespace-nowrap text-xs font-medium text-gray-900">
                             {item.formattedDate}
                           </td>
@@ -745,8 +741,7 @@ const Profile = () => {
               </h2>
               <button
                 onClick={handleAddFluidData}
-                className="text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-3 rounded-lg text-sm"
-              >
+                className="text-white bg-gray-700 hover:bg-gray-900 transition-colors py-2 px-3 rounded-lg text-sm">
                 + Add New
               </button>
             </div>
@@ -790,8 +785,7 @@ const Profile = () => {
                           key={item._id}
                           className={
                             index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                          }
-                        >
+                          }>
                           <td className="px-3 py-2 whitespace-nowrap text-xs font-medium text-gray-900">
                             {item.formattedDate}
                           </td>
@@ -807,8 +801,7 @@ const Profile = () => {
                                 {item.outputTypes.map((type, i) => (
                                   <span
                                     key={i}
-                                    className="px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs"
-                                  >
+                                    className="px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
                                     {type}
                                   </span>
                                 ))}
