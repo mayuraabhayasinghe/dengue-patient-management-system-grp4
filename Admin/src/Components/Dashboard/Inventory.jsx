@@ -25,6 +25,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import axios from "axios";
+import api from "../../../../Client/src/api/api";
 
 ChartJS.register(
   CategoryScale,
@@ -48,7 +49,7 @@ const Inventory = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/inventory/");
+        const res = await axios.get(`${api}/api/inventory/`);
         setInventoryItems(res.data);
       } catch (err) {
         console.error("Error fetching inventory:", err);
@@ -61,7 +62,7 @@ const Inventory = () => {
 
   const deleteItem = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/inventory/${id}`);
+      await axios.delete(`${api}/api/inventory/${id}`);
       setInventoryItems((prev) => prev.filter((item) => item._id !== id));
       setShowMobileMenu(null);
     } catch (err) {

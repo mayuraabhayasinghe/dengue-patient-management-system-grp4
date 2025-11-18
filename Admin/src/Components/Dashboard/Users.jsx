@@ -27,7 +27,7 @@ const Users = () => {
     // get all users
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/getuser");
+        const res = await axios.get(`${api}/api/auth/getuser`);
         setUsers(res.data || []);
       } catch (err) {
         console.error("Failed to fetch users:", err);

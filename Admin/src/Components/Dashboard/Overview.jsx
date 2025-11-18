@@ -21,6 +21,7 @@ import {
   ArcElement,
 } from "chart.js";
 import axios from "axios";
+import api from "../../../../Client/src/api/api";
 
 ChartJS.register(
   CategoryScale,
@@ -47,9 +48,9 @@ const Overview = () => {
     const fetchUsersAndBeds = async () => {
       try {
         const [userRes, bedRes, wardRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/auth/getuser"),
-          axios.get("http://localhost:5000/api/beds"),
-          axios.get("http://localhost:5000/api/wards"),
+          axios.get(`${api}/api/auth/getuser`),
+          axios.get(`${api}/api/beds`),
+          axios.get(`${api}/api/wards`),
         ]);
 
         if (userRes.data) {

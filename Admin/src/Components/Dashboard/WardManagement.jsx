@@ -45,8 +45,8 @@ const WardManagement = () => {
       try {
         setLoading(true);
         const [wardsResponse, bedsResponse] = await Promise.all([
-          axios.get("http://localhost:5000/api/wards"),
-          axios.get("http://localhost:5000/api/beds"),
+          axios.get(`${api}/api/wards`),
+          axios.get(`${api}/api/beds`),
         ]);
         setWards(wardsResponse.data);
         setBeds(bedsResponse.data);
