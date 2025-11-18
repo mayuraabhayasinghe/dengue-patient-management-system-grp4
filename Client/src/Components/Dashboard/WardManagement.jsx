@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBed, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import api from "../../api/api";
 
 const WardManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");

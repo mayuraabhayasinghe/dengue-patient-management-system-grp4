@@ -15,6 +15,7 @@ import {
   faUserCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import api from "../../api/api";
 
 const Patients = () => {
   const [patients, setPatients] = useState([]);
